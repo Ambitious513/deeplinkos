@@ -1,0 +1,230 @@
+---
+title: "Firebase Dynamic Links Shut Down: The Best Free Alternatives Right Now (2026)"
+description: "Google shut down Firebase Dynamic Links on August 25, 2025. If your app is still broken or you're starting fresh, here's a complete breakdown of the best free and paid alternatives available in 2026."
+date: "2026-05-20"
+category: "Deep Linking"
+readTime: "12 min"
+featuredImage: "/images/blog/firebase-alternative.jpg"
+featuredImageAlt: "Firebase Dynamic Links alternatives in 2026"
+keywords:
+  - "firebase dynamic links alternative"
+  - "firebase dynamic links shutdown"
+  - "firebase dynamic links deprecated"
+  - "firebase dynamic links sunset"
+  - "free deep link generator"
+  - "open source deep link tool"
+  - "branch.io alternative"
+  - "smart link generator free"
+  - "universal links alternative"
+  - "app links alternative"
+  - "deferred deep linking"
+  - "mobile deep linking tool 2026"
+faq:
+  - question: "When did Firebase Dynamic Links shut down?"
+    answer: "Google shut down Firebase Dynamic Links on August 25, 2025. After that date, all existing dynamic links stopped working and no new links could be created. If you are still seeing broken redirects in your app, you need to replace those links immediately."
+  - question: "What is the best free Firebase Dynamic Links alternative in 2026?"
+    answer: "For most teams, the best free option is DeepLinkOS. It is completely free, requires no account, and generates smart deep links in seconds. For teams that need deferred deep linking and attribution, Branch.io has a generous free tier up to 10,000 monthly active users."
+  - question: "Will my existing Firebase Dynamic Links ever work again?"
+    answer: "No. Firebase Dynamic Links shut down permanently on August 25, 2025. Any old links still in your app, emails, or campaigns will remain broken. You need to create replacement links using a new tool and update every surface where the old links appear."
+  - question: "Can I migrate Firebase Dynamic Links to DeepLinkOS?"
+    answer: "Yes, easily. Open DeepLinkOS, paste your destination URL, and you get a new smart link in seconds. The tool auto-detects the platform, routes iOS users to the native app, Android users to the Play Store, and falls back to the web on desktop. No account required."
+  - question: "What is deferred deep linking and do I need it?"
+    answer: "Deferred deep linking routes users to a specific in-app screen even if the app is not installed yet. After they install the app for the first time, it opens directly to the right screen. You need this for campaign tracking and onboarding flows. For simple app-open routing, standard deep links are enough."
+  - question: "Is Branch.io free?"
+    answer: "Branch.io has a free tier for apps with up to 10,000 monthly active users. Beyond that, pricing starts at around $59 per month. If you just need simple link routing without attribution tracking, free tools like DeepLinkOS are a much better fit."
+  - question: "Can I build my own deep link solution?"
+    answer: "Yes. A basic deep link router can be built with a simple server-side script that reads the User-Agent header and redirects accordingly. The tradeoff is maintenance time, hosting costs, and handling edge cases like in-app browsers and WeChat. For most teams, using an existing tool is faster and more reliable."
+---
+
+## What Happened to Firebase Dynamic Links
+
+If you clicked a link in your app recently and landed on a 404 or a dead page, Firebase Dynamic Links is probably the reason.
+
+Google officially shut down Firebase Dynamic Links on **August 25, 2025**. No warning. No migration tool. No legacy redirect support. Just a deprecation notice buried in an email, and then silence.
+
+For the millions of apps that relied on Dynamic Links for onboarding flows, referral campaigns, magic links, and in-app routing, this was a serious problem. And for a lot of developers, it still is.
+
+This guide covers exactly what happened, why it matters in 2026, and which alternatives are worth your time today.
+
+If you want the short answer: [create a free smart link on DeepLinkOS](/) right now. No account, no setup, takes about 30 seconds.
+
+## Why Google Shut It Down
+
+Firebase Dynamic Links launched in 2015 as a free, easy way to create smart links that worked across iOS, Android, and the web. For a decade, it handled:
+
+- Universal Links (iOS) and App Links (Android)
+- Deferred deep linking for post-install routing
+- Short URLs with custom domains
+- Device-based routing (different destination per platform)
+
+The problem? It stopped being profitable. Google's larger Firebase strategy shifted toward monetized products, and Dynamic Links, being completely free with no clear path to revenue, got cut.
+
+The announcement came on October 24, 2023. The shutdown date was August 25, 2025. That's roughly 22 months of notice, which sounds reasonable until you realize most teams have hundreds of dynamic links embedded in:
+
+- Email campaigns and drip sequences
+- Push notification templates
+- QR codes on physical products and printed materials
+- In-app share buttons
+- Third-party dashboards and attribution tools
+
+Replacing all of that takes real time and resources, and a lot of teams were caught unprepared.
+
+## What Broke and What You Need to Fix
+
+Every link with a `page.link` domain or a custom Firebase domain that routed through Dynamic Links stopped working on the shutdown date.
+
+Here's what you probably still need to fix if you're reading this in 2026:
+
+**In your codebase:** Any hardcoded Firebase dynamic link URLs. Search your repo for `page.link` and replace them.
+
+**In your email templates:** Magic links, onboarding sequences, and transactional emails that used dynamic links for app routing. Update these in your ESP dashboard.
+
+**In your app's share function:** If your app generates share links programmatically, you need to update the SDK call to use a new provider.
+
+**In print materials and QR codes:** These are the hardest to fix because physical copies can't be updated remotely. If you printed QR codes that point to Firebase links, you need to reprint or use a redirect layer.
+
+## The 6 Best Firebase Dynamic Links Alternatives in 2026
+
+Here's what the market looks like now, broken down by use case, cost, and setup complexity.
+
+### 1. DeepLinkOS: Best Free Option for Simple Routing
+
+**Cost:** Free on v1 | **Account required:** No | **Self-hosted option:** Yes
+
+DeepLinkOS is the fastest way to replace a Firebase Dynamic Link. You paste any destination URL, the tool detects the platform automatically (YouTube, Instagram, WhatsApp, TikTok, Google Maps, or any custom URI), and generates a smart redirect link that works across all devices.
+
+There's no dashboard, no SDK, no tracking scripts to install. You get a link. You share it. It works.
+
+For teams replacing hundreds of Firebase links, this is the path of least resistance for the routing logic itself. You can read more about [what deep links are and how they work](/blog/what-is-a-deep-link) if you want a fuller picture first.
+
+**Best for:** Developers and marketers who need simple app-open routing without attribution data.
+
+**Limitations:** No deferred deep linking yet (coming in v2). No analytics dashboard. These features are on the roadmap.
+
+### 2. Branch.io: Best Full-Featured Alternative
+
+**Cost:** Free up to 10K MAU, then $59 per month minimum | **Account required:** Yes
+
+Branch is the enterprise standard for mobile deep linking. It supports deferred deep linking, attribution, universal links, app links, custom domains, and A/B testing. The free tier is solid for indie apps and early-stage startups.
+
+The migration from Firebase is well-documented. Branch has a specific [Firebase Dynamic Links migration guide](https://help.branch.io/developers-hub/docs/firebase-dynamic-links-migration) that makes the switch manageable.
+
+**Best for:** Apps that need deferred deep linking combined with conversion attribution.
+
+**Limitations:** Gets expensive fast. The dashboard has a steep learning curve. Significant vendor lock-in once you're set up.
+
+### 3. AppsFlyer OneLink: Best Enterprise Option
+
+**Cost:** Free tier up to 6,000 conversions per month, then custom pricing | **Account required:** Yes
+
+AppsFlyer's OneLink product is a direct Firebase Dynamic Links replacement with deferred deep linking built in. If your team already uses AppsFlyer for mobile attribution, OneLink is the natural upgrade path.
+
+**Best for:** Enterprise apps with large budgets and sophisticated attribution requirements.
+
+**Limitations:** Very expensive at scale. Requires SDK integration. Overkill if you just need routing.
+
+### 4. Adjust: Best for Paid Acquisition Teams
+
+**Cost:** Custom pricing, no free tier | **Account required:** Yes
+
+Adjust combines deep linking with full mobile measurement and fraud protection. If you run paid user acquisition campaigns on Meta, Google, or TikTok Ads, Adjust's network integrations add real value beyond what a pure deep linking tool can offer.
+
+**Best for:** Growth teams running significant paid UA campaigns that need tight attribution.
+
+**Limitations:** No free tier. Attribution-first product where deep linking is a supporting feature rather than the core.
+
+### 5. Kochava SmartLinks: Best SMB Option
+
+**Cost:** Free tier available, Pro plans from $100 per month | **Account required:** Yes
+
+Kochava's SmartLinks give you deep linking with basic attribution and a cleaner dashboard than AppsFlyer. The free tier works for smaller apps. Pricing is more accessible than Branch at mid-market scale.
+
+**Best for:** Growing apps that need light attribution alongside deep linking without Branch's price tag.
+
+**Limitations:** Smaller partner ecosystem. Fewer integrations compared to Branch or AppsFlyer.
+
+### 6. Self-Hosted Redirect Server: Best for Full Control
+
+**Cost:** Infrastructure only | **Account required:** No | **Maintenance:** High
+
+The concept is simple: a server reads the User-Agent header from an incoming request and redirects accordingly. iOS devices go to your custom URI scheme or Universal Link, Android devices go to your App Link or Play Store URL, everything else goes to the web.
+
+A basic Node.js implementation looks like this:
+
+```js
+app.get('/link/:id', (req, res) => {
+  const ua = req.headers['user-agent'] || '';
+  if (/iPhone|iPad/.test(ua)) return res.redirect(iosDeepLink);
+  if (/Android/.test(ua)) return res.redirect(androidDeepLink);
+  res.redirect(webFallback);
+});
+```
+
+**Best for:** Engineering teams with DevOps experience and a strong preference for no external dependencies.
+
+**Limitations:** No deferred deep linking without additional session fingerprinting logic. No analytics out of the box. Significant edge case complexity (Facebook in-app browser, WeChat, Instagram browser, etc.).
+
+## Side-by-Side Comparison
+
+Here's how the top alternatives stack up on the key criteria:
+
+| Tool | Free Tier | Deferred Links | Attribution | Setup Difficulty |
+|------|-----------|---------------|-------------|-----------------|
+| DeepLinkOS | Unlimited | No (v2) | No (v2) | Very easy |
+| Branch.io | 10K MAU | Yes | Yes | Medium |
+| AppsFlyer | 6K conv | Yes | Yes | Hard |
+| Adjust | No | Yes | Yes | Hard |
+| Kochava | Limited | Yes | Basic | Medium |
+| Self-hosted | Yes | Manual | Manual | Very hard |
+
+## How to Migrate Your Firebase Dynamic Links
+
+### Step 1: Find All Your Links
+
+Search your codebase for `page.link` and any custom Firebase domains you configured. Also check email templates, push notification content, and marketing copy.
+
+### Step 2: Pick Your Tool Based on What You Actually Need
+
+Ask these three questions:
+
+1. Do you need to track which marketing campaign drove which app install? If yes, you need Branch, AppsFlyer, Adjust, or Kochava.
+2. Do you need to route new users to a specific in-app screen after install? If yes, you need deferred deep linking. Branch has the best free tier for this.
+3. Do you just need links that open the right app on the right device? If yes, [DeepLinkOS](/) is the fastest free option and requires no setup.
+
+### Step 3: Create Replacement Links
+
+For each Firebase link, create an equivalent in your new tool. With DeepLinkOS, this is literally:
+
+1. Paste the destination URL
+2. The platform gets detected automatically
+3. Click to generate the smart link
+4. Copy the new URL
+
+That's the whole process. You can read our full guide on [how to create a deep link](/blog/how-to-create-a-deep-link) for step-by-step instructions.
+
+### Step 4: Update Every Surface
+
+Work through your checklist:
+
+- Email templates in your ESP
+- Push notification content
+- In-app share sheet logic (requires a code update)
+- Social media bios and pinned posts
+- QR codes (regenerate or use a redirect layer)
+- Any paid campaigns still running with old URLs
+
+### Step 5: Test on Real Devices
+
+Always test on actual iOS and Android hardware, not simulators. Check:
+
+- Does the link open the right app?
+- Does the fallback web page load when the app is not installed?
+- Do in-app browsers (Instagram, TikTok, Facebook) handle the redirect correctly?
+
+## The Bottom Line
+
+Firebase Dynamic Links is gone and it's not coming back. The good news is that the replacement options in 2026 are better than what Firebase offered anyway, especially for teams that need attribution data.
+
+For simple, free app-open routing with no setup required, [DeepLinkOS](/) is the obvious starting point. For anything requiring deferred deep linking or campaign attribution, Branch.io's free tier covers most early-stage apps.
+
+The migration is not fun, but it's also not complicated. Start with your highest-traffic links, test them on both platforms, and work your way through the rest.
