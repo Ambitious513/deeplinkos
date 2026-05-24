@@ -91,7 +91,7 @@ export function SiteHeader() {
             {/* Desktop nav links */}
             <div className="nav__links" aria-label="Site sections">
               {navLinks.map((l) => (
-                <Link key={l.href} href={l.href}>{l.label}</Link>
+                <Link key={l.href} href={l.href as any}>{l.label}</Link>
               ))}
             </div>
 
@@ -145,7 +145,7 @@ export function SiteHeader() {
       >
         <nav className="nav__mobile-links" aria-label="Mobile site navigation">
           {navLinks.map((l) => (
-            <Link key={l.href} href={l.href} onClick={closeMenu}>
+            <Link key={l.href} href={l.href as any} onClick={closeMenu}>
               {l.label}
             </Link>
           ))}

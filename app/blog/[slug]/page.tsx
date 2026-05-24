@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BlogToc } from "@/components/blog-toc";
 import { BlogFaq } from "@/components/blog-faq";
+import Link from "next/link";
 
 /* ── Heading ID utilities ──────────────────────────────────────────── */
 function slugify(text: string): string {
@@ -181,13 +182,13 @@ export default async function BlogPostPage({
           <aside className="post-sidebar" aria-label="Article sidebar">
             <div className="post-sidebar__sticky">
               <BlogToc items={tocItems} />
-              <a href="/blog" className="post-back-btn">
+              <Link href="/blog" className="post-back-btn">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                   <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.7"
                     strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 All Articles
-              </a>
+              </Link>
             </div>
           </aside>
 
@@ -209,9 +210,9 @@ export default async function BlogPostPage({
                 <p className="post-footer-cta__label">
                   Ready to create your first smart deep link?
                 </p>
-                <a href="/#composer" className="btn-primary" id="post-try-free-btn">
+                <Link href="/#composer" className="btn-primary" id="post-try-free-btn">
                   Try DeepLinkOS Free, No Account Needed
-                </a>
+                </Link>
               </div>
             </div>
           </article>

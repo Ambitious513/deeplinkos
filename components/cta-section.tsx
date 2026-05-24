@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function CtaSection() {
   return (
     <section className="cta-section" id="cta" aria-labelledby="cta-heading">
@@ -19,9 +21,9 @@ export function CtaSection() {
                 <path d="M2.5 7H11.5M8 3.5L11.5 7L8 10.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </a>
-            <a href="/blog" className="btn-ghost" id="cta-blog-btn">
+            <Link href="/blog" className="btn-ghost" id="cta-blog-btn">
               Read the Deep Linking Guide
-            </a>
+            </Link>
           </div>
         </div>
       </div>

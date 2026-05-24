@@ -40,7 +40,7 @@ export default function DisclaimerPage() {
       <div className="legal-section">
         <h2>No Warranty</h2>
         <p>
-          DeepLinkOS is provided on an "as is" basis. We make no representations or
+          DeepLinkOS is provided on an &quot;as is&quot; basis. We make no representations or
           warranties of any kind, express or implied, about the completeness, accuracy,
           reliability, suitability, or availability of the service or the information
           it provides.
@@ -129,7 +129,7 @@ export default function DisclaimerPage() {
       <div className="legal-section">
         <h2>Changes to This Disclaimer</h2>
         <p>
-          This disclaimer may be updated at any time. The "Last updated" date at the
+          This disclaimer may be updated at any time. The &quot;Last updated&quot; date at the
           top of this page reflects the most recent revision. Continued use of
           DeepLinkOS after changes are posted constitutes acceptance of the revised
           disclaimer.

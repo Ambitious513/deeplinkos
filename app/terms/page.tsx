@@ -106,7 +106,7 @@ export default function TermsPage() {
       <div className="legal-section">
         <h2>5. Disclaimers and Limitation of Liability</h2>
         <p>
-          DeepLinkOS is provided on an "as is" and "as available" basis without warranties
+          DeepLinkOS is provided on an &quot;as is&quot; and &quot;as available&quot; basis without warranties
           of any kind, either express or implied. We do not guarantee that the service
           will be uninterrupted, error-free, or that generated links will function
           correctly on all devices, operating system versions, or app versions.
@@ -138,7 +138,7 @@ export default function TermsPage() {
         <h2>7. Changes to These Terms</h2>
         <p>
           We may update these Terms of Service at any time. Changes will be posted on
-          this page with an updated "Last updated" date. Continued use of DeepLinkOS
+          this page with an updated &quot;Last updated&quot; date. Continued use of DeepLinkOS
           after changes are posted constitutes your acceptance of the revised terms.
         </p>
       </div>
