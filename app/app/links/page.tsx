@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-
 export default function LinksPage() {
-  redirect("/");
+  return <div>Debug: You have reached the /app/links route!</div>;
 }

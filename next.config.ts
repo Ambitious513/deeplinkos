@@ -3,7 +3,8 @@ import path from "node:path";
 
 const nextConfig: NextConfig = {
   typedRoutes: true,
-  outputFileTracingRoot: path.resolve(process.cwd())
+  outputFileTracingRoot: path.resolve(process.cwd()),
+  output: "standalone"
 };
 
 export default nextConfig;
