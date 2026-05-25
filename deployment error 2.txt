@@ -1,0 +1,388 @@
+2026-May-24 21:23:26.030970 Starting deployment of Ambitious513/deeplinkos:main to localhost.
+2026-May-24 21:23:26.880903 Preparing container with helper image: ghcr.io/coollabsio/coolify-helper:1.0.12
+2026-May-24 21:23:27.239010 [DEBUG] [CMD]: docker stop -t 30 wkwgw8840ccg0kc0cg8o4w4k
+2026-May-24 21:23:27.239010 [DEBUG] Error response from daemon: No such container: wkwgw8840ccg0kc0cg8o4w4k
+2026-May-24 21:23:27.707397 [DEBUG] [CMD]: docker run -d --network coolify --name wkwgw8840ccg0kc0cg8o4w4k  --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/coollabsio/coolify-helper:1.0.12
+2026-May-24 21:23:27.707397 [DEBUG] 57ff0ee756d92af15e1245a07a1ba6b4427fad80e4fb2f6e1c1ec09a19f7c718
+2026-May-24 21:23:29.311593 [DEBUG] [CMD]: docker exec wkwgw8840ccg0kc0cg8o4w4k bash -c 'GIT_SSH_COMMAND="ssh -o ConnectTimeout=30 -p 22 -o Port=22 -o LogLevel=ERROR -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git ls-remote https://github.com/Ambitious513/deeplinkos refs/heads/main'
+2026-May-24 21:23:29.311593 [DEBUG] 1cd7ccaca1d57abe1bae9bf9a8e8fe2bd59ffdd3	refs/heads/main
+2026-May-24 21:23:29.698391 Image not found (xw88g4k08cs404c4ww8488ow:1cd7ccaca1d57abe1bae9bf9a8e8fe2bd59ffdd3). Building new image.
+2026-May-24 21:23:29.704987 ----------------------------------------
+2026-May-24 21:23:29.709442 Importing Ambitious513/deeplinkos:main (commit sha 1cd7ccaca1d57abe1bae9bf9a8e8fe2bd59ffdd3) to /artifacts/wkwgw8840ccg0kc0cg8o4w4k.
+2026-May-24 21:23:30.151031 [DEBUG] [CMD]: docker exec wkwgw8840ccg0kc0cg8o4w4k bash -c 'git clone --depth=1 --recurse-submodules --shallow-submodules -b 'main' 'https://github.com/Ambitious513/deeplinkos' '/artifacts/wkwgw8840ccg0kc0cg8o4w4k' && cd '/artifacts/wkwgw8840ccg0kc0cg8o4w4k' && if [ -f .gitmodules ]; then sed -i "s#git@\(.*\):#https://\1/#g" '/artifacts/wkwgw8840ccg0kc0cg8o4w4k'/.gitmodules || true && git submodule sync && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git submodule update --init --recursive --depth=1; fi && cd '/artifacts/wkwgw8840ccg0kc0cg8o4w4k' && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git lfs pull'
+2026-May-24 21:23:30.151031 [DEBUG] Cloning into '/artifacts/wkwgw8840ccg0kc0cg8o4w4k'...
+2026-May-24 21:23:32.906952 [DEBUG] [CMD]: docker exec wkwgw8840ccg0kc0cg8o4w4k bash -c 'cd /artifacts/wkwgw8840ccg0kc0cg8o4w4k && git log -1 1cd7ccaca1d57abe1bae9bf9a8e8fe2bd59ffdd3 --pretty=%B'
+2026-May-24 21:23:32.906952 [DEBUG] fix: regenerate package-lock.json and add engines field
+2026-May-24 21:23:32.915808 [DEBUG] - Fixes Coolify npm ci failure: @emnapi/runtime and @emnapi/core were
+2026-May-24 21:23:32.915808 [DEBUG] missing from lock file (lock file was out of sync with package.json)
+2026-May-24 21:23:32.915808 [DEBUG] - Add engines.node >=22.12.0 to satisfy vite@7.3.3 requirement
+2026-May-24 21:23:33.535381 Generating nixpacks configuration with: nixpacks plan -f json --env NIXPACKS_NODE_VERSION=22 --env COOLIFY_URL=https://deeplinkos.com,https://www.deeplinkos.com --env COOLIFY_FQDN=deeplinkos.com,www.deeplinkos.com --env COOLIFY_BRANCH=main --env COOLIFY_RESOURCE_UUID=xw88g4k08cs404c4ww8488ow /artifacts/wkwgw8840ccg0kc0cg8o4w4k
+2026-May-24 21:23:34.117905 [DEBUG] [CMD]: docker exec wkwgw8840ccg0kc0cg8o4w4k bash -c 'nixpacks plan -f json --env NIXPACKS_NODE_VERSION=22 --env COOLIFY_URL=https://deeplinkos.com,https://www.deeplinkos.com --env COOLIFY_FQDN=deeplinkos.com,www.deeplinkos.com --env COOLIFY_BRANCH=main --env COOLIFY_RESOURCE_UUID=xw88g4k08cs404c4ww8488ow /artifacts/wkwgw8840ccg0kc0cg8o4w4k'
+2026-May-24 21:23:34.117905 [DEBUG] {
+2026-May-24 21:23:34.117905 [DEBUG] "providers": [],
+2026-May-24 21:23:34.117905 [DEBUG] "buildImage": "ghcr.io/railwayapp/nixpacks:ubuntu-1745885067",
+2026-May-24 21:23:34.117905 [DEBUG] "variables": {
+2026-May-24 21:23:34.117905 [DEBUG] "CI": "true",
+2026-May-24 21:23:34.117905 [DEBUG] "COOLIFY_BRANCH": "main",
+2026-May-24 21:23:34.117905 [DEBUG] "COOLIFY_FQDN": "deeplinkos.com,www.deeplinkos.com",
+2026-May-24 21:23:34.117905 [DEBUG] "COOLIFY_RESOURCE_UUID": "xw88g4k08cs404c4ww8488ow",
+2026-May-24 21:23:34.117905 [DEBUG] "COOLIFY_URL": "https://deeplinkos.com,https://www.deeplinkos.com",
+2026-May-24 21:23:34.117905 [DEBUG] "NIXPACKS_METADATA": "node",
+2026-May-24 21:23:34.117905 [DEBUG] "NIXPACKS_NODE_VERSION": "22",
+2026-May-24 21:23:34.117905 [DEBUG] "NODE_ENV": "production",
+2026-May-24 21:23:34.117905 [DEBUG] "NPM_CONFIG_PRODUCTION": "false"
+2026-May-24 21:23:34.117905 [DEBUG] },
+2026-May-24 21:23:34.117905 [DEBUG] "phases": {
+2026-May-24 21:23:34.117905 [DEBUG] "build": {
+2026-May-24 21:23:34.117905 [DEBUG] "dependsOn": [
+2026-May-24 21:23:34.117905 [DEBUG] "install"
+2026-May-24 21:23:34.117905 [DEBUG] ],
+2026-May-24 21:23:34.117905 [DEBUG] "cmds": [
+2026-May-24 21:23:34.117905 [DEBUG] "npm run build"
+2026-May-24 21:23:34.117905 [DEBUG] ],
+2026-May-24 21:23:34.117905 [DEBUG] "cacheDirectories": [
+2026-May-24 21:23:34.117905 [DEBUG] ".next/cache",
+2026-May-24 21:23:34.117905 [DEBUG] "node_modules/.cache"
+2026-May-24 21:23:34.117905 [DEBUG] ]
+2026-May-24 21:23:34.117905 [DEBUG] },
+2026-May-24 21:23:34.117905 [DEBUG] "install": {
+2026-May-24 21:23:34.117905 [DEBUG] "dependsOn": [
+2026-May-24 21:23:34.117905 [DEBUG] "setup"
+2026-May-24 21:23:34.117905 [DEBUG] ],
+2026-May-24 21:23:34.117905 [DEBUG] "cmds": [
+2026-May-24 21:23:34.117905 [DEBUG] "npm ci"
+2026-May-24 21:23:34.117905 [DEBUG] ],
+2026-May-24 21:23:34.117905 [DEBUG] "cacheDirectories": [
+2026-May-24 21:23:34.117905 [DEBUG] "/root/.npm"
+2026-May-24 21:23:34.117905 [DEBUG] ],
+2026-May-24 21:23:34.117905 [DEBUG] "paths": [
+2026-May-24 21:23:34.117905 [DEBUG] "/app/node_modules/.bin"
+2026-May-24 21:23:34.117905 [DEBUG] ]
+2026-May-24 21:23:34.117905 [DEBUG] },
+2026-May-24 21:23:34.117905 [DEBUG] "setup": {
+2026-May-24 21:23:34.117905 [DEBUG] "nixPkgs": [
+2026-May-24 21:23:34.117905 [DEBUG] "nodejs_22",
+2026-May-24 21:23:34.117905 [DEBUG] "npm-9_x",
+2026-May-24 21:23:34.117905 [DEBUG] "openssl"
+2026-May-24 21:23:34.117905 [DEBUG] ],
+2026-May-24 21:23:34.117905 [DEBUG] "nixLibs": [
+2026-May-24 21:23:34.117905 [DEBUG] "gcc-unwrapped"
+2026-May-24 21:23:34.117905 [DEBUG] ],
+2026-May-24 21:23:34.117905 [DEBUG] "nixOverlays": [
+2026-May-24 21:23:34.117905 [DEBUG] "https://github.com/railwayapp/nix-npm-overlay/archive/main.tar.gz"
+2026-May-24 21:23:34.117905 [DEBUG] ],
+2026-May-24 21:23:34.117905 [DEBUG] "nixpkgsArchive": "23f9169c4ccce521379e602cc82ed873a1f1b52b"
+2026-May-24 21:23:34.117905 [DEBUG] }
+2026-May-24 21:23:34.117905 [DEBUG] },
+2026-May-24 21:23:34.117905 [DEBUG] "start": {
+2026-May-24 21:23:34.117905 [DEBUG] "cmd": "npm run start"
+2026-May-24 21:23:34.117905 [DEBUG] }
+2026-May-24 21:23:34.117905 [DEBUG] }
+2026-May-24 21:23:34.541962 [DEBUG] [CMD]: docker exec wkwgw8840ccg0kc0cg8o4w4k bash -c 'nixpacks detect /artifacts/wkwgw8840ccg0kc0cg8o4w4k'
+2026-May-24 21:23:34.541962 [DEBUG] node
+2026-May-24 21:23:34.554077 Found application type: node.
+2026-May-24 21:23:34.563762 If you need further customization, please check the documentation of Nixpacks: https://nixpacks.com/docs/providers/node
+2026-May-24 21:23:34.573941 [DEBUG] Final Nixpacks plan: {
+2026-May-24 21:23:34.573941 [DEBUG] "providers": [],
+2026-May-24 21:23:34.573941 [DEBUG] "buildImage": "ghcr.io\/railwayapp\/nixpacks:ubuntu-1745885067",
+2026-May-24 21:23:34.573941 [DEBUG] "phases": {
+2026-May-24 21:23:34.573941 [DEBUG] "build": {
+2026-May-24 21:23:34.573941 [DEBUG] "dependsOn": [
+2026-May-24 21:23:34.573941 [DEBUG] "install"
+2026-May-24 21:23:34.573941 [DEBUG] ],
+2026-May-24 21:23:34.573941 [DEBUG] "cmds": [
+2026-May-24 21:23:34.573941 [DEBUG] "npm run build"
+2026-May-24 21:23:34.573941 [DEBUG] ],
+2026-May-24 21:23:34.573941 [DEBUG] "cacheDirectories": [
+2026-May-24 21:23:34.573941 [DEBUG] ".next\/cache",
+2026-May-24 21:23:34.573941 [DEBUG] "node_modules\/.cache"
+2026-May-24 21:23:34.573941 [DEBUG] ]
+2026-May-24 21:23:34.573941 [DEBUG] },
+2026-May-24 21:23:34.573941 [DEBUG] "install": {
+2026-May-24 21:23:34.573941 [DEBUG] "dependsOn": [
+2026-May-24 21:23:34.573941 [DEBUG] "setup"
+2026-May-24 21:23:34.573941 [DEBUG] ],
+2026-May-24 21:23:34.573941 [DEBUG] "cmds": [
+2026-May-24 21:23:34.573941 [DEBUG] "npm ci"
+2026-May-24 21:23:34.573941 [DEBUG] ],
+2026-May-24 21:23:34.573941 [DEBUG] "cacheDirectories": [
+2026-May-24 21:23:34.573941 [DEBUG] "\/root\/.npm"
+2026-May-24 21:23:34.573941 [DEBUG] ],
+2026-May-24 21:23:34.573941 [DEBUG] "paths": [
+2026-May-24 21:23:34.573941 [DEBUG] "\/app\/node_modules\/.bin"
+2026-May-24 21:23:34.573941 [DEBUG] ]
+2026-May-24 21:23:34.573941 [DEBUG] },
+2026-May-24 21:23:34.573941 [DEBUG] "setup": {
+2026-May-24 21:23:34.573941 [DEBUG] "nixPkgs": [
+2026-May-24 21:23:34.573941 [DEBUG] "nodejs_22",
+2026-May-24 21:23:34.573941 [DEBUG] "npm-9_x",
+2026-May-24 21:23:34.573941 [DEBUG] "openssl"
+2026-May-24 21:23:34.573941 [DEBUG] ],
+2026-May-24 21:23:34.573941 [DEBUG] "nixLibs": [
+2026-May-24 21:23:34.573941 [DEBUG] "gcc-unwrapped"
+2026-May-24 21:23:34.573941 [DEBUG] ],
+2026-May-24 21:23:34.573941 [DEBUG] "nixOverlays": [
+2026-May-24 21:23:34.573941 [DEBUG] "https:\/\/github.com\/railwayapp\/nix-npm-overlay\/archive\/main.tar.gz"
+2026-May-24 21:23:34.573941 [DEBUG] ],
+2026-May-24 21:23:34.573941 [DEBUG] "nixpkgsArchive": "23f9169c4ccce521379e602cc82ed873a1f1b52b",
+2026-May-24 21:23:34.573941 [DEBUG] "aptPkgs": [
+2026-May-24 21:23:34.573941 [DEBUG] "curl",
+2026-May-24 21:23:34.573941 [DEBUG] "wget"
+2026-May-24 21:23:34.573941 [DEBUG] ]
+2026-May-24 21:23:34.573941 [DEBUG] }
+2026-May-24 21:23:34.573941 [DEBUG] },
+2026-May-24 21:23:34.573941 [DEBUG] "start": {
+2026-May-24 21:23:34.573941 [DEBUG] "cmd": "npm run start"
+2026-May-24 21:23:34.573941 [DEBUG] }
+2026-May-24 21:23:34.573941 [DEBUG] }
+2026-May-24 21:23:35.903092 [DEBUG] Creating build-time .env file in /artifacts (outside Docker context).
+2026-May-24 21:23:36.362829 ----------------------------------------
+2026-May-24 21:23:36.369699 Building docker image started.
+2026-May-24 21:23:36.374882 To check the current progress, click on Show Debug Logs.
+2026-May-24 21:23:37.247521 [DEBUG] [CMD]: docker exec wkwgw8840ccg0kc0cg8o4w4k bash -c 'nixpacks build -c /artifacts/thegameplan.json --cache-key 'xw88g4k08cs404c4ww8488ow' --no-error-without-start -n xw88g4k08cs404c4ww8488ow:1cd7ccaca1d57abe1bae9bf9a8e8fe2bd59ffdd3 /artifacts/wkwgw8840ccg0kc0cg8o4w4k -o /artifacts/wkwgw8840ccg0kc0cg8o4w4k'
+2026-May-24 21:23:37.247521 [DEBUG] 
+2026-May-24 21:23:37.247521 [DEBUG] ╔══════════════════ Nixpacks v1.41.0 ══════════════════╗
+2026-May-24 21:23:37.247521 [DEBUG] ║ setup      │ nodejs_22, npm-9_x, openssl, curl, wget ║
+2026-May-24 21:23:37.247521 [DEBUG] ║──────────────────────────────────────────────────────║
+2026-May-24 21:23:37.247521 [DEBUG] ║ install    │ npm ci                                  ║
+2026-May-24 21:23:37.247521 [DEBUG] ║──────────────────────────────────────────────────────║
+2026-May-24 21:23:37.247521 [DEBUG] ║ build      │ npm run build                           ║
+2026-May-24 21:23:37.247521 [DEBUG] ║──────────────────────────────────────────────────────║
+2026-May-24 21:23:37.247521 [DEBUG] ║ start      │ npm run start                           ║
+2026-May-24 21:23:37.247521 [DEBUG] ╚══════════════════════════════════════════════════════╝
+2026-May-24 21:23:37.251687 [DEBUG] Saved output to:
+2026-May-24 21:23:37.251687 [DEBUG] /artifacts/wkwgw8840ccg0kc0cg8o4w4k
+2026-May-24 21:23:37.661315 [DEBUG] [CMD]: docker exec wkwgw8840ccg0kc0cg8o4w4k bash -c 'cat /artifacts/wkwgw8840ccg0kc0cg8o4w4k/.nixpacks/Dockerfile'
+2026-May-24 21:23:37.661315 [DEBUG] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+2026-May-24 21:23:37.661315 [DEBUG] 
+2026-May-24 21:23:37.661315 [DEBUG] ENTRYPOINT ["/bin/bash", "-l", "-c"]
+2026-May-24 21:23:37.661315 [DEBUG] WORKDIR /app/
+2026-May-24 21:23:37.661315 [DEBUG] 
+2026-May-24 21:23:37.661315 [DEBUG] 
+2026-May-24 21:23:37.661315 [DEBUG] COPY .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix
+2026-May-24 21:23:37.661315 [DEBUG] RUN nix-env -if .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix && nix-collect-garbage -d
+2026-May-24 21:23:37.661315 [DEBUG] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends curl wget
+2026-May-24 21:23:37.661315 [DEBUG] 
+2026-May-24 21:23:37.661315 [DEBUG] ARG CI COOLIFY_BRANCH COOLIFY_FQDN COOLIFY_RESOURCE_UUID COOLIFY_URL NEXT_PUBLIC_SITE_URL NIXPACKS_METADATA NIXPACKS_NODE_VERSION NODE_ENV NPM_CONFIG_PRODUCTION RESEND_API_KEY
+2026-May-24 21:23:37.661315 [DEBUG] ENV CI=$CI COOLIFY_BRANCH=$COOLIFY_BRANCH COOLIFY_FQDN=$COOLIFY_FQDN COOLIFY_RESOURCE_UUID=$COOLIFY_RESOURCE_UUID COOLIFY_URL=$COOLIFY_URL NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL NIXPACKS_METADATA=$NIXPACKS_METADATA NIXPACKS_NODE_VERSION=$NIXPACKS_NODE_VERSION NODE_ENV=$NODE_ENV NPM_CONFIG_PRODUCTION=$NPM_CONFIG_PRODUCTION RESEND_API_KEY=$RESEND_API_KEY
+2026-May-24 21:23:37.661315 [DEBUG] 
+2026-May-24 21:23:37.661315 [DEBUG] # setup phase
+2026-May-24 21:23:37.661315 [DEBUG] # noop
+2026-May-24 21:23:37.661315 [DEBUG] 
+2026-May-24 21:23:37.661315 [DEBUG] # install phase
+2026-May-24 21:23:37.661315 [DEBUG] ENV NIXPACKS_PATH=/app/node_modules/.bin:$NIXPACKS_PATH
+2026-May-24 21:23:37.661315 [DEBUG] COPY . /app/.
+2026-May-24 21:23:37.661315 [DEBUG] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-/root/npm,target=/root/.npm npm ci
+2026-May-24 21:23:37.661315 [DEBUG] 
+2026-May-24 21:23:37.661315 [DEBUG] # build phase
+2026-May-24 21:23:37.661315 [DEBUG] COPY . /app/.
+2026-May-24 21:23:37.661315 [DEBUG] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build
+2026-May-24 21:23:37.661315 [DEBUG] 
+2026-May-24 21:23:37.661315 [DEBUG] 
+2026-May-24 21:23:37.661315 [DEBUG] RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
+2026-May-24 21:23:37.661315 [DEBUG] 
+2026-May-24 21:23:37.661315 [DEBUG] 
+2026-May-24 21:23:37.661315 [DEBUG] # start
+2026-May-24 21:23:37.661315 [DEBUG] COPY . /app
+2026-May-24 21:23:37.661315 [DEBUG] 
+2026-May-24 21:23:37.661315 [DEBUG] CMD ["npm run start"]
+2026-May-24 21:23:38.511479 [DEBUG] [CMD]: docker exec wkwgw8840ccg0kc0cg8o4w4k bash -c 'cat /artifacts/build.sh'
+2026-May-24 21:23:38.511479 [DEBUG] cd /artifacts/wkwgw8840ccg0kc0cg8o4w4k && set -a && source /artifacts/build-time.env && set +a && docker build --add-host coolify:10.0.1.3 --add-host coolify-db:10.0.1.2 --add-host coolify-realtime:10.0.1.4 --add-host coolify-redis:10.0.1.6 --network host -f /artifacts/wkwgw8840ccg0kc0cg8o4w4k/.nixpacks/Dockerfile --progress plain -t xw88g4k08cs404c4ww8488ow:1cd7ccaca1d57abe1bae9bf9a8e8fe2bd59ffdd3 --build-arg CI --build-arg COOLIFY_BRANCH --build-arg COOLIFY_FQDN --build-arg COOLIFY_RESOURCE_UUID --build-arg COOLIFY_URL --build-arg NIXPACKS_METADATA --build-arg NIXPACKS_NODE_VERSION --build-arg NODE_ENV --build-arg NPM_CONFIG_PRODUCTION --build-arg RESEND_API_KEY --build-arg NEXT_PUBLIC_SITE_URL --build-arg COOLIFY_BUILD_SECRETS_HASH=721631698c0ef24a2aa4f3a8940871e00aecdc153dbf310de0fdf54f2ab83582 --build-arg 'COOLIFY_URL' --build-arg 'COOLIFY_FQDN' --build-arg 'COOLIFY_BRANCH' --build-arg 'COOLIFY_RESOURCE_UUID' /artifacts/wkwgw8840ccg0kc0cg8o4w4k
+2026-May-24 21:23:40.033967 [DEBUG] [CMD]: docker exec wkwgw8840ccg0kc0cg8o4w4k bash -c 'bash /artifacts/build.sh'
+2026-May-24 21:23:40.033967 [DEBUG] #0 building with "default" instance using docker driver
+2026-May-24 21:23:40.033967 [DEBUG] 
+2026-May-24 21:23:40.033967 [DEBUG] #1 [internal] load build definition from Dockerfile
+2026-May-24 21:23:40.033967 [DEBUG] #1 transferring dockerfile: 1.54kB done
+2026-May-24 21:23:40.033967 [DEBUG] #1 DONE 0.1s
+2026-May-24 21:23:40.033967 [DEBUG] 
+2026-May-24 21:23:40.033967 [DEBUG] #2 [internal] load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+2026-May-24 21:23:40.478601 [DEBUG] #2 DONE 0.6s
+2026-May-24 21:23:40.587450 [DEBUG] #3 [internal] load .dockerignore
+2026-May-24 21:23:40.587450 [DEBUG] #3 transferring context: 2B done
+2026-May-24 21:23:40.587450 [DEBUG] #3 DONE 0.0s
+2026-May-24 21:23:40.587450 [DEBUG] 
+2026-May-24 21:23:40.587450 [DEBUG] #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-May-24 21:23:40.587450 [DEBUG] #4 resolve ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de 0.0s done
+2026-May-24 21:23:40.587450 [DEBUG] #4 DONE 0.1s
+2026-May-24 21:23:40.587450 [DEBUG] 
+2026-May-24 21:23:40.587450 [DEBUG] #5 [internal] load build context
+2026-May-24 21:23:40.695512 [DEBUG] #5 transferring context: 3.36MB 0.1s done
+2026-May-24 21:23:40.695512 [DEBUG] #5 DONE 0.1s
+2026-May-24 21:23:40.695512 [DEBUG] 
+2026-May-24 21:23:40.695512 [DEBUG] #6 [stage-0  2/11] WORKDIR /app/
+2026-May-24 21:23:40.695512 [DEBUG] #6 CACHED
+2026-May-24 21:23:40.695512 [DEBUG] 
+2026-May-24 21:23:40.695512 [DEBUG] #7 [stage-0  3/11] COPY .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix
+2026-May-24 21:23:40.695512 [DEBUG] #7 CACHED
+2026-May-24 21:23:40.695512 [DEBUG] 
+2026-May-24 21:23:40.695512 [DEBUG] #8 [stage-0  4/11] RUN nix-env -if .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix && nix-collect-garbage -d
+2026-May-24 21:23:40.695512 [DEBUG] #8 CACHED
+2026-May-24 21:23:40.695512 [DEBUG] 
+2026-May-24 21:23:40.695512 [DEBUG] #9 [stage-0  5/11] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends curl wget
+2026-May-24 21:23:40.695512 [DEBUG] #9 CACHED
+2026-May-24 21:23:40.695512 [DEBUG] 
+2026-May-24 21:23:40.695512 [DEBUG] #10 [stage-0  6/11] COPY . /app/.
+2026-May-24 21:23:40.813299 [DEBUG] #10 DONE 0.1s
+2026-May-24 21:23:40.970599 [DEBUG] #11 [stage-0  7/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-/root/npm,target=/root/.npm npm ci
+2026-May-24 21:23:41.437058 [DEBUG] #11 0.620 npm warn config production Use `--omit=dev` instead.
+2026-May-24 21:23:42.505713 [DEBUG] #11 1.692 npm error code EUSAGE
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync. Please update your lock file with `npm install` before continuing.
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error Missing: @emnapi/runtime@1.10.0 from lock file
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error Missing: @emnapi/core@1.10.0 from lock file
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error Clean install a project
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error Usage:
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error npm ci
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error Options:
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error [--install-strategy <hoisted|nested|shallow|linked>] [--legacy-bundling]
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error [--global-style] [--omit <dev|optional|peer> [--omit <dev|optional|peer> ...]]
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error [--include <prod|dev|optional|peer> [--include <prod|dev|optional|peer> ...]]
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error [--strict-peer-deps] [--foreground-scripts] [--ignore-scripts] [--no-audit]
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error [--no-bin-links] [--no-fund] [--dry-run]
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error [-w|--workspace <workspace-name> [-w|--workspace <workspace-name> ...]]
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error [-ws|--workspaces] [--include-workspace-root] [--install-links]
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error aliases: clean-install, ic, install-clean, isntall-clean
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.693 npm error Run "npm help ci" for more info
+2026-May-24 21:23:42.646376 [DEBUG] #11 1.695 npm error A complete log of this run can be found in: /root/.npm/_logs/2026-05-24T21_23_41_347Z-debug-0.log
+2026-May-24 21:23:42.646376 [DEBUG] #11 ERROR: process "/bin/bash -ol pipefail -c npm ci" did not complete successfully: exit code: 1
+2026-May-24 21:23:42.685405 [DEBUG] ------
+2026-May-24 21:23:42.685405 [DEBUG] > [stage-0  7/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-/root/npm,target=/root/.npm npm ci:
+2026-May-24 21:23:42.685405 [DEBUG] 1.693 npm error [--include <prod|dev|optional|peer> [--include <prod|dev|optional|peer> ...]]
+2026-May-24 21:23:42.685405 [DEBUG] 1.693 npm error [--strict-peer-deps] [--foreground-scripts] [--ignore-scripts] [--no-audit]
+2026-May-24 21:23:42.685405 [DEBUG] 1.693 npm error [--no-bin-links] [--no-fund] [--dry-run]
+2026-May-24 21:23:42.685405 [DEBUG] 1.693 npm error [-w|--workspace <workspace-name> [-w|--workspace <workspace-name> ...]]
+2026-May-24 21:23:42.685405 [DEBUG] 1.693 npm error [-ws|--workspaces] [--include-workspace-root] [--install-links]
+2026-May-24 21:23:42.685405 [DEBUG] 1.693 npm error
+2026-May-24 21:23:42.685405 [DEBUG] 1.693 npm error aliases: clean-install, ic, install-clean, isntall-clean
+2026-May-24 21:23:42.685405 [DEBUG] 1.693 npm error
+2026-May-24 21:23:42.685405 [DEBUG] 1.693 npm error Run "npm help ci" for more info
+2026-May-24 21:23:42.685405 [DEBUG] 1.695 npm error A complete log of this run can be found in: /root/.npm/_logs/2026-05-24T21_23_41_347Z-debug-0.log
+2026-May-24 21:23:42.685405 [DEBUG] ------
+2026-May-24 21:23:42.692392 [DEBUG] 3 warnings found (use docker --debug to expand):
+2026-May-24 21:23:42.692392 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 11)
+2026-May-24 21:23:42.692392 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "RESEND_API_KEY") (line 12)
+2026-May-24 21:23:42.692392 [DEBUG] - UndefinedVar: Usage of undefined variable '$NIXPACKS_PATH' (line 18)
+2026-May-24 21:23:42.698496 [DEBUG] Dockerfile:20
+2026-May-24 21:23:42.698496 [DEBUG] --------------------
+2026-May-24 21:23:42.698496 [DEBUG] 18 |     ENV NIXPACKS_PATH=/app/node_modules/.bin:$NIXPACKS_PATH
+2026-May-24 21:23:42.698496 [DEBUG] 19 |     COPY . /app/.
+2026-May-24 21:23:42.698496 [DEBUG] 20 | >>> RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-/root/npm,target=/root/.npm npm ci
+2026-May-24 21:23:42.698496 [DEBUG] 21 |
+2026-May-24 21:23:42.698496 [DEBUG] 22 |     # build phase
+2026-May-24 21:23:42.698496 [DEBUG] --------------------
+2026-May-24 21:23:42.698496 [DEBUG] ERROR: failed to build: failed to solve: process "/bin/bash -ol pipefail -c npm ci" did not complete successfully: exit code: 1
+2026-May-24 21:23:42.704502 [DEBUG] exit status 1
+2026-May-24 21:23:42.754025 ========================================
+2026-May-24 21:23:42.759813 Deployment failed: Command execution failed (exit code 1): docker exec wkwgw8840ccg0kc0cg8o4w4k bash -c 'bash /artifacts/build.sh'
+2026-May-24 21:23:42.759813 Error: #0 building with "default" instance using docker driver
+2026-May-24 21:23:42.759813 
+2026-May-24 21:23:42.759813 #1 [internal] load build definition from Dockerfile
+2026-May-24 21:23:42.759813 #1 transferring dockerfile: 1.54kB done
+2026-May-24 21:23:42.759813 #1 DONE 0.1s
+2026-May-24 21:23:42.759813 
+2026-May-24 21:23:42.759813 #2 [internal] load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+2026-May-24 21:23:42.759813 #2 DONE 0.6s
+2026-May-24 21:23:42.759813 
+2026-May-24 21:23:42.759813 #3 [internal] load .dockerignore
+2026-May-24 21:23:42.759813 #3 transferring context: 2B done
+2026-May-24 21:23:42.759813 #3 DONE 0.0s
+2026-May-24 21:23:42.759813 
+2026-May-24 21:23:42.759813 #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-May-24 21:23:42.759813 #4 resolve ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de 0.0s done
+2026-May-24 21:23:42.759813 #4 DONE 0.1s
+2026-May-24 21:23:42.759813 
+2026-May-24 21:23:42.759813 #5 [internal] load build context
+2026-May-24 21:23:42.759813 #5 transferring context: 3.36MB 0.1s done
+2026-May-24 21:23:42.759813 #5 DONE 0.1s
+2026-May-24 21:23:42.759813 
+2026-May-24 21:23:42.759813 #6 [stage-0  2/11] WORKDIR /app/
+2026-May-24 21:23:42.759813 #6 CACHED
+2026-May-24 21:23:42.759813 
+2026-May-24 21:23:42.759813 #7 [stage-0  3/11] COPY .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix
+2026-May-24 21:23:42.759813 #7 CACHED
+2026-May-24 21:23:42.759813 
+2026-May-24 21:23:42.759813 #8 [stage-0  4/11] RUN nix-env -if .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix && nix-collect-garbage -d
+2026-May-24 21:23:42.759813 #8 CACHED
+2026-May-24 21:23:42.759813 
+2026-May-24 21:23:42.759813 #9 [stage-0  5/11] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends curl wget
+2026-May-24 21:23:42.759813 #9 CACHED
+2026-May-24 21:23:42.759813 
+2026-May-24 21:23:42.759813 #10 [stage-0  6/11] COPY . /app/.
+2026-May-24 21:23:42.759813 #10 DONE 0.1s
+2026-May-24 21:23:42.759813 
+2026-May-24 21:23:42.759813 #11 [stage-0  7/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-/root/npm,target=/root/.npm npm ci
+2026-May-24 21:23:42.759813 #11 0.620 npm warn config production Use `--omit=dev` instead.
+2026-May-24 21:23:42.759813 #11 1.692 npm error code EUSAGE
+2026-May-24 21:23:42.759813 #11 1.693 npm error
+2026-May-24 21:23:42.759813 #11 1.693 npm error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync. Please update your lock file with `npm install` before continuing.
+2026-May-24 21:23:42.759813 #11 1.693 npm error
+2026-May-24 21:23:42.759813 #11 1.693 npm error Missing: @emnapi/runtime@1.10.0 from lock file
+2026-May-24 21:23:42.759813 #11 1.693 npm error Missing: @emnapi/core@1.10.0 from lock file
+2026-May-24 21:23:42.759813 #11 1.693 npm error
+2026-May-24 21:23:42.759813 #11 1.693 npm error Clean install a project
+2026-May-24 21:23:42.759813 #11 1.693 npm error
+2026-May-24 21:23:42.759813 #11 1.693 npm error Usage:
+2026-May-24 21:23:42.759813 #11 1.693 npm error npm ci
+2026-May-24 21:23:42.759813 #11 1.693 npm error
+2026-May-24 21:23:42.759813 #11 1.693 npm error Options:
+2026-May-24 21:23:42.759813 #11 1.693 npm error [--install-strategy <hoisted|nested|shallow|linked>] [--legacy-bundling]
+2026-May-24 21:23:42.759813 #11 1.693 npm error [--global-style] [--omit <dev|optional|peer> [--omit <dev|optional|peer> ...]]
+2026-May-24 21:23:42.759813 #11 1.693 npm error [--include <prod|dev|optional|peer> [--include <prod|dev|optional|peer> ...]]
+2026-May-24 21:23:42.759813 #11 1.693 npm error [--strict-peer-deps] [--foreground-scripts] [--ignore-scripts] [--no-audit]
+2026-May-24 21:23:42.759813 #11 1.693 npm error [--no-bin-links] [--no-fund] [--dry-run]
+2026-May-24 21:23:42.759813 #11 1.693 npm error [-w|--workspace <workspace-name> [-w|--workspace <workspace-name> ...]]
+2026-May-24 21:23:42.759813 #11 1.693 npm error [-ws|--workspaces] [--include-workspace-root] [--install-links]
+2026-May-24 21:23:42.759813 #11 1.693 npm error
+2026-May-24 21:23:42.759813 #11 1.693 npm error aliases: clean-install, ic, install-clean, isntall-clean
+2026-May-24 21:23:42.759813 #11 1.693 npm error
+2026-May-24 21:23:42.759813 #11 1.693 npm error Run "npm help ci" for more info
+2026-May-24 21:23:42.759813 #11 1.695 npm error A complete log of this run can be found in: /root/.npm/_logs/2026-05-24T21_23_41_347Z-debug-0.log
+2026-May-24 21:23:42.759813 #11 ERROR: process "/bin/bash -ol pipefail -c npm ci" did not complete successfully: exit code: 1
+2026-May-24 21:23:42.759813 ------
+2026-May-24 21:23:42.759813 > [stage-0  7/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-/root/npm,target=/root/.npm npm ci:
+2026-May-24 21:23:42.759813 1.693 npm error [--include <prod|dev|optional|peer> [--include <prod|dev|optional|peer> ...]]
+2026-May-24 21:23:42.759813 1.693 npm error [--strict-peer-deps] [--foreground-scripts] [--ignore-scripts] [--no-audit]
+2026-May-24 21:23:42.759813 1.693 npm error [--no-bin-links] [--no-fund] [--dry-run]
+2026-May-24 21:23:42.759813 1.693 npm error [-w|--workspace <workspace-name> [-w|--workspace <workspace-name> ...]]
+2026-May-24 21:23:42.759813 1.693 npm error [-ws|--workspaces] [--include-workspace-root] [--install-links]
+2026-May-24 21:23:42.759813 1.693 npm error
+2026-May-24 21:23:42.759813 1.693 npm error aliases: clean-install, ic, install-clean, isntall-clean
+2026-May-24 21:23:42.759813 1.693 npm error
+2026-May-24 21:23:42.759813 1.693 npm error Run "npm help ci" for more info
+2026-May-24 21:23:42.759813 1.695 npm error A complete log of this run can be found in: /root/.npm/_logs/2026-05-24T21_23_41_347Z-debug-0.log
+2026-May-24 21:23:42.759813 ------
+2026-May-24 21:23:42.759813 
+2026-May-24 21:23:42.759813 3 warnings found (use docker --debug to expand):
+2026-May-24 21:23:42.759813 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 11)
+2026-May-24 21:23:42.759813 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "RESEND_API_KEY") (line 12)
+2026-May-24 21:23:42.759813 - UndefinedVar: Usage of undefined variable '$NIXPACKS_PATH' (line 18)
+2026-May-24 21:23:42.759813 Dockerfile:20
+2026-May-24 21:23:42.759813 --------------------
+2026-May-24 21:23:42.759813 18 |     ENV NIXPACKS_PATH=/app/node_modules/.bin:$NIXPACKS_PATH
+2026-May-24 21:23:42.759813 19 |     COPY . /app/.
+2026-May-24 21:23:42.759813 20 | >>> RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-/root/npm,target=/root/.npm npm ci
+2026-May-24 21:23:42.759813 21 |
+2026-May-24 21:23:42.759813 22 |     # build phase
+2026-May-24 21:23:42.759813 --------------------
+2026-May-24 21:23:42.759813 ERROR: failed to build: failed to solve: process "/bin/bash -ol pipefail -c npm ci" did not complete successfully: exit code: 1
+2026-May-24 21:23:42.759813 exit status 1
+2026-May-24 21:23:42.768030 [DEBUG] Error type: RuntimeException
+2026-May-24 21:23:42.774659 [DEBUG] Error code: 0
+2026-May-24 21:23:42.780923 [DEBUG] Location: /var/www/html/app/Traits/ExecuteRemoteCommand.php:243
+2026-May-24 21:23:42.786004 [DEBUG] Stack trace (first 5 lines):
+2026-May-24 21:23:42.791188 [DEBUG] #0 /var/www/html/app/Traits/ExecuteRemoteCommand.php(104): App\Jobs\ApplicationDeploymentJob->executeCommandWithProcess()
+2026-May-24 21:23:42.796190 [DEBUG] #1 /var/www/html/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php(271): App\Jobs\ApplicationDeploymentJob->{closure:App\Traits\ExecuteRemoteCommand::execute_remote_command():71}()
+2026-May-24 21:23:42.801192 [DEBUG] #2 /var/www/html/app/Traits/ExecuteRemoteCommand.php(71): Illuminate\Support\Collection->each()
+2026-May-24 21:23:42.808180 [DEBUG] #3 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(3118): App\Jobs\ApplicationDeploymentJob->execute_remote_command()
+2026-May-24 21:23:42.817360 [DEBUG] #4 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(888): App\Jobs\ApplicationDeploymentJob->build_image()
+2026-May-24 21:23:42.826970 ========================================
+2026-May-24 21:23:42.833733 Deployment failed. Removing the new version of your application.
+2026-May-24 21:23:44.332019 Gracefully shutting down build container: wkwgw8840ccg0kc0cg8o4w4k
+2026-May-24 21:23:44.820514 [DEBUG] [CMD]: docker stop -t 30 wkwgw8840ccg0kc0cg8o4w4k
+2026-May-24 21:23:44.820514 [DEBUG] wkwgw8840ccg0kc0cg8o4w4k

@@ -1,0 +1,466 @@
+2026-May-24 21:31:12.549672 Starting deployment of Ambitious513/deeplinkos:main to localhost.
+2026-May-24 21:31:12.802858 Preparing container with helper image: ghcr.io/coollabsio/coolify-helper:1.0.12
+2026-May-24 21:31:12.915588 [DEBUG] [CMD]: docker stop -t 30 mccoco0wogggw8g88kogss88
+2026-May-24 21:31:12.915588 [DEBUG] Error response from daemon: No such container: mccoco0wogggw8g88kogss88
+2026-May-24 21:31:13.098183 [DEBUG] [CMD]: docker run -d --network coolify --name mccoco0wogggw8g88kogss88  --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/coollabsio/coolify-helper:1.0.12
+2026-May-24 21:31:13.098183 [DEBUG] 84a159181b2d452a684441f4b2c53389b31731c9298fa2310fd3d60327e2d11e
+2026-May-24 21:31:14.135085 [DEBUG] [CMD]: docker exec mccoco0wogggw8g88kogss88 bash -c 'GIT_SSH_COMMAND="ssh -o ConnectTimeout=30 -p 22 -o Port=22 -o LogLevel=ERROR -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git ls-remote https://github.com/Ambitious513/deeplinkos refs/heads/main'
+2026-May-24 21:31:14.135085 [DEBUG] 9bb2ef63c4cb1c57c02d3e2e99459dff642611f2	refs/heads/main
+2026-May-24 21:31:14.284068 Image not found (xw88g4k08cs404c4ww8488ow:9bb2ef63c4cb1c57c02d3e2e99459dff642611f2). Building new image.
+2026-May-24 21:31:14.289010 ----------------------------------------
+2026-May-24 21:31:14.292817 Importing Ambitious513/deeplinkos:main (commit sha 9bb2ef63c4cb1c57c02d3e2e99459dff642611f2) to /artifacts/mccoco0wogggw8g88kogss88.
+2026-May-24 21:31:14.452565 [DEBUG] [CMD]: docker exec mccoco0wogggw8g88kogss88 bash -c 'git clone --depth=1 --recurse-submodules --shallow-submodules -b 'main' 'https://github.com/Ambitious513/deeplinkos' '/artifacts/mccoco0wogggw8g88kogss88' && cd '/artifacts/mccoco0wogggw8g88kogss88' && if [ -f .gitmodules ]; then sed -i "s#git@\(.*\):#https://\1/#g" '/artifacts/mccoco0wogggw8g88kogss88'/.gitmodules || true && git submodule sync && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git submodule update --init --recursive --depth=1; fi && cd '/artifacts/mccoco0wogggw8g88kogss88' && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git lfs pull'
+2026-May-24 21:31:14.452565 [DEBUG] Cloning into '/artifacts/mccoco0wogggw8g88kogss88'...
+2026-May-24 21:31:15.962712 [DEBUG] [CMD]: docker exec mccoco0wogggw8g88kogss88 bash -c 'cd /artifacts/mccoco0wogggw8g88kogss88 && git log -1 9bb2ef63c4cb1c57c02d3e2e99459dff642611f2 --pretty=%B'
+2026-May-24 21:31:15.962712 [DEBUG] fix: recreate package-lock.json to include all platform bindings
+2026-May-24 21:31:16.153338 Generating nixpacks configuration with: nixpacks plan -f json --env NIXPACKS_NODE_VERSION=22 --env COOLIFY_URL=https://deeplinkos.com,https://www.deeplinkos.com --env COOLIFY_FQDN=deeplinkos.com,www.deeplinkos.com --env COOLIFY_BRANCH=main --env COOLIFY_RESOURCE_UUID=xw88g4k08cs404c4ww8488ow /artifacts/mccoco0wogggw8g88kogss88
+2026-May-24 21:31:16.356905 [DEBUG] [CMD]: docker exec mccoco0wogggw8g88kogss88 bash -c 'nixpacks plan -f json --env NIXPACKS_NODE_VERSION=22 --env COOLIFY_URL=https://deeplinkos.com,https://www.deeplinkos.com --env COOLIFY_FQDN=deeplinkos.com,www.deeplinkos.com --env COOLIFY_BRANCH=main --env COOLIFY_RESOURCE_UUID=xw88g4k08cs404c4ww8488ow /artifacts/mccoco0wogggw8g88kogss88'
+2026-May-24 21:31:16.356905 [DEBUG] {
+2026-May-24 21:31:16.356905 [DEBUG] "providers": [],
+2026-May-24 21:31:16.356905 [DEBUG] "buildImage": "ghcr.io/railwayapp/nixpacks:ubuntu-1745885067",
+2026-May-24 21:31:16.356905 [DEBUG] "variables": {
+2026-May-24 21:31:16.356905 [DEBUG] "CI": "true",
+2026-May-24 21:31:16.356905 [DEBUG] "COOLIFY_BRANCH": "main",
+2026-May-24 21:31:16.356905 [DEBUG] "COOLIFY_FQDN": "deeplinkos.com,www.deeplinkos.com",
+2026-May-24 21:31:16.356905 [DEBUG] "COOLIFY_RESOURCE_UUID": "xw88g4k08cs404c4ww8488ow",
+2026-May-24 21:31:16.356905 [DEBUG] "COOLIFY_URL": "https://deeplinkos.com,https://www.deeplinkos.com",
+2026-May-24 21:31:16.356905 [DEBUG] "NIXPACKS_METADATA": "node",
+2026-May-24 21:31:16.356905 [DEBUG] "NIXPACKS_NODE_VERSION": "22",
+2026-May-24 21:31:16.356905 [DEBUG] "NODE_ENV": "production",
+2026-May-24 21:31:16.356905 [DEBUG] "NPM_CONFIG_PRODUCTION": "false"
+2026-May-24 21:31:16.356905 [DEBUG] },
+2026-May-24 21:31:16.356905 [DEBUG] "phases": {
+2026-May-24 21:31:16.356905 [DEBUG] "build": {
+2026-May-24 21:31:16.356905 [DEBUG] "dependsOn": [
+2026-May-24 21:31:16.356905 [DEBUG] "install"
+2026-May-24 21:31:16.356905 [DEBUG] ],
+2026-May-24 21:31:16.356905 [DEBUG] "cmds": [
+2026-May-24 21:31:16.356905 [DEBUG] "npm run build"
+2026-May-24 21:31:16.356905 [DEBUG] ],
+2026-May-24 21:31:16.356905 [DEBUG] "cacheDirectories": [
+2026-May-24 21:31:16.356905 [DEBUG] ".next/cache",
+2026-May-24 21:31:16.356905 [DEBUG] "node_modules/.cache"
+2026-May-24 21:31:16.356905 [DEBUG] ]
+2026-May-24 21:31:16.356905 [DEBUG] },
+2026-May-24 21:31:16.356905 [DEBUG] "install": {
+2026-May-24 21:31:16.356905 [DEBUG] "dependsOn": [
+2026-May-24 21:31:16.356905 [DEBUG] "setup"
+2026-May-24 21:31:16.356905 [DEBUG] ],
+2026-May-24 21:31:16.356905 [DEBUG] "cmds": [
+2026-May-24 21:31:16.356905 [DEBUG] "npm ci"
+2026-May-24 21:31:16.356905 [DEBUG] ],
+2026-May-24 21:31:16.356905 [DEBUG] "cacheDirectories": [
+2026-May-24 21:31:16.356905 [DEBUG] "/root/.npm"
+2026-May-24 21:31:16.356905 [DEBUG] ],
+2026-May-24 21:31:16.356905 [DEBUG] "paths": [
+2026-May-24 21:31:16.356905 [DEBUG] "/app/node_modules/.bin"
+2026-May-24 21:31:16.356905 [DEBUG] ]
+2026-May-24 21:31:16.356905 [DEBUG] },
+2026-May-24 21:31:16.356905 [DEBUG] "setup": {
+2026-May-24 21:31:16.356905 [DEBUG] "nixPkgs": [
+2026-May-24 21:31:16.356905 [DEBUG] "nodejs_22",
+2026-May-24 21:31:16.356905 [DEBUG] "npm-9_x",
+2026-May-24 21:31:16.356905 [DEBUG] "openssl"
+2026-May-24 21:31:16.356905 [DEBUG] ],
+2026-May-24 21:31:16.356905 [DEBUG] "nixLibs": [
+2026-May-24 21:31:16.356905 [DEBUG] "gcc-unwrapped"
+2026-May-24 21:31:16.356905 [DEBUG] ],
+2026-May-24 21:31:16.356905 [DEBUG] "nixOverlays": [
+2026-May-24 21:31:16.356905 [DEBUG] "https://github.com/railwayapp/nix-npm-overlay/archive/main.tar.gz"
+2026-May-24 21:31:16.356905 [DEBUG] ],
+2026-May-24 21:31:16.356905 [DEBUG] "nixpkgsArchive": "23f9169c4ccce521379e602cc82ed873a1f1b52b"
+2026-May-24 21:31:16.356905 [DEBUG] }
+2026-May-24 21:31:16.356905 [DEBUG] },
+2026-May-24 21:31:16.356905 [DEBUG] "start": {
+2026-May-24 21:31:16.356905 [DEBUG] "cmd": "npm run start"
+2026-May-24 21:31:16.356905 [DEBUG] }
+2026-May-24 21:31:16.356905 [DEBUG] }
+2026-May-24 21:31:16.638971 [DEBUG] [CMD]: docker exec mccoco0wogggw8g88kogss88 bash -c 'nixpacks detect /artifacts/mccoco0wogggw8g88kogss88'
+2026-May-24 21:31:16.638971 [DEBUG] node
+2026-May-24 21:31:16.658659 Found application type: node.
+2026-May-24 21:31:16.671075 If you need further customization, please check the documentation of Nixpacks: https://nixpacks.com/docs/providers/node
+2026-May-24 21:31:16.688936 [DEBUG] Final Nixpacks plan: {
+2026-May-24 21:31:16.688936 [DEBUG] "providers": [],
+2026-May-24 21:31:16.688936 [DEBUG] "buildImage": "ghcr.io\/railwayapp\/nixpacks:ubuntu-1745885067",
+2026-May-24 21:31:16.688936 [DEBUG] "phases": {
+2026-May-24 21:31:16.688936 [DEBUG] "build": {
+2026-May-24 21:31:16.688936 [DEBUG] "dependsOn": [
+2026-May-24 21:31:16.688936 [DEBUG] "install"
+2026-May-24 21:31:16.688936 [DEBUG] ],
+2026-May-24 21:31:16.688936 [DEBUG] "cmds": [
+2026-May-24 21:31:16.688936 [DEBUG] "npm run build"
+2026-May-24 21:31:16.688936 [DEBUG] ],
+2026-May-24 21:31:16.688936 [DEBUG] "cacheDirectories": [
+2026-May-24 21:31:16.688936 [DEBUG] ".next\/cache",
+2026-May-24 21:31:16.688936 [DEBUG] "node_modules\/.cache"
+2026-May-24 21:31:16.688936 [DEBUG] ]
+2026-May-24 21:31:16.688936 [DEBUG] },
+2026-May-24 21:31:16.688936 [DEBUG] "install": {
+2026-May-24 21:31:16.688936 [DEBUG] "dependsOn": [
+2026-May-24 21:31:16.688936 [DEBUG] "setup"
+2026-May-24 21:31:16.688936 [DEBUG] ],
+2026-May-24 21:31:16.688936 [DEBUG] "cmds": [
+2026-May-24 21:31:16.688936 [DEBUG] "npm ci"
+2026-May-24 21:31:16.688936 [DEBUG] ],
+2026-May-24 21:31:16.688936 [DEBUG] "cacheDirectories": [
+2026-May-24 21:31:16.688936 [DEBUG] "\/root\/.npm"
+2026-May-24 21:31:16.688936 [DEBUG] ],
+2026-May-24 21:31:16.688936 [DEBUG] "paths": [
+2026-May-24 21:31:16.688936 [DEBUG] "\/app\/node_modules\/.bin"
+2026-May-24 21:31:16.688936 [DEBUG] ]
+2026-May-24 21:31:16.688936 [DEBUG] },
+2026-May-24 21:31:16.688936 [DEBUG] "setup": {
+2026-May-24 21:31:16.688936 [DEBUG] "nixPkgs": [
+2026-May-24 21:31:16.688936 [DEBUG] "nodejs_22",
+2026-May-24 21:31:16.688936 [DEBUG] "npm-9_x",
+2026-May-24 21:31:16.688936 [DEBUG] "openssl"
+2026-May-24 21:31:16.688936 [DEBUG] ],
+2026-May-24 21:31:16.688936 [DEBUG] "nixLibs": [
+2026-May-24 21:31:16.688936 [DEBUG] "gcc-unwrapped"
+2026-May-24 21:31:16.688936 [DEBUG] ],
+2026-May-24 21:31:16.688936 [DEBUG] "nixOverlays": [
+2026-May-24 21:31:16.688936 [DEBUG] "https:\/\/github.com\/railwayapp\/nix-npm-overlay\/archive\/main.tar.gz"
+2026-May-24 21:31:16.688936 [DEBUG] ],
+2026-May-24 21:31:16.688936 [DEBUG] "nixpkgsArchive": "23f9169c4ccce521379e602cc82ed873a1f1b52b",
+2026-May-24 21:31:16.688936 [DEBUG] "aptPkgs": [
+2026-May-24 21:31:16.688936 [DEBUG] "curl",
+2026-May-24 21:31:16.688936 [DEBUG] "wget"
+2026-May-24 21:31:16.688936 [DEBUG] ]
+2026-May-24 21:31:16.688936 [DEBUG] }
+2026-May-24 21:31:16.688936 [DEBUG] },
+2026-May-24 21:31:16.688936 [DEBUG] "start": {
+2026-May-24 21:31:16.688936 [DEBUG] "cmd": "npm run start"
+2026-May-24 21:31:16.688936 [DEBUG] }
+2026-May-24 21:31:16.688936 [DEBUG] }
+2026-May-24 21:31:17.603527 [DEBUG] Creating build-time .env file in /artifacts (outside Docker context).
+2026-May-24 21:31:17.942201 ----------------------------------------
+2026-May-24 21:31:17.953082 Building docker image started.
+2026-May-24 21:31:17.962214 To check the current progress, click on Show Debug Logs.
+2026-May-24 21:31:18.565709 [DEBUG] [CMD]: docker exec mccoco0wogggw8g88kogss88 bash -c 'nixpacks build -c /artifacts/thegameplan.json --cache-key 'xw88g4k08cs404c4ww8488ow' --no-error-without-start -n xw88g4k08cs404c4ww8488ow:9bb2ef63c4cb1c57c02d3e2e99459dff642611f2 /artifacts/mccoco0wogggw8g88kogss88 -o /artifacts/mccoco0wogggw8g88kogss88'
+2026-May-24 21:31:18.565709 [DEBUG] 
+2026-May-24 21:31:18.565709 [DEBUG] ╔══════════════════ Nixpacks v1.41.0 ══════════════════╗
+2026-May-24 21:31:18.565709 [DEBUG] ║ setup      │ nodejs_22, npm-9_x, openssl, curl, wget ║
+2026-May-24 21:31:18.565709 [DEBUG] ║──────────────────────────────────────────────────────║
+2026-May-24 21:31:18.565709 [DEBUG] ║ install    │ npm ci                                  ║
+2026-May-24 21:31:18.565709 [DEBUG] ║──────────────────────────────────────────────────────║
+2026-May-24 21:31:18.565709 [DEBUG] ║ build      │ npm run build                           ║
+2026-May-24 21:31:18.565709 [DEBUG] ║──────────────────────────────────────────────────────║
+2026-May-24 21:31:18.565709 [DEBUG] ║ start      │ npm run start                           ║
+2026-May-24 21:31:18.565709 [DEBUG] ╚══════════════════════════════════════════════════════╝
+2026-May-24 21:31:18.568018 [DEBUG] Saved output to:
+2026-May-24 21:31:18.568018 [DEBUG] /artifacts/mccoco0wogggw8g88kogss88
+2026-May-24 21:31:18.737288 [DEBUG] [CMD]: docker exec mccoco0wogggw8g88kogss88 bash -c 'cat /artifacts/mccoco0wogggw8g88kogss88/.nixpacks/Dockerfile'
+2026-May-24 21:31:18.737288 [DEBUG] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+2026-May-24 21:31:18.737288 [DEBUG] 
+2026-May-24 21:31:18.737288 [DEBUG] ENTRYPOINT ["/bin/bash", "-l", "-c"]
+2026-May-24 21:31:18.737288 [DEBUG] WORKDIR /app/
+2026-May-24 21:31:18.737288 [DEBUG] 
+2026-May-24 21:31:18.737288 [DEBUG] 
+2026-May-24 21:31:18.737288 [DEBUG] COPY .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix
+2026-May-24 21:31:18.737288 [DEBUG] RUN nix-env -if .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix && nix-collect-garbage -d
+2026-May-24 21:31:18.737288 [DEBUG] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends curl wget
+2026-May-24 21:31:18.737288 [DEBUG] 
+2026-May-24 21:31:18.737288 [DEBUG] ARG CI COOLIFY_BRANCH COOLIFY_FQDN COOLIFY_RESOURCE_UUID COOLIFY_URL NEXT_PUBLIC_SITE_URL NIXPACKS_METADATA NIXPACKS_NODE_VERSION NODE_ENV NPM_CONFIG_PRODUCTION RESEND_API_KEY
+2026-May-24 21:31:18.737288 [DEBUG] ENV CI=$CI COOLIFY_BRANCH=$COOLIFY_BRANCH COOLIFY_FQDN=$COOLIFY_FQDN COOLIFY_RESOURCE_UUID=$COOLIFY_RESOURCE_UUID COOLIFY_URL=$COOLIFY_URL NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL NIXPACKS_METADATA=$NIXPACKS_METADATA NIXPACKS_NODE_VERSION=$NIXPACKS_NODE_VERSION NODE_ENV=$NODE_ENV NPM_CONFIG_PRODUCTION=$NPM_CONFIG_PRODUCTION RESEND_API_KEY=$RESEND_API_KEY
+2026-May-24 21:31:18.737288 [DEBUG] 
+2026-May-24 21:31:18.737288 [DEBUG] # setup phase
+2026-May-24 21:31:18.737288 [DEBUG] # noop
+2026-May-24 21:31:18.737288 [DEBUG] 
+2026-May-24 21:31:18.737288 [DEBUG] # install phase
+2026-May-24 21:31:18.737288 [DEBUG] ENV NIXPACKS_PATH=/app/node_modules/.bin:$NIXPACKS_PATH
+2026-May-24 21:31:18.737288 [DEBUG] COPY . /app/.
+2026-May-24 21:31:18.737288 [DEBUG] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-/root/npm,target=/root/.npm npm ci
+2026-May-24 21:31:18.737288 [DEBUG] 
+2026-May-24 21:31:18.737288 [DEBUG] # build phase
+2026-May-24 21:31:18.737288 [DEBUG] COPY . /app/.
+2026-May-24 21:31:18.737288 [DEBUG] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build
+2026-May-24 21:31:18.737288 [DEBUG] 
+2026-May-24 21:31:18.737288 [DEBUG] 
+2026-May-24 21:31:18.737288 [DEBUG] RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
+2026-May-24 21:31:18.737288 [DEBUG] 
+2026-May-24 21:31:18.737288 [DEBUG] 
+2026-May-24 21:31:18.737288 [DEBUG] # start
+2026-May-24 21:31:18.737288 [DEBUG] COPY . /app
+2026-May-24 21:31:18.737288 [DEBUG] 
+2026-May-24 21:31:18.737288 [DEBUG] CMD ["npm run start"]
+2026-May-24 21:31:19.124663 [DEBUG] [CMD]: docker exec mccoco0wogggw8g88kogss88 bash -c 'cat /artifacts/build.sh'
+2026-May-24 21:31:19.124663 [DEBUG] cd /artifacts/mccoco0wogggw8g88kogss88 && set -a && source /artifacts/build-time.env && set +a && docker build --add-host coolify:10.0.1.3 --add-host coolify-db:10.0.1.2 --add-host coolify-realtime:10.0.1.4 --add-host coolify-redis:10.0.1.6 --network host -f /artifacts/mccoco0wogggw8g88kogss88/.nixpacks/Dockerfile --progress plain -t xw88g4k08cs404c4ww8488ow:9bb2ef63c4cb1c57c02d3e2e99459dff642611f2 --build-arg CI --build-arg COOLIFY_BRANCH --build-arg COOLIFY_FQDN --build-arg COOLIFY_RESOURCE_UUID --build-arg COOLIFY_URL --build-arg NIXPACKS_METADATA --build-arg NIXPACKS_NODE_VERSION --build-arg NODE_ENV --build-arg NPM_CONFIG_PRODUCTION --build-arg RESEND_API_KEY --build-arg NEXT_PUBLIC_SITE_URL --build-arg COOLIFY_BUILD_SECRETS_HASH=721631698c0ef24a2aa4f3a8940871e00aecdc153dbf310de0fdf54f2ab83582 --build-arg 'COOLIFY_URL' --build-arg 'COOLIFY_FQDN' --build-arg 'COOLIFY_BRANCH' --build-arg 'COOLIFY_RESOURCE_UUID' /artifacts/mccoco0wogggw8g88kogss88
+2026-May-24 21:31:19.631883 [DEBUG] [CMD]: docker exec mccoco0wogggw8g88kogss88 bash -c 'bash /artifacts/build.sh'
+2026-May-24 21:31:19.631883 [DEBUG] #0 building with "default" instance using docker driver
+2026-May-24 21:31:19.631883 [DEBUG] 
+2026-May-24 21:31:19.631883 [DEBUG] #1 [internal] load build definition from Dockerfile
+2026-May-24 21:31:19.631883 [DEBUG] #1 transferring dockerfile: 1.54kB done
+2026-May-24 21:31:19.631883 [DEBUG] #1 DONE 0.0s
+2026-May-24 21:31:19.631883 [DEBUG] 
+2026-May-24 21:31:19.631883 [DEBUG] #2 [internal] load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+2026-May-24 21:31:19.987838 [DEBUG] #2 DONE 0.5s
+2026-May-24 21:31:20.096800 [DEBUG] #3 [internal] load .dockerignore
+2026-May-24 21:31:20.096800 [DEBUG] #3 transferring context: 2B done
+2026-May-24 21:31:20.096800 [DEBUG] #3 DONE 0.0s
+2026-May-24 21:31:20.096800 [DEBUG] 
+2026-May-24 21:31:20.096800 [DEBUG] #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-May-24 21:31:20.096800 [DEBUG] #4 resolve ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de 0.0s done
+2026-May-24 21:31:20.096800 [DEBUG] #4 DONE 0.0s
+2026-May-24 21:31:20.096800 [DEBUG] 
+2026-May-24 21:31:20.096800 [DEBUG] #5 [internal] load build context
+2026-May-24 21:31:20.096800 [DEBUG] #5 transferring context: 3.43MB 0.0s done
+2026-May-24 21:31:20.096800 [DEBUG] #5 DONE 0.1s
+2026-May-24 21:31:20.096800 [DEBUG] 
+2026-May-24 21:31:20.096800 [DEBUG] #6 [stage-0  3/11] COPY .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix
+2026-May-24 21:31:20.096800 [DEBUG] #6 CACHED
+2026-May-24 21:31:20.096800 [DEBUG] 
+2026-May-24 21:31:20.096800 [DEBUG] #7 [stage-0  4/11] RUN nix-env -if .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix && nix-collect-garbage -d
+2026-May-24 21:31:20.096800 [DEBUG] #7 CACHED
+2026-May-24 21:31:20.096800 [DEBUG] 
+2026-May-24 21:31:20.096800 [DEBUG] #8 [stage-0  2/11] WORKDIR /app/
+2026-May-24 21:31:20.096800 [DEBUG] #8 CACHED
+2026-May-24 21:31:20.096800 [DEBUG] 
+2026-May-24 21:31:20.096800 [DEBUG] #9 [stage-0  5/11] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends curl wget
+2026-May-24 21:31:20.309533 [DEBUG] #9 CACHED
+2026-May-24 21:31:20.309533 [DEBUG] 
+2026-May-24 21:31:20.309533 [DEBUG] #10 [stage-0  6/11] COPY . /app/.
+2026-May-24 21:31:20.312172 [DEBUG] #10 DONE 0.1s
+2026-May-24 21:31:20.312172 [DEBUG] 
+2026-May-24 21:31:20.312172 [DEBUG] #11 [stage-0  7/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-/root/npm,target=/root/.npm npm ci
+2026-May-24 21:31:20.329826 [DEBUG] #11 0.172 npm warn config production Use `--omit=dev` instead.
+2026-May-24 21:31:52.033426 [DEBUG] #11 31.86
+2026-May-24 21:31:52.033426 [DEBUG] #11 31.86 added 536 packages, and audited 537 packages in 32s
+2026-May-24 21:31:52.215027 [DEBUG] #11 31.86
+2026-May-24 21:31:52.215027 [DEBUG] #11 31.86 264 packages are looking for funding
+2026-May-24 21:31:52.215027 [DEBUG] #11 31.86   run `npm fund` for details
+2026-May-24 21:31:52.215027 [DEBUG] #11 31.91
+2026-May-24 21:31:52.215027 [DEBUG] #11 31.91 2 moderate severity vulnerabilities
+2026-May-24 21:31:52.215027 [DEBUG] #11 31.91
+2026-May-24 21:31:52.215027 [DEBUG] #11 31.91 To address all issues (including breaking changes), run:
+2026-May-24 21:31:52.215027 [DEBUG] #11 31.91   npm audit fix --force
+2026-May-24 21:31:52.215027 [DEBUG] #11 31.91
+2026-May-24 21:31:52.215027 [DEBUG] #11 31.91 Run `npm audit` for details.
+2026-May-24 21:31:52.309834 [DEBUG] #11 DONE 32.2s
+2026-May-24 21:31:52.463474 [DEBUG] #12 [stage-0  8/11] COPY . /app/.
+2026-May-24 21:31:54.472799 [DEBUG] #12 DONE 2.2s
+2026-May-24 21:31:54.617635 [DEBUG] #13 [stage-0  9/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build
+2026-May-24 21:31:54.843580 [DEBUG] #13 0.376 npm warn config production Use `--omit=dev` instead.
+2026-May-24 21:31:55.029193 [DEBUG] #13 0.412
+2026-May-24 21:31:55.029193 [DEBUG] #13 0.412 > deeplink-saas@0.1.0 build
+2026-May-24 21:31:55.029193 [DEBUG] #13 0.412 > next build
+2026-May-24 21:31:55.029193 [DEBUG] #13 0.412
+2026-May-24 21:31:56.339756 [DEBUG] #13 1.873 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+2026-May-24 21:31:56.448551 [DEBUG] #13 1.874 This information is used to shape Next.js' roadmap and prioritize features.
+2026-May-24 21:31:56.448551 [DEBUG] #13 1.876 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+2026-May-24 21:31:56.448551 [DEBUG] #13 1.876 https://nextjs.org/telemetry
+2026-May-24 21:31:56.448551 [DEBUG] #13 1.876
+2026-May-24 21:31:56.448551 [DEBUG] #13 1.983    ▲ Next.js 15.5.18
+2026-May-24 21:31:56.561812 [DEBUG] #13 1.984
+2026-May-24 21:31:56.561812 [DEBUG] #13 2.096    Creating an optimized production build ...
+2026-May-24 21:32:16.954378 [DEBUG] #13 22.48  ✓ Compiled successfully in 15.5s
+2026-May-24 21:32:17.118194 [DEBUG] #13 22.50    Linting and checking validity of types ...
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 Failed to compile.
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 ./app/blog/[slug]/page.tsx
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 184:15  Error: Do not use an `<a>` element to navigate to `/blog/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 212:17  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 ./app/disclaimer/page.tsx
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 43:40  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 43:46  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 132:59  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 132:72  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 ./app/layout.tsx
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 78:9  Warning: Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 ./app/privacy/page.tsx
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 170:24  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 183:22  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 183:35  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 ./app/terms/page.tsx
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 109:40  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 109:46  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 109:52  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 109:65  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 141:37  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 141:50  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 ./components/cta-section.tsx
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 22:13  Error: Do not use an `<a>` element to navigate to `/blog/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35
+2026-May-24 21:32:26.820103 [DEBUG] #13 32.35 info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+2026-May-24 21:32:27.060895 [DEBUG] #13 ERROR: process "/bin/bash -ol pipefail -c npm run build" did not complete successfully: exit code: 1
+2026-May-24 21:32:27.206448 [DEBUG] ------
+2026-May-24 21:32:27.206448 [DEBUG] > [stage-0  9/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build:
+2026-May-24 21:32:27.206448 [DEBUG] 32.35 109:46  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.206448 [DEBUG] 32.35 109:52  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.206448 [DEBUG] 32.35 109:65  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.206448 [DEBUG] 32.35 141:37  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.206448 [DEBUG] 32.35 141:50  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.206448 [DEBUG] 32.35
+2026-May-24 21:32:27.206448 [DEBUG] 32.35 ./components/cta-section.tsx
+2026-May-24 21:32:27.206448 [DEBUG] 32.35 22:13  Error: Do not use an `<a>` element to navigate to `/blog/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+2026-May-24 21:32:27.206448 [DEBUG] 32.35
+2026-May-24 21:32:27.206448 [DEBUG] 32.35 info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+2026-May-24 21:32:27.206448 [DEBUG] ------
+2026-May-24 21:32:27.212951 [DEBUG] 3 warnings found (use docker --debug to expand):
+2026-May-24 21:32:27.212951 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 11)
+2026-May-24 21:32:27.212951 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "RESEND_API_KEY") (line 12)
+2026-May-24 21:32:27.212951 [DEBUG] - UndefinedVar: Usage of undefined variable '$NIXPACKS_PATH' (line 18)
+2026-May-24 21:32:27.231355 [DEBUG] Dockerfile:24
+2026-May-24 21:32:27.231355 [DEBUG] --------------------
+2026-May-24 21:32:27.231355 [DEBUG] 22 |     # build phase
+2026-May-24 21:32:27.231355 [DEBUG] 23 |     COPY . /app/.
+2026-May-24 21:32:27.231355 [DEBUG] 24 | >>> RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build
+2026-May-24 21:32:27.231355 [DEBUG] 25 |
+2026-May-24 21:32:27.231355 [DEBUG] 26 |
+2026-May-24 21:32:27.231355 [DEBUG] --------------------
+2026-May-24 21:32:27.231355 [DEBUG] ERROR: failed to build: failed to solve: process "/bin/bash -ol pipefail -c npm run build" did not complete successfully: exit code: 1
+2026-May-24 21:32:27.263626 [DEBUG] exit status 1
+2026-May-24 21:32:27.486240 ========================================
+2026-May-24 21:32:27.500241 Deployment failed: Command execution failed (exit code 1): docker exec mccoco0wogggw8g88kogss88 bash -c 'bash /artifacts/build.sh'
+2026-May-24 21:32:27.500241 Error: #0 building with "default" instance using docker driver
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 #1 [internal] load build definition from Dockerfile
+2026-May-24 21:32:27.500241 #1 transferring dockerfile: 1.54kB done
+2026-May-24 21:32:27.500241 #1 DONE 0.0s
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 #2 [internal] load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+2026-May-24 21:32:27.500241 #2 DONE 0.5s
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 #3 [internal] load .dockerignore
+2026-May-24 21:32:27.500241 #3 transferring context: 2B done
+2026-May-24 21:32:27.500241 #3 DONE 0.0s
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-May-24 21:32:27.500241 #4 resolve ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de 0.0s done
+2026-May-24 21:32:27.500241 #4 DONE 0.0s
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 #5 [internal] load build context
+2026-May-24 21:32:27.500241 #5 transferring context: 3.43MB 0.0s done
+2026-May-24 21:32:27.500241 #5 DONE 0.1s
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 #6 [stage-0  3/11] COPY .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix
+2026-May-24 21:32:27.500241 #6 CACHED
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 #7 [stage-0  4/11] RUN nix-env -if .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix && nix-collect-garbage -d
+2026-May-24 21:32:27.500241 #7 CACHED
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 #8 [stage-0  2/11] WORKDIR /app/
+2026-May-24 21:32:27.500241 #8 CACHED
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 #9 [stage-0  5/11] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends curl wget
+2026-May-24 21:32:27.500241 #9 CACHED
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 #10 [stage-0  6/11] COPY . /app/.
+2026-May-24 21:32:27.500241 #10 DONE 0.1s
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 #11 [stage-0  7/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-/root/npm,target=/root/.npm npm ci
+2026-May-24 21:32:27.500241 #11 0.172 npm warn config production Use `--omit=dev` instead.
+2026-May-24 21:32:27.500241 #11 31.86
+2026-May-24 21:32:27.500241 #11 31.86 added 536 packages, and audited 537 packages in 32s
+2026-May-24 21:32:27.500241 #11 31.86
+2026-May-24 21:32:27.500241 #11 31.86 264 packages are looking for funding
+2026-May-24 21:32:27.500241 #11 31.86   run `npm fund` for details
+2026-May-24 21:32:27.500241 #11 31.91
+2026-May-24 21:32:27.500241 #11 31.91 2 moderate severity vulnerabilities
+2026-May-24 21:32:27.500241 #11 31.91
+2026-May-24 21:32:27.500241 #11 31.91 To address all issues (including breaking changes), run:
+2026-May-24 21:32:27.500241 #11 31.91   npm audit fix --force
+2026-May-24 21:32:27.500241 #11 31.91
+2026-May-24 21:32:27.500241 #11 31.91 Run `npm audit` for details.
+2026-May-24 21:32:27.500241 #11 DONE 32.2s
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 #12 [stage-0  8/11] COPY . /app/.
+2026-May-24 21:32:27.500241 #12 DONE 2.2s
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 #13 [stage-0  9/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build
+2026-May-24 21:32:27.500241 #13 0.376 npm warn config production Use `--omit=dev` instead.
+2026-May-24 21:32:27.500241 #13 0.412
+2026-May-24 21:32:27.500241 #13 0.412 > deeplink-saas@0.1.0 build
+2026-May-24 21:32:27.500241 #13 0.412 > next build
+2026-May-24 21:32:27.500241 #13 0.412
+2026-May-24 21:32:27.500241 #13 1.873 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+2026-May-24 21:32:27.500241 #13 1.874 This information is used to shape Next.js' roadmap and prioritize features.
+2026-May-24 21:32:27.500241 #13 1.876 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+2026-May-24 21:32:27.500241 #13 1.876 https://nextjs.org/telemetry
+2026-May-24 21:32:27.500241 #13 1.876
+2026-May-24 21:32:27.500241 #13 1.983    ▲ Next.js 15.5.18
+2026-May-24 21:32:27.500241 #13 1.984
+2026-May-24 21:32:27.500241 #13 2.096    Creating an optimized production build ...
+2026-May-24 21:32:27.500241 #13 22.48  ✓ Compiled successfully in 15.5s
+2026-May-24 21:32:27.500241 #13 22.50    Linting and checking validity of types ...
+2026-May-24 21:32:27.500241 #13 32.35
+2026-May-24 21:32:27.500241 #13 32.35 Failed to compile.
+2026-May-24 21:32:27.500241 #13 32.35
+2026-May-24 21:32:27.500241 #13 32.35 ./app/blog/[slug]/page.tsx
+2026-May-24 21:32:27.500241 #13 32.35 184:15  Error: Do not use an `<a>` element to navigate to `/blog/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+2026-May-24 21:32:27.500241 #13 32.35 212:17  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+2026-May-24 21:32:27.500241 #13 32.35
+2026-May-24 21:32:27.500241 #13 32.35 ./app/disclaimer/page.tsx
+2026-May-24 21:32:27.500241 #13 32.35 43:40  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 #13 32.35 43:46  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 #13 32.35 132:59  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 #13 32.35 132:72  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 #13 32.35
+2026-May-24 21:32:27.500241 #13 32.35 ./app/layout.tsx
+2026-May-24 21:32:27.500241 #13 32.35 78:9  Warning: Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+2026-May-24 21:32:27.500241 #13 32.35
+2026-May-24 21:32:27.500241 #13 32.35 ./app/privacy/page.tsx
+2026-May-24 21:32:27.500241 #13 32.35 170:24  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 #13 32.35 183:22  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 #13 32.35 183:35  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 #13 32.35
+2026-May-24 21:32:27.500241 #13 32.35 ./app/terms/page.tsx
+2026-May-24 21:32:27.500241 #13 32.35 109:40  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 #13 32.35 109:46  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 #13 32.35 109:52  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 #13 32.35 109:65  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 #13 32.35 141:37  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 #13 32.35 141:50  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 #13 32.35
+2026-May-24 21:32:27.500241 #13 32.35 ./components/cta-section.tsx
+2026-May-24 21:32:27.500241 #13 32.35 22:13  Error: Do not use an `<a>` element to navigate to `/blog/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+2026-May-24 21:32:27.500241 #13 32.35
+2026-May-24 21:32:27.500241 #13 32.35 info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+2026-May-24 21:32:27.500241 #13 ERROR: process "/bin/bash -ol pipefail -c npm run build" did not complete successfully: exit code: 1
+2026-May-24 21:32:27.500241 ------
+2026-May-24 21:32:27.500241 > [stage-0  9/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build:
+2026-May-24 21:32:27.500241 32.35 109:46  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 32.35 109:52  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 32.35 109:65  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 32.35 141:37  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 32.35 141:50  Error: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+2026-May-24 21:32:27.500241 32.35
+2026-May-24 21:32:27.500241 32.35 ./components/cta-section.tsx
+2026-May-24 21:32:27.500241 32.35 22:13  Error: Do not use an `<a>` element to navigate to `/blog/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+2026-May-24 21:32:27.500241 32.35
+2026-May-24 21:32:27.500241 32.35 info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+2026-May-24 21:32:27.500241 ------
+2026-May-24 21:32:27.500241 
+2026-May-24 21:32:27.500241 3 warnings found (use docker --debug to expand):
+2026-May-24 21:32:27.500241 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 11)
+2026-May-24 21:32:27.500241 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "RESEND_API_KEY") (line 12)
+2026-May-24 21:32:27.500241 - UndefinedVar: Usage of undefined variable '$NIXPACKS_PATH' (line 18)
+2026-May-24 21:32:27.500241 Dockerfile:24
+2026-May-24 21:32:27.500241 --------------------
+2026-May-24 21:32:27.500241 22 |     # build phase
+2026-May-24 21:32:27.500241 23 |     COPY . /app/.
+2026-May-24 21:32:27.500241 24 | >>> RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build
+2026-May-24 21:32:27.500241 25 |
+2026-May-24 21:32:27.500241 26 |
+2026-May-24 21:32:27.500241 --------------------
+2026-May-24 21:32:27.500241 ERROR: failed to build: failed to solve: process "/bin/bash -ol pipefail -c npm run build" did not complete successfully: exit code: 1
+2026-May-24 21:32:27.500241 exit status 1
+2026-May-24 21:32:27.513197 [DEBUG] Error type: RuntimeException
+2026-May-24 21:32:27.527629 [DEBUG] Error code: 0
+2026-May-24 21:32:27.539034 [DEBUG] Location: /var/www/html/app/Traits/ExecuteRemoteCommand.php:243
+2026-May-24 21:32:27.549396 [DEBUG] Stack trace (first 5 lines):
+2026-May-24 21:32:27.561555 [DEBUG] #0 /var/www/html/app/Traits/ExecuteRemoteCommand.php(104): App\Jobs\ApplicationDeploymentJob->executeCommandWithProcess()
+2026-May-24 21:32:27.572868 [DEBUG] #1 /var/www/html/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php(271): App\Jobs\ApplicationDeploymentJob->{closure:App\Traits\ExecuteRemoteCommand::execute_remote_command():71}()
+2026-May-24 21:32:27.586050 [DEBUG] #2 /var/www/html/app/Traits/ExecuteRemoteCommand.php(71): Illuminate\Support\Collection->each()
+2026-May-24 21:32:27.602933 [DEBUG] #3 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(3118): App\Jobs\ApplicationDeploymentJob->execute_remote_command()
+2026-May-24 21:32:27.609491 [DEBUG] #4 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(888): App\Jobs\ApplicationDeploymentJob->build_image()
+2026-May-24 21:32:27.614892 ========================================
+2026-May-24 21:32:27.620396 Deployment failed. Removing the new version of your application.
+2026-May-24 21:32:28.432766 Gracefully shutting down build container: mccoco0wogggw8g88kogss88
+2026-May-24 21:32:29.106572 [DEBUG] [CMD]: docker stop -t 30 mccoco0wogggw8g88kogss88
+2026-May-24 21:32:29.106572 [DEBUG] mccoco0wogggw8g88kogss88

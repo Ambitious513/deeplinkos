@@ -12,10 +12,10 @@ export function AppShell({ children }: PropsWithChildren) {
 
         <div className="dashboard__group">
           <span className="dashboard__label">Workspace</span>
-          <Link href="/app" className="dashboard__link">
+          <Link href="/dashboard" className="dashboard__link">
             Generator
           </Link>
-          <Link href="/app/links" className="dashboard__link">
+          <Link href="/dashboard/links" className="dashboard__link">
             Recent links
           </Link>
         </div>

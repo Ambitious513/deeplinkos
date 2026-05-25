@@ -1,0 +1,41 @@
+2026-May-25 10:34:33.822056 Starting deployment of Ambitious513/deeplinkos:main to localhost.
+2026-May-25 10:34:34.078923 Preparing container with helper image: ghcr.io/coollabsio/coolify-helper:1.0.12
+2026-May-25 10:34:34.220344 [DEBUG] [CMD]: docker stop -t 30 gskg4kwoggss0wcosko0ss04
+2026-May-25 10:34:34.220344 [DEBUG] Error response from daemon: No such container: gskg4kwoggss0wcosko0ss04
+2026-May-25 10:34:34.517466 [DEBUG] [CMD]: docker run -d --network coolify --name gskg4kwoggss0wcosko0ss04  --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/coollabsio/coolify-helper:1.0.12
+2026-May-25 10:34:34.517466 [DEBUG] 25386a23698588e847c28afc5dade53e2675e22f3fd87b358dba55d62c3c7610
+2026-May-25 10:34:35.960073 [DEBUG] [CMD]: docker exec gskg4kwoggss0wcosko0ss04 bash -c 'GIT_SSH_COMMAND="ssh -o ConnectTimeout=30 -p 22 -o Port=22 -o LogLevel=ERROR -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git ls-remote https://github.com/Ambitious513/deeplinkos refs/heads/main'
+2026-May-25 10:34:35.960073 [DEBUG] bbee852ed0f3db8403e540f3cf23d227ead59ad0	refs/heads/main
+2026-May-25 10:34:36.371884 [DEBUG] [CMD]: docker images -q xw88g4k08cs404c4ww8488ow:bbee852ed0f3db8403e540f3cf23d227ead59ad0 2>/dev/null
+2026-May-25 10:34:36.371884 [DEBUG] 9d8146b40d88
+2026-May-25 10:34:36.390383 No configuration changed & image found (xw88g4k08cs404c4ww8488ow:bbee852ed0f3db8403e540f3cf23d227ead59ad0) with the same Git Commit SHA. Build step skipped.
+2026-May-25 10:34:37.753232 [DEBUG] Creating .env file with runtime variables for container.
+2026-May-25 10:34:38.560350 ----------------------------------------
+2026-May-25 10:34:38.565562 Rolling update started.
+2026-May-25 10:34:39.274348 [DEBUG] [CMD]: docker exec gskg4kwoggss0wcosko0ss04 bash -c 'COOLIFY_URL=https://deeplinkos.com,https//www.deeplinkos.com COOLIFY_FQDN=deeplinkos.com,https COOLIFY_BRANCH=main COOLIFY_RESOURCE_UUID=xw88g4k08cs404c4ww8488ow  docker compose --project-name xw88g4k08cs404c4ww8488ow --project-directory /artifacts/gskg4kwoggss0wcosko0ss04 -f /artifacts/gskg4kwoggss0wcosko0ss04/docker-compose.yaml up --build -d'
+2026-May-25 10:34:39.274348 [DEBUG] time="2026-05-25T10:34:39Z" level=warning msg="Found orphan containers ([xw88g4k08cs404c4ww8488ow-221640752803]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+2026-May-25 10:34:39.274348 [DEBUG] Container xw88g4k08cs404c4ww8488ow-103433367478  Creating
+2026-May-25 10:34:39.454938 [DEBUG] xw88g4k08cs404c4ww8488ow-103433367478 Your kernel does not support memory swappiness capabilities or the cgroup is not mounted. Memory swappiness discarded.
+2026-May-25 10:34:39.454938 [DEBUG] Container xw88g4k08cs404c4ww8488ow-103433367478  Created
+2026-May-25 10:34:39.523538 [DEBUG] Container xw88g4k08cs404c4ww8488ow-103433367478  Starting
+2026-May-25 10:34:40.143895 [DEBUG] Container xw88g4k08cs404c4ww8488ow-103433367478  Started
+2026-May-25 10:34:40.179676 New container started.
+2026-May-25 10:34:40.196048 Waiting for healthcheck to pass on the new container.
+2026-May-25 10:34:40.217875 Healthcheck URL (inside the container): GET: http://localhost:3000/
+2026-May-25 10:34:40.241218 Waiting for the start period (30 seconds) before starting healthcheck.
+2026-May-25 10:35:10.547467 [DEBUG] [CMD]: docker inspect --format='{{json .State.Health.Status}}' xw88g4k08cs404c4ww8488ow-103433367478
+2026-May-25 10:35:10.547467 [DEBUG] "healthy"
+2026-May-25 10:35:10.861869 [DEBUG] [CMD]: docker inspect --format='{{json .State.Health.Log}}' xw88g4k08cs404c4ww8488ow-103433367478
+2026-May-25 10:35:10.861869 [DEBUG] [{"Start":"2026-05-25T10:34:45.133507427Z","End":"2026-05-25T10:34:47.867865639Z","ExitCode":0,"Output":""},{"Start":"2026-05-25T10:34:52.869042651Z","End":"2026-05-25T10:34:53.084752094Z","ExitCode":0,"Output":""},{"Start":"2026-05-25T10:34:58.086467029Z","End":"2026-05-25T10:34:58.237744028Z","ExitCode":0,"Output":""},{"Start":"2026-05-25T10:35:03.238056282Z","End":"2026-05-25T10:35:03.980510484Z","ExitCode":0,"Output":""},{"Start":"2026-05-25T10:35:08.981494963Z","End":"2026-05-25T10:35:09.05200336Z","ExitCode":0,"Output":""}]
+2026-May-25 10:35:10.874630 Attempt 1 of 10 | Healthcheck status: "healthy"
+2026-May-25 10:35:10.892302 Healthcheck logs: (no logs) | Return code: 0
+2026-May-25 10:35:10.912758 New container is healthy.
+2026-May-25 10:35:10.917825 Removing old containers.
+2026-May-25 10:35:12.663249 [DEBUG] [CMD]: docker stop -t 30 xw88g4k08cs404c4ww8488ow-221640752803
+2026-May-25 10:35:12.663249 [DEBUG] xw88g4k08cs404c4ww8488ow-221640752803
+2026-May-25 10:35:13.011646 [DEBUG] [CMD]: docker rm -f xw88g4k08cs404c4ww8488ow-221640752803
+2026-May-25 10:35:13.011646 [DEBUG] xw88g4k08cs404c4ww8488ow-221640752803
+2026-May-25 10:35:13.019506 Rolling update completed.
+2026-May-25 10:35:13.407309 Gracefully shutting down build container: gskg4kwoggss0wcosko0ss04
+2026-May-25 10:35:13.746611 [DEBUG] [CMD]: docker stop -t 30 gskg4kwoggss0wcosko0ss04
+2026-May-25 10:35:13.746611 [DEBUG] gskg4kwoggss0wcosko0ss04

@@ -14,7 +14,7 @@ export default function NotFound() {
           and publish a fresh short link in a minute.
         </p>
         <div className="hero__actions">
-          <Link href="/app" className="button button--primary">
+          <Link href="/dashboard" className="button button--primary">
             Open app
           </Link>
           <Link href="/" className="button button--secondary">

@@ -14,10 +14,10 @@ export default function MissingPage() {
           routing record with valid mobile and fallback destinations.
         </p>
         <div className="hero__actions">
-          <Link href="/app" className="button button--primary">
+          <Link href="/dashboard" className="button button--primary">
             Open app
           </Link>
-          <Link href="/app/links" className="button button--secondary">
+          <Link href="/dashboard/links" className="button button--secondary">
             Recent links
           </Link>
         </div>
