@@ -144,7 +144,12 @@ function toIosScheme(preset: PresetKey, url: URL): string | undefined {
     }
 
     default:
-      return undefined;
+      // For generic web links on iOS, try to break out to Google Chrome.
+      // If Chrome isn't installed, the redirect fails and the fallback timer
+      // safely opens the regular web link inside the WebView.
+      return url.protocol === "https:"
+        ? `googlechromes://${url.hostname}${path}${url.search}`
+        : `googlechrome://${url.hostname}${path}${url.search}`;
   }
 }
 
@@ -161,8 +166,10 @@ function toAndroidIntent(preset: PresetKey, url: URL): string | undefined {
     telegram:  "org.telegram.messenger",
   };
 
-  const pkg = packages[preset];
-  if (!pkg) return undefined;
+  // If preset doesn't have a specific native app package (e.g. "custom" / generic web link),
+  // we target Google Chrome. This forces in-app WebViews (like Facebook, IG, TikTok)
+  // to break out and open the link in the native Android browser instead of trapping the user.
+  const pkg = packages[preset] || "com.android.chrome";
 
   // URL encode the desktop fallback URL for the Intent string
   const encodedFallback = encodeURIComponent(url.toString());
