@@ -95,18 +95,102 @@ function slugFromUrl(input: string) {
   }
 }
 
+/** Build a native iOS URI scheme from a web URL for the given preset */
+function toIosScheme(preset: PresetKey, url: URL): string | undefined {
+  const path = url.pathname; // e.g. /watch, /@handle, /reel/123
+
+  switch (preset) {
+    case "youtube":
+      // vnd.youtube:// is the confirmed working iOS scheme
+      return `vnd.youtube://${url.hostname}${path}${url.search}`;
+
+    case "instagram":
+      // instagram:// handles profiles, reels, posts
+      return `instagram://${url.hostname}${path}${url.search}`;
+
+    case "tiktok":
+      return `snssdk1233://${url.hostname}${path}${url.search}`;
+
+    case "twitter":
+      return `twitter://${url.hostname}${path}${url.search}`;
+
+    case "facebook":
+      return `fb://${url.hostname}${path}${url.search}`;
+
+    case "whatsapp": {
+      // wa.me/PHONE → whatsapp://send?phone=PHONE
+      const phone = url.pathname.replace(/^\//, "");
+      return phone ? `whatsapp://send?phone=${phone}` : undefined;
+    }
+
+    case "telegram": {
+      // t.me/USERNAME → tg://resolve?domain=USERNAME
+      const username = url.pathname.replace(/^\//, "");
+      return username ? `tg://resolve?domain=${username}` : undefined;
+    }
+
+    default:
+      return undefined;
+  }
+}
+
+/** Build an Android Intent URI from a web URL for the given preset.
+ *  Intent URIs bypass WebView restrictions because they are handled by the OS. */
+function toAndroidIntent(preset: PresetKey, url: URL): string | undefined {
+  const packages: Partial<Record<PresetKey, string>> = {
+    youtube:   "com.google.android.youtube",
+    instagram: "com.instagram.android",
+    tiktok:    "com.zhiliaoapp.musically",
+    twitter:   "com.twitter.android",
+    facebook:  "com.facebook.katana",
+    whatsapp:  "com.whatsapp",
+    telegram:  "org.telegram.messenger",
+  };
+
+  const pkg = packages[preset];
+  if (!pkg) return undefined;
+
+  if (preset === "whatsapp") {
+    const phone = url.pathname.replace(/^\//, "");
+    return phone
+      ? `intent://send?phone=${phone}#Intent;scheme=whatsapp;package=${pkg};end;`
+      : undefined;
+  }
+
+  if (preset === "telegram") {
+    const username = url.pathname.replace(/^\//, "");
+    return username
+      ? `intent://resolve?domain=${username}#Intent;scheme=tg;package=${pkg};end;`
+      : undefined;
+  }
+
+  // Generic: intent://host/path#Intent;scheme=https;package=PKG;end;
+  return `intent://${url.hostname}${url.pathname}${url.search}#Intent;scheme=https;package=${pkg};end;`;
+}
+
 export function inferLinkFromDestination(input: string): InferredLink {
   const desktopUrl = normalizeUrl(input);
   const preset = detectPresetFromUrl(desktopUrl);
+
+  let iosDeepLink: string | undefined;
+  let androidDeepLink: string | undefined;
+
+  try {
+    const parsed = new URL(desktopUrl);
+    iosDeepLink     = toIosScheme(preset, parsed)     ?? desktopUrl;
+    androidDeepLink = toAndroidIntent(preset, parsed) ?? desktopUrl;
+  } catch {
+    iosDeepLink     = desktopUrl;
+    androidDeepLink = desktopUrl;
+  }
 
   return {
     preset,
     title: titleFromPreset(preset),
     slug: slugFromUrl(desktopUrl),
     desktopUrl,
-    // Universal links often open the app directly for supported destinations, which keeps v1 simple.
-    iosDeepLink: desktopUrl,
-    androidDeepLink: desktopUrl
+    iosDeepLink,
+    androidDeepLink,
   };
 }
 
