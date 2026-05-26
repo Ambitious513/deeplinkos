@@ -26,9 +26,23 @@ export function detectPlatform(userAgent: string | null): DevicePlatform {
  * Regular mobile browsers (Chrome, Safari) handle intent:// and custom schemes just fine
  * via a plain HTTP 307 redirect — which is much faster.
  */
-export function isInAppWebView(userAgent: string | null, xRequestedWith: string | null = null): boolean {
-  const ua = userAgent || "";
+export function isInAppWebView(
+  userAgent: string | null,
+  xRequestedWith: string | null = null,
+  referer: string | null = null
+): boolean {
+  const ua = (userAgent || "").toLowerCase();
   const xrw = (xRequestedWith || "").toLowerCase();
+  const ref = (referer || "").toLowerCase();
+
+  // Social Media Link Wrappers (Chrome Custom Tabs detection)
+  // Even if the User-Agent is perfect Chrome and X-Requested-With is missing,
+  // if the user clicked from a social network shortener, they are likely trapped
+  // in a Chrome Custom Tab or SFSafariViewController. We force the JS interstitial
+  // because JS .click() breaks out of CCTs better than 307 redirects.
+  if (/t\.co|l\.facebook\.com|l\.instagram\.com|lnkd\.in|out\.reddit\.com/i.test(ref)) {
+    return true;
+  }
 
   // Android Stealth WebViews (e.g. Twitter, Telegram, etc.)
   // The X-Requested-With header contains the package name of the app hosting the WebView.
