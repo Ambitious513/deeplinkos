@@ -6,7 +6,8 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const link = await createLinkFromPayload(body);
-    const forwardedHost = request.headers.get("x-forwarded-host");
+    const forwardedHostHeader = request.headers.get("x-forwarded-host");
+    const forwardedHost = forwardedHostHeader ? forwardedHostHeader.split(",")[0].trim() : null;
     const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
     const origin = process.env.NEXT_PUBLIC_SITE_URL || (forwardedHost ? `${forwardedProto}://${forwardedHost}` : new URL(request.url).origin);
 
