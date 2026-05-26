@@ -32,7 +32,7 @@ export default async function DeepLinkPage({
     "/";
 
   // On desktop just do a server-side redirect right away
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // @ts-expect-error - dynamic fallback bypasses typedRoutes restriction
   if (platform === "desktop") redirect(webFallback as any);
 
   // Escape values to safely embed in inline script
