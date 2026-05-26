@@ -55,18 +55,27 @@ export async function GET(
   // which is still a fully-featured browser with cookies and tracking.
   if (cct && platform === "android") {
     const encodedUrl = encodeURIComponent(webFallback);
-    // Each Intent targets a real, widely-installed Android browser.
-    // S.browser_fallback_url is set to the web URL, so if that browser
-    // isn't installed, Android falls back gracefully to the CCT web view.
+
+    // ── Browser-specific URL schemes ──────────────────────────────────────────
+    // Using https:// intents triggers Android's activity chooser (showing both
+    // Chrome and the target browser). Instead we use each browser's OWN custom
+    // URL scheme — these are ONLY registered by that specific browser, so Android
+    // opens them directly with zero chooser dialog.
+    //
+    // Cascade order (most → least likely to be installed on Android):
     const browsers = [
-      // Firefox — most popular alternative browser (~400M installs)
-      `intent://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}#Intent;scheme=https;package=org.mozilla.firefox;S.browser_fallback_url=${encodedUrl};end;`,
-      // Brave — privacy-focused, very popular
-      `intent://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}#Intent;scheme=https;package=com.brave.browser;S.browser_fallback_url=${encodedUrl};end;`,
-      // Samsung Internet — pre-installed on all Samsung devices
-      `intent://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}#Intent;scheme=https;package=com.sec.android.app.sbrowser;S.browser_fallback_url=${encodedUrl};end;`,
-      // Microsoft Edge — growing share, pre-installed on some devices
-      `intent://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}#Intent;scheme=https;package=com.microsoft.emmx;S.browser_fallback_url=${encodedUrl};end;`,
+      // 1. Samsung Internet — pre-installed on ALL Samsung devices (~30% of Android market)
+      //    sbrowser:// is Samsung's proprietary scheme, only Samsung Internet handles it.
+      `sbrowser://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}`,
+      // 2. Firefox — 400M+ installs, widely popular
+      //    firefox://open-url?url=... is Firefox's own scheme
+      `firefox://open-url?url=${encodedUrl}`,
+      // 3. Brave — privacy-focused, fast-growing
+      `brave://open-url?url=${encodedUrl}`,
+      // 4. Microsoft Edge — pre-installed on many devices, growing
+      `microsoft-edge://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}`,
+      // 5. DuckDuckGo Browser — very privacy-conscious users
+      `ddgquicklink://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}`,
     ];
 
     const html = `<!DOCTYPE html>
