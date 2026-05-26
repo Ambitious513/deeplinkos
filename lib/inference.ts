@@ -150,22 +150,25 @@ function toAndroidIntent(preset: PresetKey, url: URL): string | undefined {
   const pkg = packages[preset];
   if (!pkg) return undefined;
 
+  // URL encode the desktop fallback URL for the Intent string
+  const encodedFallback = encodeURIComponent(url.toString());
+
   if (preset === "whatsapp") {
     const phone = url.pathname.replace(/^\//, "");
     return phone
-      ? `intent://send?phone=${phone}#Intent;scheme=whatsapp;package=${pkg};end;`
+      ? `intent://send?phone=${phone}#Intent;scheme=whatsapp;package=${pkg};S.browser_fallback_url=${encodedFallback};end;`
       : undefined;
   }
 
   if (preset === "telegram") {
     const username = url.pathname.replace(/^\//, "");
     return username
-      ? `intent://resolve?domain=${username}#Intent;scheme=tg;package=${pkg};end;`
+      ? `intent://resolve?domain=${username}#Intent;scheme=tg;package=${pkg};S.browser_fallback_url=${encodedFallback};end;`
       : undefined;
   }
 
-  // Generic: intent://host/path#Intent;scheme=https;package=PKG;end;
-  return `intent://${url.hostname}${url.pathname}${url.search}#Intent;scheme=https;package=${pkg};end;`;
+  // Generic: intent://host/path#Intent;scheme=https;package=PKG;S.browser_fallback_url=...;end;
+  return `intent://${url.hostname}${url.pathname}${url.search}#Intent;scheme=https;package=${pkg};S.browser_fallback_url=${encodedFallback};end;`;
 }
 
 export function inferLinkFromDestination(input: string): InferredLink {
