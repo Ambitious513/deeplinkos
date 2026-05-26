@@ -1,0 +1,429 @@
+2026-May-26 16:09:18.515898 Starting deployment of Ambitious513/deeplinkos:main to localhost.
+2026-May-26 16:09:18.818346 Preparing container with helper image: ghcr.io/coollabsio/coolify-helper:1.0.12
+2026-May-26 16:09:18.942150 [DEBUG] [CMD]: docker stop -t 30 k0ogoo8ows4wcw4cc8c4cg04
+2026-May-26 16:09:18.942150 [DEBUG] Error response from daemon: No such container: k0ogoo8ows4wcw4cc8c4cg04
+2026-May-26 16:09:19.106070 [DEBUG] [CMD]: docker run -d --network coolify --name k0ogoo8ows4wcw4cc8c4cg04  --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/coollabsio/coolify-helper:1.0.12
+2026-May-26 16:09:19.106070 [DEBUG] f984c380625a6e7414bf079f45243dd6b19d97bb6684f998032c774c91eab61b
+2026-May-26 16:09:20.281585 [DEBUG] [CMD]: docker exec k0ogoo8ows4wcw4cc8c4cg04 bash -c 'GIT_SSH_COMMAND="ssh -o ConnectTimeout=30 -p 22 -o Port=22 -o LogLevel=ERROR -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git ls-remote https://github.com/Ambitious513/deeplinkos refs/heads/main'
+2026-May-26 16:09:20.281585 [DEBUG] 92b701096832c956180571325a986b94d8dc41f8	refs/heads/main
+2026-May-26 16:09:20.412071 Image not found (xw88g4k08cs404c4ww8488ow:92b701096832c956180571325a986b94d8dc41f8). Building new image.
+2026-May-26 16:09:20.417532 ----------------------------------------
+2026-May-26 16:09:20.422221 Importing Ambitious513/deeplinkos:main (commit sha 92b701096832c956180571325a986b94d8dc41f8) to /artifacts/k0ogoo8ows4wcw4cc8c4cg04.
+2026-May-26 16:09:20.598321 [DEBUG] [CMD]: docker exec k0ogoo8ows4wcw4cc8c4cg04 bash -c 'git clone --depth=1 --recurse-submodules --shallow-submodules -b 'main' 'https://github.com/Ambitious513/deeplinkos' '/artifacts/k0ogoo8ows4wcw4cc8c4cg04' && cd '/artifacts/k0ogoo8ows4wcw4cc8c4cg04' && if [ -f .gitmodules ]; then sed -i "s#git@\(.*\):#https://\1/#g" '/artifacts/k0ogoo8ows4wcw4cc8c4cg04'/.gitmodules || true && git submodule sync && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git submodule update --init --recursive --depth=1; fi && cd '/artifacts/k0ogoo8ows4wcw4cc8c4cg04' && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git lfs pull'
+2026-May-26 16:09:20.598321 [DEBUG] Cloning into '/artifacts/k0ogoo8ows4wcw4cc8c4cg04'...
+2026-May-26 16:09:22.356587 [DEBUG] [CMD]: docker exec k0ogoo8ows4wcw4cc8c4cg04 bash -c 'cd /artifacts/k0ogoo8ows4wcw4cc8c4cg04 && git log -1 92b701096832c956180571325a986b94d8dc41f8 --pretty=%B'
+2026-May-26 16:09:22.356587 [DEBUG] fix: replace eslint disable rule with ts-expect-error to fix build failure
+2026-May-26 16:09:22.359284 [DEBUG] 
+2026-May-26 16:09:22.670347 Generating nixpacks configuration with: nixpacks plan -f json --env NIXPACKS_NODE_VERSION=22 --env COOLIFY_URL=https://deeplinkos.com,https://www.deeplinkos.com --env COOLIFY_FQDN=deeplinkos.com,www.deeplinkos.com --env COOLIFY_BRANCH=main --env COOLIFY_RESOURCE_UUID=xw88g4k08cs404c4ww8488ow /artifacts/k0ogoo8ows4wcw4cc8c4cg04
+2026-May-26 16:09:22.932403 [DEBUG] [CMD]: docker exec k0ogoo8ows4wcw4cc8c4cg04 bash -c 'nixpacks plan -f json --env NIXPACKS_NODE_VERSION=22 --env COOLIFY_URL=https://deeplinkos.com,https://www.deeplinkos.com --env COOLIFY_FQDN=deeplinkos.com,www.deeplinkos.com --env COOLIFY_BRANCH=main --env COOLIFY_RESOURCE_UUID=xw88g4k08cs404c4ww8488ow /artifacts/k0ogoo8ows4wcw4cc8c4cg04'
+2026-May-26 16:09:22.932403 [DEBUG] {
+2026-May-26 16:09:22.932403 [DEBUG] "providers": [],
+2026-May-26 16:09:22.932403 [DEBUG] "buildImage": "ghcr.io/railwayapp/nixpacks:ubuntu-1745885067",
+2026-May-26 16:09:22.932403 [DEBUG] "variables": {
+2026-May-26 16:09:22.932403 [DEBUG] "CI": "true",
+2026-May-26 16:09:22.932403 [DEBUG] "COOLIFY_BRANCH": "main",
+2026-May-26 16:09:22.932403 [DEBUG] "COOLIFY_FQDN": "deeplinkos.com,www.deeplinkos.com",
+2026-May-26 16:09:22.932403 [DEBUG] "COOLIFY_RESOURCE_UUID": "xw88g4k08cs404c4ww8488ow",
+2026-May-26 16:09:22.932403 [DEBUG] "COOLIFY_URL": "https://deeplinkos.com,https://www.deeplinkos.com",
+2026-May-26 16:09:22.932403 [DEBUG] "NIXPACKS_METADATA": "node",
+2026-May-26 16:09:22.932403 [DEBUG] "NIXPACKS_NODE_VERSION": "22",
+2026-May-26 16:09:22.932403 [DEBUG] "NODE_ENV": "production",
+2026-May-26 16:09:22.932403 [DEBUG] "NPM_CONFIG_PRODUCTION": "false"
+2026-May-26 16:09:22.932403 [DEBUG] },
+2026-May-26 16:09:22.932403 [DEBUG] "phases": {
+2026-May-26 16:09:22.932403 [DEBUG] "build": {
+2026-May-26 16:09:22.932403 [DEBUG] "dependsOn": [
+2026-May-26 16:09:22.932403 [DEBUG] "install"
+2026-May-26 16:09:22.932403 [DEBUG] ],
+2026-May-26 16:09:22.932403 [DEBUG] "cmds": [
+2026-May-26 16:09:22.932403 [DEBUG] "npm run build"
+2026-May-26 16:09:22.932403 [DEBUG] ],
+2026-May-26 16:09:22.932403 [DEBUG] "cacheDirectories": [
+2026-May-26 16:09:22.932403 [DEBUG] ".next/cache",
+2026-May-26 16:09:22.932403 [DEBUG] "node_modules/.cache"
+2026-May-26 16:09:22.932403 [DEBUG] ]
+2026-May-26 16:09:22.932403 [DEBUG] },
+2026-May-26 16:09:22.932403 [DEBUG] "install": {
+2026-May-26 16:09:22.932403 [DEBUG] "dependsOn": [
+2026-May-26 16:09:22.932403 [DEBUG] "setup"
+2026-May-26 16:09:22.932403 [DEBUG] ],
+2026-May-26 16:09:22.932403 [DEBUG] "cmds": [
+2026-May-26 16:09:22.932403 [DEBUG] "npm install"
+2026-May-26 16:09:22.932403 [DEBUG] ],
+2026-May-26 16:09:22.932403 [DEBUG] "cacheDirectories": [
+2026-May-26 16:09:22.932403 [DEBUG] "/root/.npm"
+2026-May-26 16:09:22.932403 [DEBUG] ],
+2026-May-26 16:09:22.932403 [DEBUG] "paths": [
+2026-May-26 16:09:22.932403 [DEBUG] "/app/node_modules/.bin"
+2026-May-26 16:09:22.932403 [DEBUG] ]
+2026-May-26 16:09:22.932403 [DEBUG] },
+2026-May-26 16:09:22.932403 [DEBUG] "setup": {
+2026-May-26 16:09:22.932403 [DEBUG] "nixPkgs": [
+2026-May-26 16:09:22.932403 [DEBUG] "nodejs_22",
+2026-May-26 16:09:22.932403 [DEBUG] "npm-9_x",
+2026-May-26 16:09:22.932403 [DEBUG] "openssl"
+2026-May-26 16:09:22.932403 [DEBUG] ],
+2026-May-26 16:09:22.932403 [DEBUG] "nixLibs": [
+2026-May-26 16:09:22.932403 [DEBUG] "gcc-unwrapped"
+2026-May-26 16:09:22.932403 [DEBUG] ],
+2026-May-26 16:09:22.932403 [DEBUG] "nixOverlays": [
+2026-May-26 16:09:22.932403 [DEBUG] "https://github.com/railwayapp/nix-npm-overlay/archive/main.tar.gz"
+2026-May-26 16:09:22.932403 [DEBUG] ],
+2026-May-26 16:09:22.932403 [DEBUG] "nixpkgsArchive": "23f9169c4ccce521379e602cc82ed873a1f1b52b"
+2026-May-26 16:09:22.932403 [DEBUG] }
+2026-May-26 16:09:22.932403 [DEBUG] },
+2026-May-26 16:09:22.932403 [DEBUG] "start": {
+2026-May-26 16:09:22.932403 [DEBUG] "cmd": "npm run start"
+2026-May-26 16:09:22.932403 [DEBUG] }
+2026-May-26 16:09:22.938095 [DEBUG] }
+2026-May-26 16:09:23.266299 [DEBUG] [CMD]: docker exec k0ogoo8ows4wcw4cc8c4cg04 bash -c 'nixpacks detect /artifacts/k0ogoo8ows4wcw4cc8c4cg04'
+2026-May-26 16:09:23.266299 [DEBUG] node
+2026-May-26 16:09:23.279802 Found application type: node.
+2026-May-26 16:09:23.285665 If you need further customization, please check the documentation of Nixpacks: https://nixpacks.com/docs/providers/node
+2026-May-26 16:09:23.296183 [DEBUG] Final Nixpacks plan: {
+2026-May-26 16:09:23.296183 [DEBUG] "providers": [],
+2026-May-26 16:09:23.296183 [DEBUG] "buildImage": "ghcr.io\/railwayapp\/nixpacks:ubuntu-1745885067",
+2026-May-26 16:09:23.296183 [DEBUG] "phases": {
+2026-May-26 16:09:23.296183 [DEBUG] "build": {
+2026-May-26 16:09:23.296183 [DEBUG] "dependsOn": [
+2026-May-26 16:09:23.296183 [DEBUG] "install"
+2026-May-26 16:09:23.296183 [DEBUG] ],
+2026-May-26 16:09:23.296183 [DEBUG] "cmds": [
+2026-May-26 16:09:23.296183 [DEBUG] "npm run build"
+2026-May-26 16:09:23.296183 [DEBUG] ],
+2026-May-26 16:09:23.296183 [DEBUG] "cacheDirectories": [
+2026-May-26 16:09:23.296183 [DEBUG] ".next\/cache",
+2026-May-26 16:09:23.296183 [DEBUG] "node_modules\/.cache"
+2026-May-26 16:09:23.296183 [DEBUG] ]
+2026-May-26 16:09:23.296183 [DEBUG] },
+2026-May-26 16:09:23.296183 [DEBUG] "install": {
+2026-May-26 16:09:23.296183 [DEBUG] "dependsOn": [
+2026-May-26 16:09:23.296183 [DEBUG] "setup"
+2026-May-26 16:09:23.296183 [DEBUG] ],
+2026-May-26 16:09:23.296183 [DEBUG] "cmds": [
+2026-May-26 16:09:23.296183 [DEBUG] "npm install"
+2026-May-26 16:09:23.296183 [DEBUG] ],
+2026-May-26 16:09:23.296183 [DEBUG] "cacheDirectories": [
+2026-May-26 16:09:23.296183 [DEBUG] "\/root\/.npm"
+2026-May-26 16:09:23.296183 [DEBUG] ],
+2026-May-26 16:09:23.296183 [DEBUG] "paths": [
+2026-May-26 16:09:23.296183 [DEBUG] "\/app\/node_modules\/.bin"
+2026-May-26 16:09:23.296183 [DEBUG] ]
+2026-May-26 16:09:23.296183 [DEBUG] },
+2026-May-26 16:09:23.296183 [DEBUG] "setup": {
+2026-May-26 16:09:23.296183 [DEBUG] "nixPkgs": [
+2026-May-26 16:09:23.296183 [DEBUG] "nodejs_22",
+2026-May-26 16:09:23.296183 [DEBUG] "npm-9_x",
+2026-May-26 16:09:23.296183 [DEBUG] "openssl"
+2026-May-26 16:09:23.296183 [DEBUG] ],
+2026-May-26 16:09:23.296183 [DEBUG] "nixLibs": [
+2026-May-26 16:09:23.296183 [DEBUG] "gcc-unwrapped"
+2026-May-26 16:09:23.296183 [DEBUG] ],
+2026-May-26 16:09:23.296183 [DEBUG] "nixOverlays": [
+2026-May-26 16:09:23.296183 [DEBUG] "https:\/\/github.com\/railwayapp\/nix-npm-overlay\/archive\/main.tar.gz"
+2026-May-26 16:09:23.296183 [DEBUG] ],
+2026-May-26 16:09:23.296183 [DEBUG] "nixpkgsArchive": "23f9169c4ccce521379e602cc82ed873a1f1b52b",
+2026-May-26 16:09:23.296183 [DEBUG] "aptPkgs": [
+2026-May-26 16:09:23.296183 [DEBUG] "curl",
+2026-May-26 16:09:23.296183 [DEBUG] "wget"
+2026-May-26 16:09:23.296183 [DEBUG] ]
+2026-May-26 16:09:23.296183 [DEBUG] }
+2026-May-26 16:09:23.296183 [DEBUG] },
+2026-May-26 16:09:23.296183 [DEBUG] "start": {
+2026-May-26 16:09:23.296183 [DEBUG] "cmd": "npm run start"
+2026-May-26 16:09:23.296183 [DEBUG] }
+2026-May-26 16:09:23.296183 [DEBUG] }
+2026-May-26 16:09:23.798119 [DEBUG] Creating build-time .env file in /artifacts (outside Docker context).
+2026-May-26 16:09:24.020969 ----------------------------------------
+2026-May-26 16:09:24.026300 Building docker image started.
+2026-May-26 16:09:24.031254 To check the current progress, click on Show Debug Logs.
+2026-May-26 16:09:24.433305 [DEBUG] [CMD]: docker exec k0ogoo8ows4wcw4cc8c4cg04 bash -c 'nixpacks build -c /artifacts/thegameplan.json --cache-key 'xw88g4k08cs404c4ww8488ow' --no-error-without-start -n xw88g4k08cs404c4ww8488ow:92b701096832c956180571325a986b94d8dc41f8 /artifacts/k0ogoo8ows4wcw4cc8c4cg04 -o /artifacts/k0ogoo8ows4wcw4cc8c4cg04'
+2026-May-26 16:09:24.433305 [DEBUG] 
+2026-May-26 16:09:24.433305 [DEBUG] ╔══════════════════ Nixpacks v1.41.0 ══════════════════╗
+2026-May-26 16:09:24.433305 [DEBUG] ║ setup      │ nodejs_22, npm-9_x, openssl, curl, wget ║
+2026-May-26 16:09:24.433305 [DEBUG] ║──────────────────────────────────────────────────────║
+2026-May-26 16:09:24.433305 [DEBUG] ║ install    │ npm install                             ║
+2026-May-26 16:09:24.433305 [DEBUG] ║──────────────────────────────────────────────────────║
+2026-May-26 16:09:24.433305 [DEBUG] ║ build      │ npm run build                           ║
+2026-May-26 16:09:24.433305 [DEBUG] ║──────────────────────────────────────────────────────║
+2026-May-26 16:09:24.433305 [DEBUG] ║ start      │ npm run start                           ║
+2026-May-26 16:09:24.433305 [DEBUG] ╚══════════════════════════════════════════════════════╝
+2026-May-26 16:09:24.437297 [DEBUG] Saved output to:
+2026-May-26 16:09:24.437297 [DEBUG] /artifacts/k0ogoo8ows4wcw4cc8c4cg04
+2026-May-26 16:09:24.634531 [DEBUG] [CMD]: docker exec k0ogoo8ows4wcw4cc8c4cg04 bash -c 'cat /artifacts/k0ogoo8ows4wcw4cc8c4cg04/.nixpacks/Dockerfile'
+2026-May-26 16:09:24.634531 [DEBUG] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+2026-May-26 16:09:24.634531 [DEBUG] 
+2026-May-26 16:09:24.634531 [DEBUG] ENTRYPOINT ["/bin/bash", "-l", "-c"]
+2026-May-26 16:09:24.634531 [DEBUG] WORKDIR /app/
+2026-May-26 16:09:24.634531 [DEBUG] 
+2026-May-26 16:09:24.634531 [DEBUG] 
+2026-May-26 16:09:24.634531 [DEBUG] COPY .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix
+2026-May-26 16:09:24.634531 [DEBUG] RUN nix-env -if .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix && nix-collect-garbage -d
+2026-May-26 16:09:24.634531 [DEBUG] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends curl wget
+2026-May-26 16:09:24.634531 [DEBUG] 
+2026-May-26 16:09:24.634531 [DEBUG] ARG CI COOLIFY_BRANCH COOLIFY_FQDN COOLIFY_RESOURCE_UUID COOLIFY_URL NEXT_PUBLIC_SITE_URL NIXPACKS_METADATA NIXPACKS_NODE_VERSION NODE_ENV NPM_CONFIG_PRODUCTION RESEND_API_KEY
+2026-May-26 16:09:24.634531 [DEBUG] ENV CI=$CI COOLIFY_BRANCH=$COOLIFY_BRANCH COOLIFY_FQDN=$COOLIFY_FQDN COOLIFY_RESOURCE_UUID=$COOLIFY_RESOURCE_UUID COOLIFY_URL=$COOLIFY_URL NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL NIXPACKS_METADATA=$NIXPACKS_METADATA NIXPACKS_NODE_VERSION=$NIXPACKS_NODE_VERSION NODE_ENV=$NODE_ENV NPM_CONFIG_PRODUCTION=$NPM_CONFIG_PRODUCTION RESEND_API_KEY=$RESEND_API_KEY
+2026-May-26 16:09:24.634531 [DEBUG] 
+2026-May-26 16:09:24.634531 [DEBUG] # setup phase
+2026-May-26 16:09:24.634531 [DEBUG] # noop
+2026-May-26 16:09:24.634531 [DEBUG] 
+2026-May-26 16:09:24.634531 [DEBUG] # install phase
+2026-May-26 16:09:24.634531 [DEBUG] ENV NIXPACKS_PATH=/app/node_modules/.bin:$NIXPACKS_PATH
+2026-May-26 16:09:24.634531 [DEBUG] COPY . /app/.
+2026-May-26 16:09:24.634531 [DEBUG] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-/root/npm,target=/root/.npm npm install
+2026-May-26 16:09:24.634531 [DEBUG] 
+2026-May-26 16:09:24.634531 [DEBUG] # build phase
+2026-May-26 16:09:24.634531 [DEBUG] COPY . /app/.
+2026-May-26 16:09:24.634531 [DEBUG] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build
+2026-May-26 16:09:24.634531 [DEBUG] 
+2026-May-26 16:09:24.634531 [DEBUG] 
+2026-May-26 16:09:24.634531 [DEBUG] RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
+2026-May-26 16:09:24.634531 [DEBUG] 
+2026-May-26 16:09:24.634531 [DEBUG] 
+2026-May-26 16:09:24.634531 [DEBUG] # start
+2026-May-26 16:09:24.634531 [DEBUG] COPY . /app
+2026-May-26 16:09:24.634531 [DEBUG] 
+2026-May-26 16:09:24.634531 [DEBUG] CMD ["npm run start"]
+2026-May-26 16:09:25.143831 [DEBUG] [CMD]: docker exec k0ogoo8ows4wcw4cc8c4cg04 bash -c 'cat /artifacts/build.sh'
+2026-May-26 16:09:25.143831 [DEBUG] cd /artifacts/k0ogoo8ows4wcw4cc8c4cg04 && set -a && source /artifacts/build-time.env && set +a && docker build --add-host coolify:10.0.1.7 --add-host coolify-db:10.0.1.5 --add-host coolify-realtime:10.0.1.3 --add-host coolify-redis:10.0.1.6 --network host -f /artifacts/k0ogoo8ows4wcw4cc8c4cg04/.nixpacks/Dockerfile --progress plain -t xw88g4k08cs404c4ww8488ow:92b701096832c956180571325a986b94d8dc41f8 --build-arg CI --build-arg COOLIFY_BRANCH --build-arg COOLIFY_FQDN --build-arg COOLIFY_RESOURCE_UUID --build-arg COOLIFY_URL --build-arg NIXPACKS_METADATA --build-arg NIXPACKS_NODE_VERSION --build-arg NODE_ENV --build-arg NPM_CONFIG_PRODUCTION --build-arg RESEND_API_KEY --build-arg NEXT_PUBLIC_SITE_URL --build-arg COOLIFY_BUILD_SECRETS_HASH=43ff30b271f637c93622a72e3ebda63153c7461f52645b4ef54fa09a50ec336e --build-arg 'COOLIFY_URL' --build-arg 'COOLIFY_FQDN' --build-arg 'COOLIFY_BRANCH' --build-arg 'COOLIFY_RESOURCE_UUID' /artifacts/k0ogoo8ows4wcw4cc8c4cg04
+2026-May-26 16:09:25.701806 [DEBUG] [CMD]: docker exec k0ogoo8ows4wcw4cc8c4cg04 bash -c 'bash /artifacts/build.sh'
+2026-May-26 16:09:25.701806 [DEBUG] #0 building with "default" instance using docker driver
+2026-May-26 16:09:25.701806 [DEBUG] 
+2026-May-26 16:09:25.701806 [DEBUG] #1 [internal] load build definition from Dockerfile
+2026-May-26 16:09:25.701806 [DEBUG] #1 transferring dockerfile: 1.54kB done
+2026-May-26 16:09:25.701806 [DEBUG] #1 DONE 0.0s
+2026-May-26 16:09:25.701806 [DEBUG] 
+2026-May-26 16:09:25.701806 [DEBUG] #2 [internal] load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+2026-May-26 16:09:26.114465 [DEBUG] #2 DONE 0.6s
+2026-May-26 16:09:26.244993 [DEBUG] #3 [internal] load .dockerignore
+2026-May-26 16:09:26.244993 [DEBUG] #3 transferring context: 2B done
+2026-May-26 16:09:26.244993 [DEBUG] #3 DONE 0.0s
+2026-May-26 16:09:26.244993 [DEBUG] 
+2026-May-26 16:09:26.244993 [DEBUG] #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-May-26 16:09:26.244993 [DEBUG] #4 resolve ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de 0.0s done
+2026-May-26 16:09:26.244993 [DEBUG] #4 DONE 0.0s
+2026-May-26 16:09:26.244993 [DEBUG] 
+2026-May-26 16:09:26.244993 [DEBUG] #5 [internal] load build context
+2026-May-26 16:09:26.244993 [DEBUG] #5 transferring context: 3.85MB 0.1s done
+2026-May-26 16:09:26.244993 [DEBUG] #5 DONE 0.1s
+2026-May-26 16:09:26.244993 [DEBUG] 
+2026-May-26 16:09:26.244993 [DEBUG] #6 [stage-0  2/11] WORKDIR /app/
+2026-May-26 16:09:26.244993 [DEBUG] #6 CACHED
+2026-May-26 16:09:26.244993 [DEBUG] 
+2026-May-26 16:09:26.244993 [DEBUG] #7 [stage-0  3/11] COPY .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix
+2026-May-26 16:09:26.244993 [DEBUG] #7 CACHED
+2026-May-26 16:09:26.244993 [DEBUG] 
+2026-May-26 16:09:26.244993 [DEBUG] #8 [stage-0  4/11] RUN nix-env -if .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix && nix-collect-garbage -d
+2026-May-26 16:09:26.244993 [DEBUG] #8 CACHED
+2026-May-26 16:09:26.244993 [DEBUG] 
+2026-May-26 16:09:26.244993 [DEBUG] #9 [stage-0  5/11] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends curl wget
+2026-May-26 16:09:26.455163 [DEBUG] #9 CACHED
+2026-May-26 16:09:26.455163 [DEBUG] 
+2026-May-26 16:09:26.455163 [DEBUG] #10 [stage-0  6/11] COPY . /app/.
+2026-May-26 16:09:26.455163 [DEBUG] #10 DONE 0.1s
+2026-May-26 16:09:26.455163 [DEBUG] 
+2026-May-26 16:09:26.455163 [DEBUG] #11 [stage-0  7/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-/root/npm,target=/root/.npm npm install
+2026-May-26 16:09:26.507727 [DEBUG] #11 0.203 npm warn config production Use `--omit=dev` instead.
+2026-May-26 16:09:26.513069 [DEBUG] 
+2026-May-26 16:09:49.207161 [DEBUG] #11 22.90
+2026-May-26 16:09:49.207161 [DEBUG] #11 22.90 added 538 packages, and audited 539 packages in 23s
+2026-May-26 16:09:49.398138 [DEBUG] #11 22.90
+2026-May-26 16:09:49.398138 [DEBUG] #11 22.90 265 packages are looking for funding
+2026-May-26 16:09:49.398138 [DEBUG] #11 22.90   run `npm fund` for details
+2026-May-26 16:09:49.398138 [DEBUG] #11 22.94
+2026-May-26 16:09:49.398138 [DEBUG] #11 22.94 2 moderate severity vulnerabilities
+2026-May-26 16:09:49.398138 [DEBUG] #11 22.94
+2026-May-26 16:09:49.398138 [DEBUG] #11 22.94 To address all issues (including breaking changes), run:
+2026-May-26 16:09:49.398138 [DEBUG] #11 22.94   npm audit fix --force
+2026-May-26 16:09:49.398138 [DEBUG] #11 22.94
+2026-May-26 16:09:49.398138 [DEBUG] #11 22.94 Run `npm audit` for details.
+2026-May-26 16:09:49.837619 [DEBUG] #11 DONE 23.5s
+2026-May-26 16:09:49.993754 [DEBUG] #12 [stage-0  8/11] COPY . /app/.
+2026-May-26 16:09:50.279288 [DEBUG] #12 DONE 0.4s
+2026-May-26 16:09:50.428913 [DEBUG] #13 [stage-0  9/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build
+2026-May-26 16:09:50.576182 [DEBUG] #13 0.298 npm warn config production Use `--omit=dev` instead.
+2026-May-26 16:09:50.752539 [DEBUG] #13 0.324
+2026-May-26 16:09:50.752539 [DEBUG] #13 0.324 > deeplink-saas@0.1.0 build
+2026-May-26 16:09:50.752539 [DEBUG] #13 0.324 > next build
+2026-May-26 16:09:50.752539 [DEBUG] #13 0.324
+2026-May-26 16:09:52.158770 [DEBUG] #13 1.873    ▲ Next.js 15.5.18
+2026-May-26 16:09:52.305478 [DEBUG] #13 1.877
+2026-May-26 16:09:52.394090 [DEBUG] #13 2.117    Creating an optimized production build ...
+2026-May-26 16:10:02.988319 [DEBUG] #13 12.67  ✓ Compiled successfully in 6.2s
+2026-May-26 16:10:03.151726 [DEBUG] #13 12.72    Linting and checking validity of types ...
+2026-May-26 16:10:14.786639 [DEBUG] #13 24.51
+2026-May-26 16:10:14.786639 [DEBUG] #13 24.51 ./app/layout.tsx
+2026-May-26 16:10:14.786639 [DEBUG] #13 24.51 79:9  Warning: Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+2026-May-26 16:10:14.786639 [DEBUG] #13 24.51
+2026-May-26 16:10:14.786639 [DEBUG] #13 24.51 info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+2026-May-26 16:10:18.395149 [DEBUG] #13 28.12 Failed to compile.
+2026-May-26 16:10:18.395149 [DEBUG] #13 28.12
+2026-May-26 16:10:18.395149 [DEBUG] #13 28.12 ./app/r/[slug]/page.tsx:35:3
+2026-May-26 16:10:18.395149 [DEBUG] #13 28.12 Type error: Unused '@ts-expect-error' directive.
+2026-May-26 16:10:18.395149 [DEBUG] #13 28.12
+2026-May-26 16:10:18.395149 [DEBUG] #13 28.12   33 |
+2026-May-26 16:10:18.395149 [DEBUG] #13 28.12   34 |   // On desktop just do a server-side redirect right away
+2026-May-26 16:10:18.395149 [DEBUG] #13 28.12 > 35 |   // @ts-expect-error - dynamic fallback bypasses typedRoutes restriction
+2026-May-26 16:10:18.395149 [DEBUG] #13 28.12      |   ^
+2026-May-26 16:10:18.395149 [DEBUG] #13 28.12   36 |   if (platform === "desktop") redirect(webFallback as any);
+2026-May-26 16:10:18.395149 [DEBUG] #13 28.12   37 |
+2026-May-26 16:10:18.395149 [DEBUG] #13 28.12   38 |   // Escape values to safely embed in inline script
+2026-May-26 16:10:18.625288 [DEBUG] #13 28.19 Next.js build worker exited with code: 1 and signal: null
+2026-May-26 16:10:18.670789 [DEBUG] #13 ERROR: process "/bin/bash -ol pipefail -c npm run build" did not complete successfully: exit code: 1
+2026-May-26 16:10:18.793536 [DEBUG] ------
+2026-May-26 16:10:18.793536 [DEBUG] > [stage-0  9/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build:
+2026-May-26 16:10:18.793536 [DEBUG] 28.12 Type error: Unused '@ts-expect-error' directive.
+2026-May-26 16:10:18.793536 [DEBUG] 28.12
+2026-May-26 16:10:18.793536 [DEBUG] 28.12   33 |
+2026-May-26 16:10:18.793536 [DEBUG] 28.12   34 |   // On desktop just do a server-side redirect right away
+2026-May-26 16:10:18.793536 [DEBUG] 28.12 > 35 |   // @ts-expect-error - dynamic fallback bypasses typedRoutes restriction
+2026-May-26 16:10:18.793536 [DEBUG] 28.12      |   ^
+2026-May-26 16:10:18.793536 [DEBUG] 28.12   36 |   if (platform === "desktop") redirect(webFallback as any);
+2026-May-26 16:10:18.793536 [DEBUG] 28.12   37 |
+2026-May-26 16:10:18.793536 [DEBUG] 28.12   38 |   // Escape values to safely embed in inline script
+2026-May-26 16:10:18.793536 [DEBUG] 28.19 Next.js build worker exited with code: 1 and signal: null
+2026-May-26 16:10:18.793536 [DEBUG] ------
+2026-May-26 16:10:18.793536 [DEBUG] 
+2026-May-26 16:10:18.793536 [DEBUG] 3 warnings found (use docker --debug to expand):
+2026-May-26 16:10:18.793536 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "RESEND_API_KEY") (line 12)
+2026-May-26 16:10:18.793536 [DEBUG] - UndefinedVar: Usage of undefined variable '$NIXPACKS_PATH' (line 18)
+2026-May-26 16:10:18.793536 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 11)
+2026-May-26 16:10:18.801516 [DEBUG] Dockerfile:24
+2026-May-26 16:10:18.801516 [DEBUG] --------------------
+2026-May-26 16:10:18.801516 [DEBUG] 22 |     # build phase
+2026-May-26 16:10:18.801516 [DEBUG] 23 |     COPY . /app/.
+2026-May-26 16:10:18.801516 [DEBUG] 24 | >>> RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build
+2026-May-26 16:10:18.801516 [DEBUG] 25 |
+2026-May-26 16:10:18.801516 [DEBUG] 26 |
+2026-May-26 16:10:18.801516 [DEBUG] --------------------
+2026-May-26 16:10:18.801516 [DEBUG] ERROR: failed to build: failed to solve: process "/bin/bash -ol pipefail -c npm run build" did not complete successfully: exit code: 1
+2026-May-26 16:10:18.814939 [DEBUG] exit status 1
+2026-May-26 16:10:18.918088 ========================================
+2026-May-26 16:10:18.928373 Deployment failed: Command execution failed (exit code 1): docker exec k0ogoo8ows4wcw4cc8c4cg04 bash -c 'bash /artifacts/build.sh'
+2026-May-26 16:10:18.928373 Error: #0 building with "default" instance using docker driver
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 #1 [internal] load build definition from Dockerfile
+2026-May-26 16:10:18.928373 #1 transferring dockerfile: 1.54kB done
+2026-May-26 16:10:18.928373 #1 DONE 0.0s
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 #2 [internal] load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+2026-May-26 16:10:18.928373 #2 DONE 0.6s
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 #3 [internal] load .dockerignore
+2026-May-26 16:10:18.928373 #3 transferring context: 2B done
+2026-May-26 16:10:18.928373 #3 DONE 0.0s
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2026-May-26 16:10:18.928373 #4 resolve ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de 0.0s done
+2026-May-26 16:10:18.928373 #4 DONE 0.0s
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 #5 [internal] load build context
+2026-May-26 16:10:18.928373 #5 transferring context: 3.85MB 0.1s done
+2026-May-26 16:10:18.928373 #5 DONE 0.1s
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 #6 [stage-0  2/11] WORKDIR /app/
+2026-May-26 16:10:18.928373 #6 CACHED
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 #7 [stage-0  3/11] COPY .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix
+2026-May-26 16:10:18.928373 #7 CACHED
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 #8 [stage-0  4/11] RUN nix-env -if .nixpacks/nixpkgs-23f9169c4ccce521379e602cc82ed873a1f1b52b.nix && nix-collect-garbage -d
+2026-May-26 16:10:18.928373 #8 CACHED
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 #9 [stage-0  5/11] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends curl wget
+2026-May-26 16:10:18.928373 #9 CACHED
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 #10 [stage-0  6/11] COPY . /app/.
+2026-May-26 16:10:18.928373 #10 DONE 0.1s
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 #11 [stage-0  7/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-/root/npm,target=/root/.npm npm install
+2026-May-26 16:10:18.928373 #11 0.203 npm warn config production Use `--omit=dev` instead.
+2026-May-26 16:10:18.928373 #11 22.90
+2026-May-26 16:10:18.928373 #11 22.90 added 538 packages, and audited 539 packages in 23s
+2026-May-26 16:10:18.928373 #11 22.90
+2026-May-26 16:10:18.928373 #11 22.90 265 packages are looking for funding
+2026-May-26 16:10:18.928373 #11 22.90   run `npm fund` for details
+2026-May-26 16:10:18.928373 #11 22.94
+2026-May-26 16:10:18.928373 #11 22.94 2 moderate severity vulnerabilities
+2026-May-26 16:10:18.928373 #11 22.94
+2026-May-26 16:10:18.928373 #11 22.94 To address all issues (including breaking changes), run:
+2026-May-26 16:10:18.928373 #11 22.94   npm audit fix --force
+2026-May-26 16:10:18.928373 #11 22.94
+2026-May-26 16:10:18.928373 #11 22.94 Run `npm audit` for details.
+2026-May-26 16:10:18.928373 #11 DONE 23.5s
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 #12 [stage-0  8/11] COPY . /app/.
+2026-May-26 16:10:18.928373 #12 DONE 0.4s
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 #13 [stage-0  9/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build
+2026-May-26 16:10:18.928373 #13 0.298 npm warn config production Use `--omit=dev` instead.
+2026-May-26 16:10:18.928373 #13 0.324
+2026-May-26 16:10:18.928373 #13 0.324 > deeplink-saas@0.1.0 build
+2026-May-26 16:10:18.928373 #13 0.324 > next build
+2026-May-26 16:10:18.928373 #13 0.324
+2026-May-26 16:10:18.928373 #13 1.873    ▲ Next.js 15.5.18
+2026-May-26 16:10:18.928373 #13 1.877
+2026-May-26 16:10:18.928373 #13 2.117    Creating an optimized production build ...
+2026-May-26 16:10:18.928373 #13 12.67  ✓ Compiled successfully in 6.2s
+2026-May-26 16:10:18.928373 #13 12.72    Linting and checking validity of types ...
+2026-May-26 16:10:18.928373 #13 24.51
+2026-May-26 16:10:18.928373 #13 24.51 ./app/layout.tsx
+2026-May-26 16:10:18.928373 #13 24.51 79:9  Warning: Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+2026-May-26 16:10:18.928373 #13 24.51
+2026-May-26 16:10:18.928373 #13 24.51 info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+2026-May-26 16:10:18.928373 #13 28.12 Failed to compile.
+2026-May-26 16:10:18.928373 #13 28.12
+2026-May-26 16:10:18.928373 #13 28.12 ./app/r/[slug]/page.tsx:35:3
+2026-May-26 16:10:18.928373 #13 28.12 Type error: Unused '@ts-expect-error' directive.
+2026-May-26 16:10:18.928373 #13 28.12
+2026-May-26 16:10:18.928373 #13 28.12   33 |
+2026-May-26 16:10:18.928373 #13 28.12   34 |   // On desktop just do a server-side redirect right away
+2026-May-26 16:10:18.928373 #13 28.12 > 35 |   // @ts-expect-error - dynamic fallback bypasses typedRoutes restriction
+2026-May-26 16:10:18.928373 #13 28.12      |   ^
+2026-May-26 16:10:18.928373 #13 28.12   36 |   if (platform === "desktop") redirect(webFallback as any);
+2026-May-26 16:10:18.928373 #13 28.12   37 |
+2026-May-26 16:10:18.928373 #13 28.12   38 |   // Escape values to safely embed in inline script
+2026-May-26 16:10:18.928373 #13 28.19 Next.js build worker exited with code: 1 and signal: null
+2026-May-26 16:10:18.928373 #13 ERROR: process "/bin/bash -ol pipefail -c npm run build" did not complete successfully: exit code: 1
+2026-May-26 16:10:18.928373 ------
+2026-May-26 16:10:18.928373 > [stage-0  9/11] RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build:
+2026-May-26 16:10:18.928373 28.12 Type error: Unused '@ts-expect-error' directive.
+2026-May-26 16:10:18.928373 28.12
+2026-May-26 16:10:18.928373 28.12   33 |
+2026-May-26 16:10:18.928373 28.12   34 |   // On desktop just do a server-side redirect right away
+2026-May-26 16:10:18.928373 28.12 > 35 |   // @ts-expect-error - dynamic fallback bypasses typedRoutes restriction
+2026-May-26 16:10:18.928373 28.12      |   ^
+2026-May-26 16:10:18.928373 28.12   36 |   if (platform === "desktop") redirect(webFallback as any);
+2026-May-26 16:10:18.928373 28.12   37 |
+2026-May-26 16:10:18.928373 28.12   38 |   // Escape values to safely embed in inline script
+2026-May-26 16:10:18.928373 28.19 Next.js build worker exited with code: 1 and signal: null
+2026-May-26 16:10:18.928373 ------
+2026-May-26 16:10:18.928373 
+2026-May-26 16:10:18.928373 3 warnings found (use docker --debug to expand):
+2026-May-26 16:10:18.928373 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "RESEND_API_KEY") (line 12)
+2026-May-26 16:10:18.928373 - UndefinedVar: Usage of undefined variable '$NIXPACKS_PATH' (line 18)
+2026-May-26 16:10:18.928373 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 11)
+2026-May-26 16:10:18.928373 Dockerfile:24
+2026-May-26 16:10:18.928373 --------------------
+2026-May-26 16:10:18.928373 22 |     # build phase
+2026-May-26 16:10:18.928373 23 |     COPY . /app/.
+2026-May-26 16:10:18.928373 24 | >>> RUN --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-next/cache,target=/app/.next/cache --mount=type=cache,id=xw88g4k08cs404c4ww8488ow-node_modules/cache,target=/app/node_modules/.cache npm run build
+2026-May-26 16:10:18.928373 25 |
+2026-May-26 16:10:18.928373 26 |
+2026-May-26 16:10:18.928373 --------------------
+2026-May-26 16:10:18.928373 ERROR: failed to build: failed to solve: process "/bin/bash -ol pipefail -c npm run build" did not complete successfully: exit code: 1
+2026-May-26 16:10:18.928373 exit status 1
+2026-May-26 16:10:18.938194 [DEBUG] Error type: RuntimeException
+2026-May-26 16:10:18.949093 [DEBUG] Error code: 0
+2026-May-26 16:10:18.959935 [DEBUG] Location: /var/www/html/app/Traits/ExecuteRemoteCommand.php:243
+2026-May-26 16:10:18.974740 [DEBUG] Stack trace (first 5 lines):
+2026-May-26 16:10:18.990652 [DEBUG] #0 /var/www/html/app/Traits/ExecuteRemoteCommand.php(104): App\Jobs\ApplicationDeploymentJob->executeCommandWithProcess()
+2026-May-26 16:10:18.997387 [DEBUG] #1 /var/www/html/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php(271): App\Jobs\ApplicationDeploymentJob->{closure:App\Traits\ExecuteRemoteCommand::execute_remote_command():71}()
+2026-May-26 16:10:19.005841 [DEBUG] #2 /var/www/html/app/Traits/ExecuteRemoteCommand.php(71): Illuminate\Support\Collection->each()
+2026-May-26 16:10:19.012388 [DEBUG] #3 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(3118): App\Jobs\ApplicationDeploymentJob->execute_remote_command()
+2026-May-26 16:10:19.019063 [DEBUG] #4 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(888): App\Jobs\ApplicationDeploymentJob->build_image()
+2026-May-26 16:10:19.025141 ========================================
+2026-May-26 16:10:19.032637 Deployment failed. Removing the new version of your application.
+2026-May-26 16:10:20.116590 Gracefully shutting down build container: k0ogoo8ows4wcw4cc8c4cg04
+2026-May-26 16:10:20.592448 [DEBUG] [CMD]: docker stop -t 30 k0ogoo8ows4wcw4cc8c4cg04
+2026-May-26 16:10:20.592448 [DEBUG] k0ogoo8ows4wcw4cc8c4cg04
