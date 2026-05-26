@@ -16,8 +16,9 @@ export async function GET(
   }
 
   const ua = request.headers.get("user-agent");
+  const xrw = request.headers.get("x-requested-with");
   const platform = detectPlatform(ua);
-  const webView = isInAppWebView(ua);
+  const webView = isInAppWebView(ua, xrw);
   const destination = resolveDestination(record, ua);
 
   if (!destination) {

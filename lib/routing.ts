@@ -26,8 +26,16 @@ export function detectPlatform(userAgent: string | null): DevicePlatform {
  * Regular mobile browsers (Chrome, Safari) handle intent:// and custom schemes just fine
  * via a plain HTTP 307 redirect — which is much faster.
  */
-export function isInAppWebView(userAgent: string | null): boolean {
+export function isInAppWebView(userAgent: string | null, xRequestedWith: string | null = null): boolean {
   const ua = userAgent || "";
+  const xrw = (xRequestedWith || "").toLowerCase();
+
+  // Android Stealth WebViews (e.g. Twitter, Telegram, etc.)
+  // The X-Requested-With header contains the package name of the app hosting the WebView.
+  // If it's present and NOT the standard system browser (Chrome, Samsung Internet), it's an in-app WebView!
+  if (xrw && xrw !== "com.android.chrome" && xrw !== "com.sec.android.app.sbrowser") {
+    return true;
+  }
 
   // Facebook / Facebook Lite / Messenger
   if (/FBAN|FBAV|FB_IAB|FBIOS|FB4A|FB_UI|FB_WebView|Messenger/i.test(ua)) return true;
