@@ -7,7 +7,7 @@ import { presetMeta } from "@/lib/constants";
 import { detectPresetFromUrl, inferLinkFromDestination } from "@/lib/inference";
 import type { CreateLinkInput, LinkRecord, PresetKey } from "@/lib/types";
 
-const LOCAL_LINK_BASE = "http://localhost:3000/r/";
+const fallbackLinkBase = process.env.NEXT_PUBLIC_SITE_URL ? `${process.env.NEXT_PUBLIC_SITE_URL}/r/` : "https://deeplinkos.com/r/";
 
 const initialState: CreateLinkInput = {
   destinationUrl: "",
@@ -166,6 +166,13 @@ export function LinkGenerator() {
     [form.destinationUrl]
   );
 
+  const localLinkBase = useMemo(() => {
+    if (typeof window !== "undefined") {
+      return `${window.location.origin}/r/`;
+    }
+    return fallbackLinkBase;
+  }, []);
+
   const activePreset = useMemo(
     () => presetMeta[detectPresetFromUrl(form.destinationUrl || "")] || presetMeta.custom,
     [form.destinationUrl]
@@ -210,7 +217,7 @@ export function LinkGenerator() {
 
       setCreated({
         ...payload,
-        shortUrl: payload.shortUrl.replace(/^https?:\/\/[^/]+/i, "http://localhost:3000")
+        shortUrl: payload.shortUrl
       });
       setShowCustomize(true);
     } catch (err) {
@@ -283,7 +290,7 @@ export function LinkGenerator() {
                 <div className="composer-stack">
                   {/* Slug field */}
                   <div className="slug-field">
-                    <span className="slug-prefix" aria-hidden="true">{LOCAL_LINK_BASE}</span>
+                    <span className="slug-prefix" aria-hidden="true">{localLinkBase}</span>
                     <input
                       id="slug-input"
                       className="composer-input composer-input--slug"
@@ -366,7 +373,7 @@ export function LinkGenerator() {
         <section className="result-banner result-banner--preview" aria-label="Link preview">
           <div className="result-banner__copy">
             <span className="result-banner__eyebrow">Preview</span>
-            <strong>{`${LOCAL_LINK_BASE}${slugPreview}`}</strong>
+            <strong>{`${localLinkBase}${slugPreview}`}</strong>
           </div>
         </section>
       )}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { BlogPost } from "@/lib/blog";
 
 type BlogCardProps = Omit<BlogPost, "content" | "faq" | "keywords">;
@@ -15,12 +16,13 @@ export function BlogCard({
     <article className="blog-card" itemScope itemType="https://schema.org/BlogPosting">
       <Link href={`/blog/${slug}`} className="blog-card__img-link" tabIndex={-1} aria-hidden="true">
         <div className="blog-card__img-wrap">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             className="blog-card__img"
             src={featuredImage}
             alt={featuredImageAlt}
-            loading="lazy"
+            fill
+            style={{ objectFit: 'cover' }}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             itemProp="image"
           />
         </div>

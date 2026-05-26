@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { BlogToc } from "@/components/blog-toc";
 import { BlogFaq } from "@/components/blog-faq";
 import Link from "next/link";
+import Image from "next/image";
 
 /* ── Heading ID utilities ──────────────────────────────────────────── */
 function slugify(text: string): string {
@@ -156,11 +157,13 @@ export default async function BlogPostPage({
       <main id="main-content" itemScope itemType="https://schema.org/BlogPosting">
         {/* Featured image hero */}
         <div className="post-hero">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={post.featuredImage}
             alt={post.featuredImageAlt}
             className="post-hero__img"
+            fill
+            style={{ objectFit: 'cover' }}
+            priority
             itemProp="image"
           />
           <div className="post-hero__overlay" aria-hidden="true" />

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import NextTopLoader from 'nextjs-toploader';
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
@@ -124,7 +125,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <meta name="theme-color" content="#3b82f6" />
         <meta name="msapplication-TileColor" content="#3b82f6" />
       </head>
-      <body>{children}</body>
+      <body>
+        <NextTopLoader color="#3b82f6" showSpinner={false} />
+        {children}
+      </body>
     </html>
   );
 }

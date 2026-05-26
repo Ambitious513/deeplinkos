@@ -173,6 +173,7 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid transparent;
+  transform: translateZ(0);
   transition: background .3s, border-color .3s;
 }
 .nav--scrolled {
@@ -860,6 +861,7 @@ body {
 /* Image link — full width, no underline */
 .blog-card__img-link { display: block; text-decoration: none; flex-shrink: 0; }
 .blog-card__img-wrap {
+  position: relative;
   width: 100%; aspect-ratio: 16 / 9;
   overflow: hidden; background: var(--bg-1);
 }
