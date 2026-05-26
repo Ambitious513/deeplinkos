@@ -29,8 +29,8 @@ export function detectPlatform(userAgent: string | null): DevicePlatform {
 export function isInAppWebView(userAgent: string | null): boolean {
   const ua = userAgent || "";
 
-  // Facebook / Facebook Lite
-  if (/FBAN|FBAV|FB_IAB|FBIOS|FB4A/i.test(ua)) return true;
+  // Facebook / Facebook Lite / Messenger
+  if (/FBAN|FBAV|FB_IAB|FBIOS|FB4A|FB_UI|FB_WebView|Messenger/i.test(ua)) return true;
 
   // Instagram
   if (/Instagram/i.test(ua)) return true;
@@ -39,7 +39,7 @@ export function isInAppWebView(userAgent: string | null): boolean {
   if (/musical_ly|TikTok/i.test(ua)) return true;
 
   // Twitter / X in-app
-  if (/TwitterAndroid|TwitteriPhone/i.test(ua)) return true;
+  if (/Twitter/i.test(ua)) return true;
 
   // Snapchat
   if (/Snapchat/i.test(ua)) return true;
@@ -53,8 +53,17 @@ export function isInAppWebView(userAgent: string | null): boolean {
   // LinkedIn
   if (/LinkedInApp/i.test(ua)) return true;
 
+  // Pinterest
+  if (/Pinterest/i.test(ua)) return true;
+
+  // Reddit
+  if (/Reddit/i.test(ua)) return true;
+
   // Generic Android WebView markers
   if (/wv\)/.test(ua) && /Android/i.test(ua)) return true;
+
+  // Generic iOS WebView markers
+  if (/(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(ua)) return true;
 
   return false;
 }
