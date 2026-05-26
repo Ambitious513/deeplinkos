@@ -35,18 +35,13 @@ export function isInAppWebView(
   const xrw = (xRequestedWith || "").toLowerCase();
   const ref = (referer || "").toLowerCase();
 
-  // Social Media Link Wrappers (Chrome Custom Tabs detection)
-  // Even if the User-Agent is perfect Chrome and X-Requested-With is missing,
-  // if the user clicked from a social network shortener, they are likely trapped
-  // in a Chrome Custom Tab or SFSafariViewController. We force the JS interstitial
-  // because JS .click() breaks out of CCTs better than 307 redirects.
+  // Social Media Link Wrappers (Chrome Custom Tabs / SFSafariViewController)
+  // Detected via Referer from known social shorteners.
   if (/t\.co|l\.facebook\.com|l\.instagram\.com|lnkd\.in|out\.reddit\.com/i.test(ref)) {
     return true;
   }
 
-  // Android Stealth WebViews (e.g. Twitter, Telegram, etc.)
-  // The X-Requested-With header contains the package name of the app hosting the WebView.
-  // If it's present and NOT the standard system browser (Chrome, Samsung Internet), it's an in-app WebView!
+  // Android Stealth WebViews — X-Requested-With reveals the hosting app package.
   if (xrw && xrw !== "com.android.chrome" && xrw !== "com.sec.android.app.sbrowser") {
     return true;
   }
@@ -88,6 +83,37 @@ export function isInAppWebView(
   if (/(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(ua)) return true;
 
   return false;
+}
+
+/**
+ * Detect if the request is specifically coming from X.com / Twitter's
+ * Chrome Custom Tab (CCT). CCTs are powered by the real Chrome engine so
+ * targeting intent://...package=com.android.chrome is a no-op. Instead we
+ * try alternative browsers and fall back to the CCT itself.
+ *
+ * Detection signal: Referer routed through t.co (Twitter's link shortener)
+ * AND the User-Agent looks like stock Chrome (no WebView wv) marker.
+ */
+export function isChromeCustomTab(
+  userAgent: string | null,
+  xRequestedWith: string | null = null,
+  referer: string | null = null
+): boolean {
+  const ua = (userAgent || "").toLowerCase();
+  const xrw = (xRequestedWith || "").toLowerCase();
+  const ref = (referer || "").toLowerCase();
+
+  // Must have a t.co referer (came from X/Twitter)
+  if (!ref.includes("t.co")) return false;
+
+  // Must look like Chrome, not a raw WebView (wv marker) or other app
+  const isChromeLike = /chrome\//.test(ua) && !/wv\)/.test(ua);
+  if (!isChromeLike) return false;
+
+  // Must NOT have an X-Requested-With that identifies a raw WebView host
+  if (xrw && xrw !== "com.android.chrome") return false;
+
+  return true;
 }
 
 export function resolveDestination(

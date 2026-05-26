@@ -1,8 +1,6 @@
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { getLink } from "@/lib/links";
-import { detectPlatform, isInAppWebView, resolveDestination } from "@/lib/routing";
+import { detectPlatform, isInAppWebView, isChromeCustomTab, resolveDestination } from "@/lib/routing";
 
 export async function GET(
   request: Request,
@@ -20,6 +18,7 @@ export async function GET(
   const ref = request.headers.get("referer");
   const platform = detectPlatform(ua);
   const webView = isInAppWebView(ua, xrw, ref);
+  const cct = isChromeCustomTab(ua, xrw, ref);
   const destination = resolveDestination(record, ua);
 
   if (!destination) {
@@ -33,9 +32,6 @@ export async function GET(
     return NextResponse.redirect(destination.destination, 307);
   }
 
-  // ── Slow path: in-app WebView (Facebook, Instagram, TikTok, etc.) ─────────
-  // These browsers block scheme-launch redirects. We must serve an HTML page
-  // that uses a JS .click() on a hidden <a> to trigger the OS intent handler.
   const webFallback =
     record.desktopUrl ||
     record.iosStoreUrl ||
@@ -49,6 +45,95 @@ export async function GET(
 
   const appScheme = destination.destination;
   const isIos = platform === "ios";
+  const title = record.title || "your link";
+
+  // ── Chrome Custom Tab path (X.com, Twitter) ───────────────────────────────
+  // We are already inside the real Chrome engine (CCT). Targeting Chrome itself
+  // is a no-op. Instead we fire a cascade of Android Intents targeting
+  // alternative browsers. The first installed one wins. If none are found,
+  // we gracefully fall back to the CCT — keeping the user in X.com Chrome
+  // which is still a fully-featured browser with cookies and tracking.
+  if (cct && platform === "android") {
+    const encodedUrl = encodeURIComponent(webFallback);
+    // Each Intent targets a real, widely-installed Android browser.
+    // S.browser_fallback_url is set to the web URL, so if that browser
+    // isn't installed, Android falls back gracefully to the CCT web view.
+    const browsers = [
+      // Firefox — most popular alternative browser (~400M installs)
+      `intent://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}#Intent;scheme=https;package=org.mozilla.firefox;S.browser_fallback_url=${encodedUrl};end;`,
+      // Brave — privacy-focused, very popular
+      `intent://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}#Intent;scheme=https;package=com.brave.browser;S.browser_fallback_url=${encodedUrl};end;`,
+      // Samsung Internet — pre-installed on all Samsung devices
+      `intent://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}#Intent;scheme=https;package=com.sec.android.app.sbrowser;S.browser_fallback_url=${encodedUrl};end;`,
+      // Microsoft Edge — growing share, pre-installed on some devices
+      `intent://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}#Intent;scheme=https;package=com.microsoft.emmx;S.browser_fallback_url=${encodedUrl};end;`,
+    ];
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Opening ${title}…</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{min-height:100svh;display:flex;flex-direction:column;align-items:center;
+         justify-content:center;text-align:center;padding:2rem;
+         background:#0d1f3c;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#e2e8f0}
+    .spinner{width:52px;height:52px;border-radius:50%;border:4px solid rgba(59,130,246,.2);
+             border-top-color:#3b82f6;animation:spin .8s linear infinite;margin:0 auto 1.5rem}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    h1{font-size:1.3rem;font-weight:700;margin-bottom:.5rem}
+    p{color:#94a3b8;font-size:.9rem;margin-bottom:.4rem}
+    a.tap{display:inline-block;margin-top:2rem;color:#60a5fa;font-size:.85rem;text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="spinner" aria-hidden="true"></div>
+  <h1>Opening ${title}…</h1>
+  <p>Opening in your installed browser…</p>
+  <a href="${webFallback}" class="tap">Tap here if nothing happens</a>
+  <script>
+  (function(){
+    // Browser cascade: try each alternative browser in order.
+    // The first one that IS installed on this device wins.
+    // Android fires S.browser_fallback_url for each that isn't installed,
+    // which keeps us in the CCT — still a great, fully-featured Chrome session.
+    var browsers = ${JSON.stringify(browsers)};
+    var web = ${JSON.stringify(webFallback)};
+    var idx = 0;
+
+    function tryNext() {
+      if (idx >= browsers.length) {
+        // All alternatives exhausted — fall back to web URL in CCT
+        window.location.href = web;
+        return;
+      }
+      var scheme = browsers[idx++];
+      // Hidden anchor click — best method for triggering Android Intents
+      var a = document.createElement('a');
+      a.href = scheme;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      // If still here after 2.5s, the browser wasn't installed — try next
+      setTimeout(tryNext, 2500);
+    }
+
+    // Small initial delay to let the page render before firing
+    setTimeout(tryNext, 300);
+  })();
+  </script>
+</body>
+</html>`;
+
+    return new NextResponse(html, {
+      status: 200,
+      headers: { "Content-Type": "text/html; charset=utf-8" },
+    });
+  }
+
+  // ── Slow path: standard in-app WebView (Facebook, Instagram, TikTok) ──────
   const fallbackDelay = isIos ? 2500 : 2000;
 
   const html = `<!DOCTYPE html>
@@ -56,7 +141,7 @@ export async function GET(
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Opening ${record.title || "your link"}…</title>
+  <title>Opening ${title}…</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{min-height:100svh;display:flex;flex-direction:column;align-items:center;
@@ -73,7 +158,7 @@ export async function GET(
 <body>
   <a id="dl" href="${appScheme}" style="display:none" aria-hidden="true"></a>
   <div class="spinner" aria-hidden="true"></div>
-  <h1>Opening ${record.title || "your link"}…</h1>
+  <h1>Opening ${title}…</h1>
   <p>You'll be redirected to the app automatically.</p>
   <a href="${webFallback}" class="tap">If nothing happens, tap here to continue</a>
   <script>
