@@ -44,6 +44,9 @@ export function detectPresetFromUrl(input: string): PresetKey {
     if (hostname === "youtu.be" || hostname.includes("youtube.com")) {
       return "youtube";
     }
+    if (hostname === "x.com" || hostname.includes("twitter.com")) {
+      return "twitter";
+    }
     if (hostname.includes("google.") && path.startsWith("/maps")) {
       return "google-maps";
     }
@@ -111,8 +114,19 @@ function toIosScheme(preset: PresetKey, url: URL): string | undefined {
     case "tiktok":
       return `snssdk1233://${url.hostname}${path}${url.search}`;
 
-    case "twitter":
+    case "twitter": {
+      // iOS Twitter app expects:
+      // twitter://user?screen_name=xxx
+      // twitter://status?id=xxx
+      const parts = path.split("/").filter(Boolean);
+      if (parts[1] === "status" && parts[2]) {
+        return `twitter://status?id=${parts[2]}`;
+      }
+      if (parts[0]) {
+        return `twitter://user?screen_name=${parts[0]}`;
+      }
       return `twitter://${url.hostname}${path}${url.search}`;
+    }
 
     case "facebook":
       return `fb://${url.hostname}${path}${url.search}`;
