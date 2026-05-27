@@ -63,15 +63,23 @@ export async function GET(
     // it to fail silently so our JS can try the next browser.
     
     const intentHostPath = `${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}`;
+    const encodedUrl = encodeURIComponent(webFallback);
+
+    // ── Deep Intent URI Cascade ───────────────────────────────────────────────
+    // CCT allows intent:// URIs, but if we use scheme=https, Android might still
+    // show an Activity Chooser (ignoring our package= parameter for security).
+    // The ultimate fix: we use intent:// but set the scheme= to the browser's
+    // OWN private protocol (e.g. sbrowser://). Since only one app on the device
+    // registers that scheme, the Chooser is physically impossible to trigger.
     const browsers = [
-      // 1. Samsung Internet — pre-installed on ALL Samsung devices (~30% of Android market)
-      `intent://${intentHostPath}#Intent;scheme=https;package=com.sec.android.app.sbrowser;end;`,
-      // 2. Firefox — 400M+ installs, widely popular
-      `intent://${intentHostPath}#Intent;scheme=https;package=org.mozilla.firefox;end;`,
-      // 3. Brave — privacy-focused, fast-growing
-      `intent://${intentHostPath}#Intent;scheme=https;package=com.brave.browser;end;`,
-      // 4. Microsoft Edge — pre-installed on many devices, growing
-      `intent://${intentHostPath}#Intent;scheme=https;package=com.microsoft.emmx;end;`,
+      // 1. Samsung Internet (sbrowser://host/path)
+      `intent://${intentHostPath}#Intent;scheme=sbrowser;package=com.sec.android.app.sbrowser;end;`,
+      // 2. Firefox (firefox://open-url?url=...)
+      `intent://open-url?url=${encodedUrl}#Intent;scheme=firefox;package=org.mozilla.firefox;end;`,
+      // 3. Brave (brave://open-url?url=...)
+      `intent://open-url?url=${encodedUrl}#Intent;scheme=brave;package=com.brave.browser;end;`,
+      // 4. Microsoft Edge (microsoft-edge://host/path)
+      `intent://${intentHostPath}#Intent;scheme=microsoft-edge;package=com.microsoft.emmx;end;`,
     ];
 
     const html = `<!DOCTYPE html>
