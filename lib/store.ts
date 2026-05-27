@@ -2,21 +2,11 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 
-import { DEFAULT_LINK_POLICY } from "@/lib/constants";
 import { createSlug, normalizeSlug } from "@/lib/slug";
-import type {
-  ClickSessionRecord,
-  CreateLinkInput,
-  EscapeEventRecord,
-  EscapeState,
-  LinkRecord,
-  RouteSelection
-} from "@/lib/types";
+import type { CreateLinkInput, LinkRecord } from "@/lib/types";
 
 const dataDir = path.join(process.cwd(), "data");
 const linksFile = path.join(dataDir, "links.json");
-const sessionsFile = path.join(dataDir, "click-sessions.json");
-const eventsFile = path.join(dataDir, "escape-events.json");
 
 async function ensureJsonFile(filePath: string, initialValue = "[]") {
   await mkdir(path.dirname(filePath), { recursive: true });
@@ -78,7 +68,6 @@ export async function createLink(input: CreateLinkInput) {
     createdByUserId: null,
     createdAt: now,
     updatedAt: now,
-    routingConfig: DEFAULT_LINK_POLICY,
     metadata: null
   };
 
@@ -86,74 +75,4 @@ export async function createLink(input: CreateLinkInput) {
   await writeCollection(linksFile, links);
 
   return record;
-}
-
-export async function createClickSession(session: ClickSessionRecord) {
-  const sessions = await readCollection<ClickSessionRecord>(sessionsFile);
-  sessions.push(session);
-  await writeCollection(sessionsFile, sessions);
-  return session;
-}
-
-export async function findClickSessionByToken(clickToken: string) {
-  const sessions = await readCollection<ClickSessionRecord>(sessionsFile);
-  return sessions.find((session) => session.clickToken === clickToken) || null;
-}
-
-export async function updateClickSession(
-  clickToken: string,
-  updater: (session: ClickSessionRecord) => ClickSessionRecord
-) {
-  const sessions = await readCollection<ClickSessionRecord>(sessionsFile);
-  const index = sessions.findIndex((session) => session.clickToken === clickToken);
-
-  if (index === -1) {
-    return null;
-  }
-
-  const next = updater(sessions[index]);
-  sessions[index] = next;
-  await writeCollection(sessionsFile, sessions);
-  return next;
-}
-
-export async function appendEscapeEvent(event: EscapeEventRecord) {
-  const events = await readCollection<EscapeEventRecord>(eventsFile);
-  events.push(event);
-  await writeCollection(eventsFile, events);
-  return event;
-}
-
-export async function createEscapeEvent(params: {
-  clickSession: ClickSessionRecord;
-  eventName: EscapeState;
-  attemptedMethod?: string | null;
-  latencyMs?: number | null;
-  experimentLane?: string | null;
-}) {
-  const now = new Date().toISOString();
-
-  return appendEscapeEvent({
-    id: randomUUID(),
-    clickSessionId: params.clickSession.id,
-    eventName: params.eventName,
-    attemptedMethod: params.attemptedMethod || null,
-    latencyMs: params.latencyMs ?? null,
-    platformFamily: params.clickSession.platformFamily,
-    browserFamilyInferred: params.clickSession.browserFamilyInferred,
-    oemFamilyInferred: params.clickSession.oemFamilyInferred,
-    xContextInferred: params.clickSession.xContextInferred,
-    experimentLane: params.experimentLane || null,
-    debugPayloadHash: params.clickSession.debugPayloadHash,
-    createdAt: now
-  });
-}
-
-export async function markRouteSelected(clickToken: string, routeSelected: RouteSelection) {
-  return updateClickSession(clickToken, (session) => ({
-    ...session,
-    routeSelected,
-    stateCurrent: "route_selected",
-    lastEventAt: new Date().toISOString()
-  }));
 }
