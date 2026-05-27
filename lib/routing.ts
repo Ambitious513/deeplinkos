@@ -1,4 +1,11 @@
-import type { DevicePlatform, LinkRecord, ResolvedDestination } from "@/lib/types";
+import type {
+  BrowserFamily,
+  DevicePlatform,
+  LinkRecord,
+  OemFamily,
+  ResolvedDestination,
+  UtmBlob
+} from "@/lib/types";
 
 export function detectPlatform(userAgent: string | null): DevicePlatform {
   const agent = (userAgent || "").toLowerCase();
@@ -16,6 +23,76 @@ export function detectPlatform(userAgent: string | null): DevicePlatform {
   }
 
   return "unknown";
+}
+
+export function inferBrowserFamily(userAgent: string | null): BrowserFamily {
+  const agent = (userAgent || "").toLowerCase();
+
+  if (agent.includes("edg/") || agent.includes("edga/")) {
+    return "edge";
+  }
+
+  if (agent.includes("samsungbrowser/")) {
+    return "samsung-internet";
+  }
+
+  if (agent.includes("brave")) {
+    return "brave";
+  }
+
+  if (agent.includes("firefox/") || agent.includes("fxios/")) {
+    return "firefox";
+  }
+
+  if (agent.includes("crios/") || agent.includes("chrome/")) {
+    return "chrome";
+  }
+
+  if (agent.includes("safari/")) {
+    return "safari";
+  }
+
+  return agent ? "other" : "unknown";
+}
+
+export function inferOemFamily(userAgent: string | null): OemFamily {
+  const agent = (userAgent || "").toLowerCase();
+  const platform = detectPlatform(userAgent);
+
+  if (platform === "ios") {
+    return "apple";
+  }
+
+  if (platform === "desktop") {
+    return "desktop";
+  }
+
+  if (platform !== "android") {
+    return "unknown";
+  }
+
+  if (agent.includes("pixel")) return "pixel";
+  if (agent.includes("sm-") || agent.includes(" samsung")) return "samsung";
+  if (agent.includes("mi ") || agent.includes("redmi") || agent.includes("xiaomi")) return "xiaomi";
+  if (agent.includes("moto") || agent.includes("motorola")) return "motorola";
+  if (agent.includes("oneplus")) return "oneplus";
+
+  return "other_oem_android";
+}
+
+export function inferOsVersion(userAgent: string | null) {
+  const agent = userAgent || "";
+  const iosMatch = agent.match(/OS (\d+(?:[_\.]\d+)*) like Mac OS X/i);
+  if (iosMatch) {
+    return iosMatch[1].replace(/_/g, ".");
+  }
+
+  const androidMatch = agent.match(/Android (\d+(?:\.\d+)*)/i);
+  if (androidMatch) {
+    return androidMatch[1];
+  }
+
+  return null;
 }
 
 /**
@@ -85,6 +162,26 @@ export function isInAppWebView(
   return false;
 }
 
+export function isXContext(
+  userAgent: string | null,
+  xRequestedWith: string | null = null,
+  referer: string | null = null
+) {
+  const ua = (userAgent || "").toLowerCase();
+  const xrw = (xRequestedWith || "").toLowerCase();
+  const ref = (referer || "").toLowerCase();
+
+  if (ref.includes("t.co") || ref.includes("x.com") || ref.includes("twitter.com")) {
+    return true;
+  }
+
+  if (xrw.includes("com.twitter.android")) {
+    return true;
+  }
+
+  return /twitter/i.test(ua);
+}
+
 /**
  * Detect if the request is specifically coming from X.com / Twitter's
  * Chrome Custom Tab (CCT). CCTs are powered by the real Chrome engine so
@@ -114,6 +211,20 @@ export function isChromeCustomTab(
   if (xrw && xrw !== "com.android.chrome") return false;
 
   return true;
+}
+
+export function mergeTrackingParams(destination: string, utmBlob: UtmBlob) {
+  try {
+    const url = new URL(destination);
+    for (const [key, value] of Object.entries(utmBlob)) {
+      if (!url.searchParams.has(key)) {
+        url.searchParams.set(key, value);
+      }
+    }
+    return url.toString();
+  } catch {
+    return destination;
+  }
 }
 
 export function resolveDestination(

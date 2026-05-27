@@ -17,7 +17,7 @@ describe("inferLinkFromDestination", () => {
     const inferred = inferLinkFromDestination("youtube.com/@buildwithtiana");
     expect(inferred.preset).toBe("youtube");
     expect(inferred.desktopUrl).toBe("https://youtube.com/@buildwithtiana");
-    expect(inferred.iosDeepLink).toBe("https://youtube.com/@buildwithtiana");
+    expect(inferred.iosDeepLink).toBe("vnd.youtube://youtube.com/@buildwithtiana");
   });
 });
 

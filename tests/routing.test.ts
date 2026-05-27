@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { detectPlatform, resolveDestination } from "../lib/routing";
+import { detectPlatform, isXContext, mergeTrackingParams, resolveDestination } from "../lib/routing";
 import type { LinkRecord } from "../lib/types";
 
 const baseRecord: LinkRecord = {
@@ -44,5 +44,23 @@ describe("resolveDestination", () => {
   it("uses the safest available fallback for unknown agents", () => {
     const result = resolveDestination(baseRecord, "Unknown Agent");
     expect(result?.destination).toBe(baseRecord.desktopUrl);
+  });
+});
+
+describe("isXContext", () => {
+  it("detects t.co-originated traffic", () => {
+    expect(isXContext(null, null, "https://t.co/example")).toBe(true);
+  });
+});
+
+describe("mergeTrackingParams", () => {
+  it("preserves and appends tracking params", () => {
+    const merged = mergeTrackingParams("https://brand.com/launch?utm_medium=social", {
+      utm_source: "x",
+      utm_medium: "social"
+    });
+
+    expect(merged).toContain("utm_medium=social");
+    expect(merged).toContain("utm_source=x");
   });
 });
