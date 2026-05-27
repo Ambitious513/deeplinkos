@@ -54,28 +54,24 @@ export async function GET(
   // we gracefully fall back to the CCT — keeping the user in X.com Chrome
   // which is still a fully-featured browser with cookies and tracking.
   if (cct && platform === "android") {
-    const encodedUrl = encodeURIComponent(webFallback);
-
-    // ── Browser-specific URL schemes ──────────────────────────────────────────
-    // Using https:// intents triggers Android's activity chooser (showing both
-    // Chrome and the target browser). Instead we use each browser's OWN custom
-    // URL scheme — these are ONLY registered by that specific browser, so Android
-    // opens them directly with zero chooser dialog.
-    //
-    // Cascade order (most → least likely to be installed on Android):
+    // ── Intent URI Cascade ────────────────────────────────────────────────────
+    // We MUST use intent:// URIs. CCT blocks raw custom schemes (sbrowser://) 
+    // without a user gesture, but allows intent://.
+    // We explicitly specify the package= to force direct launch without showing
+    // the Android activity chooser.
+    // We DO NOT use S.browser_fallback_url because if an intent fails, we want
+    // it to fail silently so our JS can try the next browser.
+    
+    const intentHostPath = `${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}`;
     const browsers = [
       // 1. Samsung Internet — pre-installed on ALL Samsung devices (~30% of Android market)
-      //    sbrowser:// is Samsung's proprietary scheme, only Samsung Internet handles it.
-      `sbrowser://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}`,
+      `intent://${intentHostPath}#Intent;scheme=https;package=com.sec.android.app.sbrowser;end;`,
       // 2. Firefox — 400M+ installs, widely popular
-      //    firefox://open-url?url=... is Firefox's own scheme
-      `firefox://open-url?url=${encodedUrl}`,
+      `intent://${intentHostPath}#Intent;scheme=https;package=org.mozilla.firefox;end;`,
       // 3. Brave — privacy-focused, fast-growing
-      `brave://open-url?url=${encodedUrl}`,
+      `intent://${intentHostPath}#Intent;scheme=https;package=com.brave.browser;end;`,
       // 4. Microsoft Edge — pre-installed on many devices, growing
-      `microsoft-edge://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}`,
-      // 5. DuckDuckGo Browser — very privacy-conscious users
-      `ddgquicklink://${new URL(webFallback).hostname}${new URL(webFallback).pathname}${new URL(webFallback).search}`,
+      `intent://${intentHostPath}#Intent;scheme=https;package=com.microsoft.emmx;end;`,
     ];
 
     const html = `<!DOCTYPE html>
@@ -104,29 +100,28 @@ export async function GET(
   <a href="${webFallback}" class="tap">Tap here if nothing happens</a>
   <script>
   (function(){
-    // Browser cascade: try each alternative browser in order.
-    // The first one that IS installed on this device wins.
-    // Android fires S.browser_fallback_url for each that isn't installed,
-    // which keeps us in the CCT — still a great, fully-featured Chrome session.
     var browsers = ${JSON.stringify(browsers)};
     var web = ${JSON.stringify(webFallback)};
     var idx = 0;
 
     function tryNext() {
+      // If we successfully broke out, the page will be hidden. Stop the cascade!
+      if (document.hidden || document.webkitHidden) return;
+
       if (idx >= browsers.length) {
         // All alternatives exhausted — fall back to web URL in CCT
         window.location.href = web;
         return;
       }
       var scheme = browsers[idx++];
-      // Hidden anchor click — best method for triggering Android Intents
       var a = document.createElement('a');
       a.href = scheme;
       a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
-      // If still here after 2.5s, the browser wasn't installed — try next
-      setTimeout(tryNext, 2500);
+      
+      // Give the OS 1.5s to launch the intent. If still here, try the next one.
+      setTimeout(tryNext, 1500);
     }
 
     // Small initial delay to let the page render before firing
