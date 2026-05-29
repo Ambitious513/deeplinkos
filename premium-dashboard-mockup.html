@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepLink OS - Premium Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.7);
+            --bg-card-hover: rgba(255, 255, 255, 0.9);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --panel-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            --gradient-bg: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08), transparent 25%),
+                           radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+        }
+
+        [data-theme="dark"] {
+            --bg-main: #09090b;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --bg-card-hover: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(9, 9, 11, 0.8);
+            --panel-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            --gradient-bg: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+                           radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-image: var(--gradient-bg);
+            background-attachment: fixed;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            -webkit-text-fill-color: white;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--bg-card-hover);
+            color: var(--text-main);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid var(--accent-primary);
+        }
+
+        .nav-item svg {
+            flex-shrink: 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px 48px;
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            background: var(--bg-card-hover);
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--accent-secondary);
+            cursor: pointer;
+            background-image: url('https://ui-avatars.com/api/?name=User&background=random');
+            background-size: cover;
+        }
+
+        /* Views */
+        .view {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--panel-shadow);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-primary);
+        }
+
+        .stat-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .stat-title {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-change {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .positive { color: var(--success); }
+        .negative { color: var(--danger); }
+        .text-muted { color: var(--text-muted); }
+
+        /* Sections Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .content-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: var(--panel-shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Chart container */
+        .chart-container {
+            height: 300px;
+            width: 100%;
+            position: relative;
+        }
+        
+        .chart-container-sm {
+            height: 220px;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Pixels & Forms */
+        .pixel-group { margin-bottom: 24px; }
+        .pixel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .pixel-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
+        .icon-google { background: #ea4335; color: white; }
+        .icon-fb { background: #1877f2; color: white; }
+
+        .input-group { display: flex; gap: 8px; }
+        .input-group-vertical { display: flex; flex-direction: column; gap: 8px; }
+        .input-group-vertical label { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+
+        .input-field {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px 16px;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-field:focus { border-color: var(--accent-primary); }
+
+        .domain-prefix-group { display: flex; align-items: stretch; }
+        .domain-prefix-group .prefix {
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border-color);
+            border-right: none;
+            padding: 10px 16px;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            color: var(--text-muted);
+            font-size: 14px;
+            display: flex; align-items: center;
+        }
+        .domain-prefix-group .alias-input {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .btn-secondary {
+            background: var(--bg-card-hover);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .btn-secondary:hover { background: var(--border-color); }
+
+        /* Table */
+        .table-responsive { overflow-x: auto; }
+        .table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        .table th, .table td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .table th { color: var(--text-muted); font-weight: 500; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .table td { font-size: 14px; }
+        .table tr:last-child td { border-bottom: none; }
+        .table tr:hover td { background: var(--bg-card-hover); cursor: pointer; }
+
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .badge.active { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+        
+        .link-short { color: var(--accent-primary); text-decoration: none; font-weight: 500; }
+        .link-short:hover { text-decoration: underline; }
+
+        /* Progress List */
+        .progress-list { list-style: none; }
+        .progress-item { margin-bottom: 16px; }
+        .progress-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; }
+        .progress-bar-bg { height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: var(--accent-primary); border-radius: 4px; }
+
+        /* Back Button */
+        .btn-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            transition: color 0.2s;
+        }
+        .btn-back:hover { color: var(--text-main); }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none; 
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.open {
+            display: flex;
+            animation: fadeInModal 0.3s forwards;
+        }
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            background: var(--bg-main);
+            width: 90%;
+            max-width: 550px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+        .modal-overlay.open .modal-content { transform: scale(1); }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-header h3 { font-size: 18px; font-weight: 600; }
+        .modal-body { padding: 24px; }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex; justify-content: flex-end; gap: 12px;
+            background: var(--bg-card);
+        }
+        .close-modal {
+            background: none; border: none; color: var(--text-muted); font-size: 28px; line-height: 1; cursor: pointer; transition: color 0.2s;
+        }
+        .close-modal:hover { color: var(--text-main); }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 900px) {
+            .content-grid, .content-grid-3 { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 70px;
+                flex-direction: row;
+                border-right: none;
+                border-top: 1px solid var(--border-color);
+                padding: 10px;
+                justify-content: space-around;
+            }
+            .logo { display: none; }
+            .nav-item {
+                flex-direction: column;
+                gap: 4px;
+                padding: 6px;
+                margin: 0;
+                border-radius: 8px;
+                font-size: 11px;
+                border-left: none !important;
+            }
+            .nav-item.active { border-bottom: 3px solid var(--accent-primary); background: transparent; }
+            .nav-item span { display: block; }
+            
+            .main-content {
+                padding: 20px;
+                padding-bottom: 90px;
+            }
+            header { flex-direction: column; align-items: flex-start; gap: 20px; }
+            .header-actions { width: 100%; justify-content: space-between; }
+            
+            .chart-container { height: 220px; }
+            .panel { padding: 16px; }
+            .mobile-chart-hint {
+                display: block !important;
+                font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 8px;
+            }
+        }
+        .mobile-chart-hint { display: none; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">D</div>
+            DeepLink
+        </div>
+        
+        <nav style="display: contents;">
+            <div class="nav-item active" data-target="view-dashboard">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" data-target="view-links">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                <span>Links</span>
+            </div>
+            <div class="nav-item" data-target="view-analytics">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <span>Analytics</span>
+            </div>
+            <div class="nav-item" data-target="view-pixels">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                <span>Pixels</span>
+            </div>
+            <div class="nav-item" data-target="view-settings">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>Settings</span>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <div class="page-title" id="page-title-text">Overview</div>
+            <div class="header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Mode">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+                <button class="btn-primary" onclick="openModal()">+ Create Link</button>
+                <div class="profile-pic"></div>
+            </div>
+        </header>
+
+        <!-- ================= DASHBOARD VIEW ================= -->
+        <div id="view-dashboard" class="view active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Total Clicks (30d)</div>
+                    <div class="stat-value">124,592</div>
+                    <div class="stat-change positive">↑ 12.5% vs last month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Unique Visitors</div>
+                    <div class="stat-value">89,430</div>
+                    <div class="stat-change positive">↑ 8.2% vs last month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Avg. Click-Through Rate</div>
+                    <div class="stat-value">24.8%</div>
+                    <div class="stat-change negative">↓ 1.2% vs last month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Active Smart Links</div>
+                    <div class="stat-value">142</div>
+                    <div class="stat-change positive">+ 12 this week</div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="panel">
+                    <div class="panel-header" style="margin-bottom: 12px;">
+                        <div class="panel-title">Click Analytics</div>
+                        <select class="input-field" style="width: auto; padding: 6px 12px;">
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="mainClicksChart"></canvas>
+                    </div>
+                    <div class="mobile-chart-hint">Tap and drag to view daily clicks</div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">Quick Links</div>
+                        <button class="btn-secondary" onclick="switchView('view-links')">View All</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                <tr onclick="openSingleLink('Summer Campaign \'26', 'dplnk.io/summer26')">
+                                    <td>
+                                        <div style="font-weight: 500;">Summer Campaign '26</div>
+                                        <div style="font-size: 12px; color: var(--text-muted);">dplnk.io/summer26</div>
+                                    </td>
+                                    <td style="text-align: right; font-weight: 600;">45k</td>
+                                </tr>
+                                <tr onclick="openSingleLink('App Install Fallback', 'dplnk.io/get-app')">
+                                    <td>
+                                        <div style="font-weight: 500;">App Install Fallback</div>
+                                        <div style="font-size: 12px; color: var(--text-muted);">dplnk.io/get-app</div>
+                                    </td>
+                                    <td style="text-align: right; font-weight: 600;">28k</td>
+                                </tr>
+                                <tr onclick="openSingleLink('Instagram Bio Link', 'dplnk.io/ig-bio')">
+                                    <td>
+                                        <div style="font-weight: 500;">Instagram Bio Link</div>
+                                        <div style="font-size: 12px; color: var(--text-muted);">dplnk.io/ig-bio</div>
+                                    </td>
+                                    <td style="text-align: right; font-weight: 600;">12k</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= LINKS MANAGER VIEW ================= -->
+        <div id="view-links" class="view">
+            <!-- Empty State Demonstration Toggle (for mockup purposes) -->
+            <div style="text-align: right; margin-bottom: 16px;">
+                <button class="btn-secondary" onclick="toggleEmptyState()" style="font-size: 12px; padding: 4px 8px;">Toggle Empty State</button>
+            </div>
+
+            <!-- Populated State -->
+            <div class="panel" id="links-populated">
+                <div class="panel-header">
+                    <div class="panel-title">All Smart Links</div>
+                    <div class="input-group">
+                        <input type="text" class="input-field" placeholder="Search links...">
+                        <button class="btn-secondary">Filter</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Link Name</th>
+                                <th>Short URL</th>
+                                <th>Destination</th>
+                                <th>Total Clicks</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr onclick="openSingleLink('Summer Campaign \'26', 'dplnk.io/summer26')">
+                                <td style="font-weight: 500;">Summer Campaign '26</td>
+                                <td><span class="link-short">dplnk.io/summer26</span></td>
+                                <td><span style="color: var(--text-muted); max-width: 150px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">https://mybrand.com/summer-sale-2026</span></td>
+                                <td>45,210</td>
+                                <td><span class="badge active">Active</span></td>
+                                <td><button class="btn-secondary" style="padding: 4px 10px;">Stats</button></td>
+                            </tr>
+                            <tr onclick="openSingleLink('App Install Fallback', 'dplnk.io/get-app')">
+                                <td style="font-weight: 500;">App Install Fallback</td>
+                                <td><span class="link-short">dplnk.io/get-app</span></td>
+                                <td><span style="color: var(--text-muted); max-width: 150px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">https://play.google.com/store/apps/...</span></td>
+                                <td>28,401</td>
+                                <td><span class="badge active">Active</span></td>
+                                <td><button class="btn-secondary" style="padding: 4px 10px;">Stats</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="panel" id="links-empty" style="display: none; text-align: center; padding: 60px 20px;">
+                <svg width="64" height="64" fill="none" stroke="var(--text-muted)" stroke-width="1.5" viewBox="0 0 24 24" style="margin: 0 auto 16px auto; opacity: 0.5;"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">No links created yet</h3>
+                <p style="color: var(--text-muted); margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">Create your first smart link to start tracking clicks, routing users, and gathering powerful analytics.</p>
+                <button class="btn-primary" onclick="openModal()">Create Your First Link</button>
+            </div>
+        </div>
+
+        <!-- ================= GLOBAL ANALYTICS VIEW ================= -->
+        <div id="view-analytics" class="view">
+            <div class="panel" style="margin-bottom: 24px; padding: 16px 24px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
+                <div style="font-weight: 600; margin-right: auto;">Global Filters:</div>
+                <select class="input-field" style="width: auto; padding: 8px 16px;">
+                    <option>Last 30 Days</option>
+                    <option>Last 7 Days</option>
+                    <option>This Year</option>
+                </select>
+                <button class="btn-secondary" style="display: flex; gap: 8px; align-items: center;">Export</button>
+            </div>
+
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 24px;">
+                <div class="stat-card">
+                    <div class="stat-title">Aggregate Clicks</div>
+                    <div class="stat-value">854,200</div>
+                    <div class="stat-change positive">↑ 18% vs prev. period</div>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-bottom: 24px;">
+                <div class="panel-header" style="margin-bottom: 12px;">
+                    <div class="panel-title">Global Traffic Trend</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="globalTrafficChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PIXELS VIEW ================= -->
+        <div id="view-pixels" class="view">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Tracking & Retargeting Integrations</div>
+                </div>
+                
+                <div class="pixel-group" style="padding: 20px; border: 1px solid var(--border-color); border-radius: 12px; background: rgba(0,0,0,0.02);">
+                    <div class="pixel-header">
+                        <div class="pixel-icon icon-google">G</div>
+                        <div>
+                            <span style="font-weight: 600; display: block;">Google Analytics (GA4)</span>
+                            <span style="font-size: 12px; color: var(--text-muted);">Fires on every link redirect to track user journeys.</span>
+                        </div>
+                    </div>
+                    <div class="input-group" style="margin-top: 16px;">
+                        <input type="text" class="input-field" placeholder="G-XXXXXXXXXX" value="G-A1B2C3D4E5">
+                        <button class="btn-primary">Update Pixel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SETTINGS / DOMAINS VIEW ================= -->
+        <div id="view-settings" class="view">
+            <div class="content-grid" style="grid-template-columns: 1fr;">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">Custom Domains</div>
+                        <button class="btn-primary">+ Add Domain</button>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px; max-width: 600px;">Use your own brand name for shortened links (e.g., link.yourbrand.com). Custom domains increase click-through rates and build brand trust.</p>
+                    
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Domain</th>
+                                    <th>Status</th>
+                                    <th>Added On</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight: 500;">link.mybrand.com</td>
+                                    <td><span class="badge active">Active</span></td>
+                                    <td>May 10, 2026</td>
+                                    <td><button class="btn-secondary" style="padding: 4px 10px;">Manage</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 500;">go.mybrand.com</td>
+                                    <td><span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2);">Pending DNS</span></td>
+                                    <td>May 28, 2026</td>
+                                    <td><button class="btn-secondary" style="padding: 4px 10px;">Verify</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">API Keys</div>
+                        <button class="btn-secondary">Generate New Key</button>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Use these keys to authenticate your API requests and integrate DeepLink OS into your own applications.</p>
+                    <div class="input-group">
+                        <input type="password" class="input-field" value="dl_live_8f7d6s5a4f3d2s1a" readonly>
+                        <button class="btn-secondary">Copy</button>
+                        <button class="btn-secondary">Revoke</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SINGLE LINK ANALYTICS VIEW ================= -->
+        <div id="view-single-link" class="view">
+            <button class="btn-back" onclick="switchView('view-links')">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg>
+                Back to Links
+            </button>
+            <div class="panel" style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h2 style="margin-bottom: 4px;" id="sl-title">Summer Campaign '26</h2>
+                    <a href="#" class="link-short" id="sl-url" style="font-size: 18px;">dplnk.io/summer26</a>
+                </div>
+            </div>
+            <div class="panel" style="margin-bottom: 24px;">
+                <div class="panel-header" style="margin-bottom: 12px;">
+                    <div class="panel-title">Traffic Trend</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="singleLinkLineChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= CREATE LINK MODAL ================= -->
+    <div id="createLinkModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Link</h3>
+                <button class="close-modal" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group-vertical">
+                    <label>Destination URL <span style="color: var(--danger);">*</span></label>
+                    <input type="url" class="input-field" placeholder="https://your-long-url.com/campaign-2026">
+                </div>
+                
+                <div class="input-group-vertical" style="margin-top: 20px;">
+                    <label>Custom Alias (Optional)</label>
+                    <div class="domain-prefix-group">
+                        <select class="input-field prefix" style="width: auto; appearance: none; border-right: 1px solid var(--border-color); cursor: pointer;">
+                            <option>dplnk.io/</option>
+                            <option>link.mybrand.com/</option>
+                        </select>
+                        <input type="text" class="input-field alias-input" placeholder="summer-sale">
+                    </div>
+                </div>
+
+                <div class="input-group-vertical" style="margin-top: 20px;">
+                    <label>Tags</label>
+                    <input type="text" class="input-field" placeholder="e.g. social, campaign-q3">
+                </div>
+
+                <div class="advanced-settings-toggle" onclick="toggleAdvanced()" style="margin-top: 20px; cursor: pointer; color: var(--accent-primary); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+                    <svg id="adv-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="transition: transform 0.2s;"><path d="M19 9l-7 7-7-7"></path></svg>
+                    Advanced Settings
+                </div>
+
+                <div id="advancedSettings" style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border-color);">
+                    <div class="input-group-vertical">
+                        <label>Password Protection</label>
+                        <input type="password" class="input-field" placeholder="Require a password to access">
+                    </div>
+                    <div class="input-group-vertical" style="margin-top: 16px;">
+                        <label>Expiration Date</label>
+                        <input type="datetime-local" class="input-field">
+                    </div>
+                    <div style="margin-top: 16px; display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="abTest" style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
+                        <label for="abTest" style="font-size: 14px; color: var(--text-main);">Enable A/B Split Testing (Add 2nd Destination)</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn-primary" onclick="submitModal()">Create Link</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Theme Management ---
+        function toggleTheme() {
+            const root = document.documentElement;
+            const currentTheme = root.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            setTimeout(() => { initCharts(); }, 100);
+        }
+
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+
+        // --- View Management ---
+        const views = document.querySelectorAll('.view');
+        const navItems = document.querySelectorAll('.nav-item');
+        const pageTitle = document.getElementById('page-title-text');
+
+        function switchView(viewId) {
+            views.forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            
+            navItems.forEach(n => {
+                if(n.dataset.target === viewId) {
+                    n.classList.add('active');
+                    pageTitle.innerText = n.querySelector('span').innerText;
+                } else {
+                    n.classList.remove('active');
+                }
+            });
+
+            if (viewId === 'view-single-link') {
+                pageTitle.innerText = "Link Analytics";
+                navItems.forEach(n => n.classList.remove('active'));
+            }
+
+            initCharts();
+        }
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => switchView(item.dataset.target));
+        });
+
+        function openSingleLink(title, url) {
+            document.getElementById('sl-title').innerText = title;
+            document.getElementById('sl-url').innerText = url;
+            switchView('view-single-link');
+        }
+
+        // --- Modal Management ---
+        const modal = document.getElementById('createLinkModal');
+        function openModal() {
+            modal.classList.add('open');
+        }
+        function closeModal() {
+            modal.classList.remove('open');
+        }
+        function submitModal() {
+            closeModal();
+            // Just for demonstration
+            setTimeout(() => alert("Link created successfully!"), 300);
+        }
+        
+        // Close modal on click outside
+        modal.addEventListener('click', (e) => {
+            if(e.target === modal) closeModal();
+        });
+
+        function toggleAdvanced() {
+            const adv = document.getElementById('advancedSettings');
+            const chevron = document.getElementById('adv-chevron');
+            if (adv.style.display === 'none') {
+                adv.style.display = 'block';
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                adv.style.display = 'none';
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // --- Empty State Demo ---
+        function toggleEmptyState() {
+            const pop = document.getElementById('links-populated');
+            const emp = document.getElementById('links-empty');
+            if (pop.style.display === 'none') {
+                pop.style.display = 'block';
+                emp.style.display = 'none';
+            } else {
+                pop.style.display = 'none';
+                emp.style.display = 'block';
+            }
+        }
+
+        // --- Chart Management ---
+        let chartInstances = {};
+
+        function getChartColors() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            return {
+                gridColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                textColor: isDark ? '#94a3b8' : '#64748b',
+                tooltipBg: isDark ? 'rgba(9, 9, 11, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                tooltipText: isDark ? '#fff' : '#0f172a',
+                primary: '#3b82f6',
+                secondary: '#8b5cf6',
+                success: '#10b981'
+            };
+        }
+
+        function createLineChart(ctxId, data) {
+            const canvas = document.getElementById(ctxId);
+            if (!canvas || canvas.offsetParent === null) return;
+            if(chartInstances[ctxId]) chartInstances[ctxId].destroy();
+            
+            const ctx = canvas.getContext('2d');
+            const colors = getChartColors();
+            const isMobile = window.innerWidth <= 768;
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, isMobile ? 200 : 300);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.6)');
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+            chartInstances[ctxId] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Clicks',
+                        data: data,
+                        borderColor: colors.primary,
+                        backgroundColor: gradient,
+                        borderWidth: isMobile ? 4 : 3,
+                        pointBackgroundColor: colors.secondary,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: isMobile ? 0 : 4,
+                        pointHoverRadius: 6,
+                        pointHitRadius: 25,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: { padding: isMobile ? { left: 0, right: 0, top: 10, bottom: 0 } : 0 },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: colors.tooltipBg,
+                            titleColor: colors.tooltipText,
+                            bodyColor: colors.tooltipText,
+                            borderColor: colors.gridColor,
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false,
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    },
+                    scales: {
+                        y: { display: !isMobile, beginAtZero: true, grid: { color: colors.gridColor, drawBorder: false }, ticks: { color: colors.textColor } },
+                        x: { display: !isMobile, grid: { display: false, drawBorder: false }, ticks: { color: colors.textColor } }
+                    },
+                    interaction: { intersect: false, mode: 'index' },
+                }
+            });
+        }
+
+        function initCharts() {
+            createLineChart('mainClicksChart', [1200, 1900, 1500, 2200, 1800, 2800, 3100]);
+            createLineChart('globalTrafficChart', [5000, 7200, 6800, 9500, 8100, 11000, 12500]);
+            createLineChart('singleLinkLineChart', [300, 450, 320, 600, 550, 800, 950]);
+        }
+
+        window.onload = () => { initCharts(); };
+        window.addEventListener('resize', () => {
+            clearTimeout(window.resizeTimer);
+            window.resizeTimer = setTimeout(() => { initCharts(); }, 250);
+        });
+    </script>
+</body>
+</html>

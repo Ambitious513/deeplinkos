@@ -13,7 +13,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@prisma/client": "^6.8.0",
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.106.2",
     "gray-matter": "^4.0.3",
     "next": "^15.3.2",
     "next-mdx-remote": "^6.0.0",
@@ -30,7 +31,6 @@
     "@types/react-dom": "^19.1.5",
     "eslint": "^9.27.0",
     "eslint-config-next": "^15.3.2",
-    "prisma": "^6.8.0",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
   }

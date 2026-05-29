@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import NextTopLoader from 'nextjs-toploader';
+import { GoogleOneTap } from "@/components/auth/google-one-tap";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
@@ -127,6 +128,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body>
         <NextTopLoader color="#3b82f6" showSpinner={false} />
+        <GoogleOneTap />
         {children}
       </body>
     </html>

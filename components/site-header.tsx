@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
+import { AuthModal } from "@/components/auth/auth-modal";
 
 type Theme = "light" | "dark";
 
@@ -37,6 +38,7 @@ export function SiteHeader() {
   const [scrolled,  setScrolled]  = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [theme,     setTheme]     = useState<Theme>("light");
+  const [authOpen,  setAuthOpen]  = useState(false);
 
   /* Read theme that was set by the anti-flash script */
   useEffect(() => {
@@ -109,13 +111,13 @@ export function SiteHeader() {
                 {theme === "light" ? <MoonIcon /> : <SunIcon />}
               </button>
 
-              {/* Desktop CTA — hidden on mobile via CSS */}
-              <Link href="#composer" className="nav__cta" id="nav-cta-btn">
-                Try It Free
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              {/* Desktop CTA */}
+              <button className="nav__cta" id="nav-cta-btn" onClick={() => setAuthOpen(true)}>
+                Sign In
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style={{ marginLeft: 6 }}>
                   <path d="M2 6h8M6.5 2.5L10 6l-3.5 3.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-              </Link>
+              </button>
 
               {/* Hamburger — shown on mobile via CSS */}
               <button
@@ -156,7 +158,6 @@ export function SiteHeader() {
         </Link>
       </div>
 
-      {/* ── Backdrop ───────────────────────────────────────────── */}
       {menuOpen && (
         <div
           className="nav__backdrop"
@@ -164,6 +165,9 @@ export function SiteHeader() {
           aria-hidden="true"
         />
       )}
+
+      {/* Auth Modal */}
+      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
     </>
   );
 }
