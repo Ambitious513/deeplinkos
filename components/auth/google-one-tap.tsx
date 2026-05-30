@@ -29,23 +29,24 @@ export function GoogleOneTap() {
   useEffect(() => {
     // Expose callback globally so the script can access it
     (window as any).handleGoogleOneTap = handleCredentialResponse;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const initializeGoogleOneTap = () => {
-    if (typeof window !== "undefined" && window.google && !initialized.current) {
+    if (typeof window !== "undefined" && (window as any).google && !initialized.current) {
       const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
       if (!clientId) {
         console.warn("NEXT_PUBLIC_GOOGLE_CLIENT_ID is missing. Google One Tap will not load.");
         return;
       }
       
-      window.google.accounts.id.initialize({
+      (window as any).google.accounts.id.initialize({
         client_id: clientId,
         callback: (window as any).handleGoogleOneTap,
         auto_select: false,
         cancel_on_tap_outside: false,
       });
-      window.google.accounts.id.prompt();
+      (window as any).google.accounts.id.prompt();
       initialized.current = true;
     }
   };
