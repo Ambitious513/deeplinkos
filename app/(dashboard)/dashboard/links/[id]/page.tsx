@@ -15,7 +15,7 @@ export default async function SingleLinkPage({ params }: { params: Promise<{ id:
 
       <div className="panel" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-              <h2 style={{ marginBottom: '4px', fontSize: '24px', fontWeight: 600 }}>Summer Campaign '26</h2>
+              <h2 style={{ marginBottom: '4px', fontSize: '24px', fontWeight: 600 }}>Summer Campaign &apos;26</h2>
               <a href="#" className="link-short" style={{ fontSize: '18px', textDecoration: 'none', color: 'var(--blue)' }}>dplnk.io/{id}</a>
           </div>
       </div>

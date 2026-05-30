@@ -53,7 +53,7 @@ export default function DashboardOverview() {
                       <tbody>
                           <tr>
                               <td>
-                                  <div style={{ fontWeight: 500 }}>Summer Campaign '26</div>
+                                  <div style={{ fontWeight: 500 }}>Summer Campaign &apos;26</div>
                                   <div style={{ fontSize: '12px', color: 'var(--text-2)' }}>dplnk.io/summer26</div>
                               </td>
                               <td style={{ textAlign: 'right', fontWeight: 600 }}>45k</td>

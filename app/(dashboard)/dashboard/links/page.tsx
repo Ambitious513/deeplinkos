@@ -28,7 +28,7 @@ export default function LinksPage() {
                   </thead>
                   <tbody>
                       <tr>
-                          <td style={{ fontWeight: 500 }}>Summer Campaign '26</td>
+                          <td style={{ fontWeight: 500 }}>Summer Campaign &apos;26</td>
                           <td><span className="link-short">dplnk.io/summer26</span></td>
                           <td><span style={{ color: 'var(--text-2)', maxWidth: '150px', display: 'inline-block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>https://mybrand.com/summer-sale-2026</span></td>
                           <td>45,210</td>
