@@ -19,8 +19,9 @@ export function GoogleOneTap() {
 
       if (error) throw error;
       
-      // Successfully logged in via One Tap
-      router.push("/dashboard");
+      // Redirect to app dashboard (never to Supabase admin)
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+      window.location.href = `${siteUrl}/dashboard`;
     } catch (error) {
       console.error("Error logging in with Google One Tap", error);
     }
