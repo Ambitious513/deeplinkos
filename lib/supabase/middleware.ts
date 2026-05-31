@@ -41,10 +41,10 @@ export async function updateSession(request: NextRequest) {
                            request.nextUrl.pathname.startsWith('/settings');
   
   if (isDashboardRoute && !user) {
-    // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
+    // TEMPORARY BYPASS: Allow access without login for testing routing
+    // const url = request.nextUrl.clone()
+    // url.pathname = '/login'
+    // return NextResponse.redirect(url)
   }
 
   // Enforced Onboarding Check
@@ -54,9 +54,10 @@ export async function updateSession(request: NextRequest) {
     const meta = user.user_metadata || {};
     if (!meta.first_name || !meta.last_name) {
       if (!request.nextUrl.pathname.startsWith('/onboarding')) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/onboarding'
-        return NextResponse.redirect(url)
+        // TEMPORARY BYPASS: Allow access without onboarding
+        // const url = request.nextUrl.clone()
+        // url.pathname = '/onboarding'
+        // return NextResponse.redirect(url)
       }
     }
   }
