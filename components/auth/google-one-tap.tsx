@@ -19,9 +19,8 @@ export function GoogleOneTap() {
 
       if (error) throw error;
       
-      // Redirect to app dashboard (never to Supabase admin)
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
-      window.location.href = `${siteUrl}/dashboard`;
+      // Use relative URL — this can NEVER go to the wrong domain
+      window.location.href = '/dashboard';
     } catch (error) {
       console.error("Error logging in with Google One Tap", error);
     }
