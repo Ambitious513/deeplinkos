@@ -8,7 +8,8 @@ import { presetMeta } from "@/lib/constants";
 import { detectPresetFromUrl, inferLinkFromDestination } from "@/lib/inference";
 import type { CreateLinkInput, LinkRecord, PresetKey } from "@/lib/types";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://deeplinkos.com";
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://deeplinkos.com";
+const siteUrl = rawSiteUrl.split(",")[0].trim().replace(/\/+$/, "");
 
 const initialState: CreateLinkInput = {
   destinationUrl: "",
@@ -160,9 +161,10 @@ export function CreateLinkModal({ isOpen, onClose }: { isOpen: boolean; onClose:
         top: "50%",
         left: "50%",
         transform: "translate(-50%, -50%)",
-        width: "min(580px, 92vw)",
+        width: "min(520px, 92vw)",
         maxHeight: "88vh",
         overflowY: "auto",
+        overflowX: "hidden",
         borderRadius: 20,
         padding: 0,
       }}>
