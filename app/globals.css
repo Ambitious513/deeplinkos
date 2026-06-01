@@ -1724,3 +1724,12 @@ body {
 .table tr:hover td { background: var(--bg-1); cursor: pointer; }
 .badge-active { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; background: var(--emerald-dim); color: var(--emerald-hi); border: 1px solid rgba(16,185,129,0.2); }
 
+/* ── Clickable stat card ─────────────────────────────────────────── */
+.stat-card--clickable { cursor: pointer; }
+.stat-card--clickable:hover { box-shadow: 0 8px 32px rgba(59,130,246,.18); }
+
+/* ── Auth modal overlay ──────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(0,0,0,.55); backdrop-filter: blur(6px);
+}

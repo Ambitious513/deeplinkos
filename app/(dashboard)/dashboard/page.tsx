@@ -135,11 +135,13 @@ export default async function DashboardOverview() {
           <div className="stat-value">N/A</div>
           <div className="stat-change">Coming soon</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-title">Active Smart Links</div>
-          <div className="stat-value">{formatNumber(activeLinks)}</div>
-          <div className="stat-change">Currently active</div>
-        </div>
+        <Link href="/dashboard/links?filter=active" style={{ textDecoration: "none", display: "block" }}>
+          <div className="stat-card stat-card--clickable">
+            <div className="stat-title">Active Smart Links</div>
+            <div className="stat-value">{formatNumber(activeLinks)}</div>
+            <div className="stat-change" style={{ color: "var(--blue)" }}>View active links →</div>
+          </div>
+        </Link>
       </div>
 
       <div className="content-grid">

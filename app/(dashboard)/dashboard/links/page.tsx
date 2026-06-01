@@ -1,15 +1,14 @@
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardHeader } from "@/components/dashboard/header";
-
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://deeplinkos.com").split(",")[0].trim().replace(/\/+$/, "");
-
 import { LinksTable } from "@/components/dashboard/links-table";
+
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://deeplinkos.com")
+  .split(",")[0].trim().replace(/\/+$/, "");
 
 export default async function LinksPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   let links: {
     id: string;
@@ -58,9 +57,16 @@ export default async function LinksPage() {
   return (
     <>
       <DashboardHeader title="Links Manager" />
-
       <div className="panel" id="links-populated">
-        <LinksTable links={links} siteUrl={siteUrl} />
+        <Suspense
+          fallback={
+            <div style={{ padding: "32px", textAlign: "center", color: "var(--text-2)" }}>
+              Loading links…
+            </div>
+          }
+        >
+          <LinksTable links={links} siteUrl={siteUrl} />
+        </Suspense>
       </div>
     </>
   );

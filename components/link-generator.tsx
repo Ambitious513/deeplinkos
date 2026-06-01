@@ -152,7 +152,7 @@ function SocialIcon({ preset }: { preset: PresetKey }) {
 
 /* ─── Main component ─────────────────────────────────────────────── */
 
-export function LinkGenerator() {
+export function LinkGenerator({ onViewAnalytics }: { onViewAnalytics?: () => void } = {}) {
   const [form, setForm] = useState<CreateLinkInput>(initialState);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -395,16 +395,15 @@ export function LinkGenerator() {
             >
               {copyState === "done" ? "✓ Copied!" : "Copy Link"}
             </button>
-            <a
-              href={created.shortUrl}
-              id="test-link-btn"
+            <button
+              type="button"
+              id="view-analytics-btn"
               className="button button--secondary"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Test your deep link in a new tab"
+              onClick={onViewAnalytics}
+              aria-label="View your link analytics"
             >
-              Test Link ↗
-            </a>
+              View Analytics →
+            </button>
           </div>
         </section>
       )}

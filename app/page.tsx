@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { AdUnit }           from "@/components/ad-unit";
 import { CtaSection }        from "@/components/cta-section";
 import { FeaturesSection }   from "@/components/features-section";
@@ -8,19 +11,21 @@ import { RoutingSection }    from "@/components/routing-section";
 import { SiteFooter }        from "@/components/site-footer";
 import { SiteHeader }        from "@/components/site-header";
 import { StatsBar }          from "@/components/stats-bar";
+import { AuthModal }         from "@/components/auth/auth-modal";
 
 export default function HomePage() {
+  const [authOpen, setAuthOpen] = useState(false);
+
   return (
     <>
       {/* Fixed nav */}
       <SiteHeader />
 
+      {/* Auth Modal — triggered by homepage CTAs */}
+      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} defaultSignUp />
+
       {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section
-        className="hero"
-        id="home"
-        aria-labelledby="hero-heading"
-      >
+      <section className="hero" id="home" aria-labelledby="hero-heading">
         <div className="hero__orb hero__orb--1" aria-hidden="true" />
         <div className="hero__orb hero__orb--2" aria-hidden="true" />
         <div className="hero__orb hero__orb--3" aria-hidden="true" />
@@ -52,7 +57,7 @@ export default function HomePage() {
             </p>
 
             {/* ── Composer ── */}
-            <LinkGenerator />
+            <LinkGenerator onViewAnalytics={() => setAuthOpen(true)} />
           </div>
         </div>
       </section>
@@ -60,7 +65,7 @@ export default function HomePage() {
       {/* ── Stats bar ────────────────────────────────────────────── */}
       <StatsBar />
 
-      {/* ── Ad: after stats / before How It Works ────────────────── */}
+      {/* ── Ad ────────────────────────────────────────────────────── */}
       <div className="ad-between-sections">
         <AdUnit format="leaderboard" slot="after-stats" />
       </div>
@@ -71,7 +76,7 @@ export default function HomePage() {
       {/* ── Platforms ────────────────────────────────────────────── */}
       <PlatformsSection />
 
-      {/* ── Ad: between Features and Routing ─────────────────────── */}
+      {/* ── Ad ────────────────────────────────────────────────────── */}
       <div className="ad-between-sections">
         <AdUnit format="leaderboard" slot="mid-page" />
       </div>
