@@ -35,9 +35,12 @@ export function AuthModal({
 
   async function handleGoogleAuth() {
     setGoogleLoading(true);
+    // Use env var first, fall back to window.location.origin
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.split(",")[0].trim().replace(/\/+$/, "")
+      || window.location.origin;
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: `${siteUrl}/auth/callback` },
     });
     setGoogleLoading(false);
   }
