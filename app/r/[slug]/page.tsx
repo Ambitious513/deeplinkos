@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { getLink } from "@/lib/links";
 import { detectPlatform } from "@/lib/routing";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function DeepLinkPage({
   params,
@@ -14,8 +15,21 @@ export default async function DeepLinkPage({
 
   if (!record) redirect("/missing");
 
-  const ua = (await headers()).get("user-agent") ?? "";
+  const headersList = await headers();
+  const ua = headersList.get("user-agent") ?? "";
   const platform = detectPlatform(ua);
+
+  // Track the click asynchronously
+  const supabase = await createClient();
+  const ip = headersList.get("x-forwarded-for") ?? "unknown";
+  await supabase.from('clicks').insert({
+    link_id: record.id,
+    device: platform,
+    os: platform, // approximate for now
+    browser: ua.includes("Chrome") ? "Chrome" : ua.includes("Safari") ? "Safari" : "Other",
+    ip_hash: ip.substring(0, 10), // anonymized
+    referrer: headersList.get("referer") ?? null
+  });
 
   const appScheme =
     platform === "ios"

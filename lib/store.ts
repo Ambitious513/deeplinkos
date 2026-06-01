@@ -1,78 +1,102 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
-import { randomUUID } from "node:crypto";
-
 import { createSlug, normalizeSlug } from "@/lib/slug";
 import type { CreateLinkInput, LinkRecord } from "@/lib/types";
+import { createClient } from "@/lib/supabase/server";
 
-const dataDir = path.join(process.cwd(), "data");
-const linksFile = path.join(dataDir, "links.json");
+export async function listLinks(): Promise<LinkRecord[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('deep_links')
+    .select('*')
+    .order('created_at', { ascending: false });
 
-async function ensureJsonFile(filePath: string, initialValue = "[]") {
-  await mkdir(path.dirname(filePath), { recursive: true });
-
-  try {
-    await readFile(filePath, "utf8");
-  } catch {
-    await writeFile(filePath, initialValue, "utf8");
+  if (error) {
+    console.error("Error listing links:", error);
+    return [];
   }
+
+  // Map snake_case from DB to camelCase LinkRecord
+  return data.map(mapToLinkRecord);
 }
 
-async function readCollection<T>(filePath: string) {
-  await ensureJsonFile(filePath);
-  const raw = await readFile(filePath, "utf8");
-  return JSON.parse(raw) as T[];
-}
-
-async function writeCollection<T>(filePath: string, records: T[]) {
-  await writeFile(filePath, JSON.stringify(records, null, 2), "utf8");
-}
-
-export async function listLinks() {
-  const links = await readCollection<LinkRecord>(linksFile);
-  return links.sort((left, right) => right.createdAt.localeCompare(left.createdAt));
-}
-
-export async function findLinkBySlug(slug: string) {
+export async function findLinkBySlug(slug: string): Promise<LinkRecord | null> {
   const normalized = normalizeSlug(slug);
-  const links = await readCollection<LinkRecord>(linksFile);
-  return links.find((link) => link.slug === normalized) || null;
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('deep_links')
+    .select('*')
+    .eq('slug', normalized)
+    .single();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return mapToLinkRecord(data);
 }
 
-export async function createLink(input: CreateLinkInput) {
-  const links = await readCollection<LinkRecord>(linksFile);
+export async function createLink(input: CreateLinkInput): Promise<LinkRecord> {
+  const supabase = await createClient();
   const desiredSlug = normalizeSlug(input.slug) || createSlug();
 
   if (!desiredSlug) {
     throw new Error("Unable to generate a slug.");
   }
 
-  if (links.some((link) => link.slug === desiredSlug)) {
+  // Check if slug exists
+  const existing = await findLinkBySlug(desiredSlug);
+  if (existing) {
     throw new Error("That slug is already taken.");
   }
 
-  const now = new Date().toISOString();
-  const record: LinkRecord = {
-    id: randomUUID(),
+  // Get current user if logged in
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const insertData = {
+    user_id: user?.id || null,
     slug: desiredSlug,
     title: input.title?.trim() || "Custom smart link",
     preset: input.preset || "custom",
     status: "active",
-    iosDeepLink: input.iosDeepLink,
-    iosStoreUrl: input.iosStoreUrl,
-    androidDeepLink: input.androidDeepLink,
-    androidStoreUrl: input.androidStoreUrl,
-    desktopUrl: input.desktopUrl,
-    campaign: input.campaign,
-    workspaceId: null,
-    createdByUserId: null,
-    createdAt: now,
-    updatedAt: now,
-    metadata: null
+    ios_deep_link: input.iosDeepLink || null,
+    ios_store_url: input.iosStoreUrl || null,
+    android_deep_link: input.androidDeepLink || null,
+    android_store_url: input.androidStoreUrl || null,
+    desktop_url: input.desktopUrl || null,
+    routing_config: input.campaign ? { campaign: input.campaign } : null,
+    is_active: true
   };
 
-  links.push(record);
-  await writeCollection(linksFile, links);
+  const { data, error } = await supabase
+    .from('deep_links')
+    .insert(insertData)
+    .select()
+    .single();
 
-  return record;
+  if (error) {
+    throw new Error(`Failed to create link: ${error.message}`);
+  }
+
+  return mapToLinkRecord(data);
+}
+
+function mapToLinkRecord(row: any): LinkRecord {
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    preset: row.preset,
+    status: row.status,
+    iosDeepLink: row.ios_deep_link,
+    iosStoreUrl: row.ios_store_url,
+    androidDeepLink: row.android_deep_link,
+    androidStoreUrl: row.android_store_url,
+    desktopUrl: row.desktop_url,
+    campaign: row.routing_config?.campaign || "",
+    workspaceId: null,
+    createdByUserId: row.user_id,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    metadata: row.metadata
+  };
 }

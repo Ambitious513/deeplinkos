@@ -1,6 +1,18 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Known app domains — requests from these hosts are treated normally
+const APP_HOSTS = new Set([
+  'deeplinkos.com',
+  'www.deeplinkos.com',
+  'localhost',
+  '127.0.0.1'
+]);
+
+function isAppHost(hostname: string): boolean {
+  return APP_HOSTS.has(hostname) || hostname.endsWith('.deeplinkos.com');
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -34,6 +46,23 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
+  // ─── Custom Domain Routing ───────────────────────────────────
+  // If the request comes from a host that is NOT the main app domain,
+  // treat the path as a slug and rewrite to /r/[slug] for deep link resolution.
+  const hostname = request.headers.get('host')?.split(':')[0] || '';
+  if (!isAppHost(hostname)) {
+    const pathname = request.nextUrl.pathname;
+    // Only rewrite root-level paths (not /api, /_next, etc.)
+    if (pathname !== '/' && !pathname.startsWith('/_next') && !pathname.startsWith('/api')) {
+      const slug = pathname.replace(/^\//, '');
+      if (slug && !slug.includes('/')) {
+        const url = request.nextUrl.clone();
+        url.pathname = `/r/${slug}`;
+        return NextResponse.rewrite(url);
+      }
+    }
+  }
 
   // Protect pro routes
   const isDashboardRoute = request.nextUrl.pathname.startsWith('/dashboard') || 
