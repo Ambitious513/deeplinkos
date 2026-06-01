@@ -21,7 +21,10 @@ const initialState: CreateLinkInput = {
   androidDeepLink: "",
   androidStoreUrl: "",
   desktopUrl: "",
-  campaign: ""
+  campaign: "",
+  password: "",
+  expiresAt: "",
+  abTestUrl: ""
 };
 
 type CreateLinkResponse = { link: LinkRecord; shortUrl: string };
@@ -66,6 +69,7 @@ export function CreateLinkModal({ isOpen, onClose }: { isOpen: boolean; onClose:
   const [created, setCreated] = useState<CreateLinkResponse | null>(null);
   const [copyState, setCopyState] = useState<"idle" | "done">("idle");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [enableAbTest, setEnableAbTest] = useState(false);
   const [slugTouched, setSlugTouched] = useState(false);
   const router = useRouter();
 
@@ -102,6 +106,7 @@ export function CreateLinkModal({ isOpen, onClose }: { isOpen: boolean; onClose:
       setCreated(null);
       setCopyState("idle");
       setShowAdvanced(false);
+      setEnableAbTest(false);
       setSlugTouched(false);
     }
   }, [isOpen]);
@@ -288,10 +293,38 @@ export function CreateLinkModal({ isOpen, onClose }: { isOpen: boolean; onClose:
                   </button>
 
                   {showAdvanced && (
-                    <div style={{ display: "grid", gap: 12 }}>
-                      <input className="cf__input" placeholder="Desktop fallback URL (optional)" value={form.desktopUrl} onChange={(e) => updateField("desktopUrl", e.target.value)} />
-                      <input className="cf__input" placeholder="App Store URL (optional)" value={form.iosStoreUrl} onChange={(e) => updateField("iosStoreUrl", e.target.value)} />
-                      <input className="cf__input" placeholder="Play Store URL (optional)" value={form.androidStoreUrl} onChange={(e) => updateField("androidStoreUrl", e.target.value)} />
+                    <div style={{ display: "grid", gap: 12, paddingTop: 8, borderTop: "1px dashed var(--border)" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        <label style={{ fontSize: ".835rem", fontWeight: 700, color: "var(--text)" }}>Desktop fallback URL (optional)</label>
+                        <input className="cf__input" placeholder="https://..." value={form.desktopUrl} onChange={(e) => updateField("desktopUrl", e.target.value)} />
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        <label style={{ fontSize: ".835rem", fontWeight: 700, color: "var(--text)" }}>App Store URL (optional)</label>
+                        <input className="cf__input" placeholder="https://apps.apple.com/..." value={form.iosStoreUrl} onChange={(e) => updateField("iosStoreUrl", e.target.value)} />
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        <label style={{ fontSize: ".835rem", fontWeight: 700, color: "var(--text)" }}>Play Store URL (optional)</label>
+                        <input className="cf__input" placeholder="https://play.google.com/..." value={form.androidStoreUrl} onChange={(e) => updateField("androidStoreUrl", e.target.value)} />
+                      </div>
+                      
+                      {/* New Advanced Settings */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        <label style={{ fontSize: ".835rem", fontWeight: 700, color: "var(--text)" }}>Password Protection</label>
+                        <input type="password" className="cf__input" placeholder="Require a password to access" value={form.password || ""} onChange={(e) => updateField("password", e.target.value)} />
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        <label style={{ fontSize: ".835rem", fontWeight: 700, color: "var(--text)" }}>Expiration Date</label>
+                        <input type="datetime-local" className="cf__input" value={form.expiresAt || ""} onChange={(e) => updateField("expiresAt", e.target.value)} />
+                      </div>
+                      <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 10 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <input type="checkbox" id="abTest" checked={enableAbTest} onChange={(e) => { setEnableAbTest(e.target.checked); if (!e.target.checked) updateField("abTestUrl", ""); }} style={{ width: 16, height: 16, accentColor: "var(--blue)" }} />
+                          <label htmlFor="abTest" style={{ fontSize: ".835rem", color: "var(--text)" }}>Enable A/B Split Testing (Add 2nd Destination)</label>
+                        </div>
+                        {enableAbTest && (
+                          <input type="url" className="cf__input" placeholder="Alternative URL for A/B testing" value={form.abTestUrl || ""} onChange={(e) => updateField("abTestUrl", e.target.value)} />
+                        )}
+                      </div>
                     </div>
                   )}
                 </>

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { DashboardHeader } from "@/components/dashboard/header";
 import Link from "next/link";
+import { LineChart } from "@/components/dashboard/charts/line-chart";
 
 const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://deeplinkos.com").split(",")[0].trim().replace(/\/+$/, "");
 
@@ -14,6 +15,8 @@ export default async function DashboardOverview() {
   let uniqueVisitors = 0;
   let activeLinks = 0;
   let recentLinks: { title: string; slug: string; clickCount: number }[] = [];
+  let labels7d: string[] = [];
+  let data7d: number[] = [];
 
   if (user) {
     // Fetch all user links
@@ -53,6 +56,37 @@ export default async function DashboardOverview() {
       if (visitorRows) {
         const uniqueHashes = new Set(visitorRows.map((r) => r.ip_hash));
         uniqueVisitors = uniqueHashes.size;
+      }
+
+      // 7-day chart data
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const since7d = sevenDaysAgo.toISOString();
+
+      const { data: chartRows } = await supabase
+        .from("clicks")
+        .select("timestamp")
+        .in("link_id", linkIds)
+        .gte("timestamp", since7d);
+
+      if (chartRows) {
+        const dayMap: Record<string, number> = {};
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const dateStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          dayMap[dateStr] = 0;
+        }
+
+        chartRows.forEach((r) => {
+          const dateStr = new Date(r.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          if (dayMap[dateStr] !== undefined) {
+            dayMap[dateStr]++;
+          }
+        });
+
+        labels7d = Object.keys(dayMap);
+        data7d = Object.values(dayMap);
       }
 
       // Click counts per link for the 5 most recent links
@@ -120,20 +154,14 @@ export default async function DashboardOverview() {
               <option>Last 30 Days</option>
             </select>
           </div>
-          <div
-            className="chart-container"
-            style={{
-              height: "300px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "1px dashed var(--border)",
-              borderRadius: "8px",
-            }}
-          >
-            <p style={{ color: "var(--text-2)", fontSize: "14px" }}>
-              Chart.js Integration Pending...
-            </p>
+          <div className="chart-container" style={{ height: "300px" }}>
+            {labels7d.length > 0 ? (
+              <LineChart labels={labels7d} data={data7d} />
+            ) : (
+              <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", border: "1px dashed var(--border)", borderRadius: "8px" }}>
+                <p style={{ color: "var(--text-2)", fontSize: "14px" }}>No click data for the last 7 days.</p>
+              </div>
+            )}
           </div>
         </div>
 

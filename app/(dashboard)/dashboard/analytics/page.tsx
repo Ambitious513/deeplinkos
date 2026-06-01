@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { DashboardHeader } from "@/components/dashboard/header";
+import { LineChart } from "@/components/dashboard/charts/line-chart";
 
 const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://deeplinkos.com").split(",")[0].trim().replace(/\/+$/, "");
 
@@ -11,6 +12,8 @@ export default async function AnalyticsPage() {
   let topLinks: { title: string; slug: string; clicks: number }[] = [];
   let deviceBreakdown: { device: string; count: number }[] = [];
   let topReferrers: { referrer: string; count: number }[] = [];
+  let labels30d: string[] = [];
+  let data30d: number[] = [];
 
   if (user) {
     // Fetch user's links
@@ -33,10 +36,35 @@ export default async function AnalyticsPage() {
       // All clicks for analysis
       const { data: clickRows } = await supabase
         .from("clicks")
-        .select("link_id, device, referrer")
+        .select("link_id, device, referrer, timestamp")
         .in("link_id", linkIds);
 
       const rows = clickRows ?? [];
+
+      // 30-day chart data
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      const dayMap: Record<string, number> = {};
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        dayMap[dateStr] = 0;
+      }
+
+      for (const row of rows) {
+        const rowDate = new Date(row.timestamp);
+        if (rowDate >= thirtyDaysAgo) {
+          const dateStr = rowDate.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          if (dayMap[dateStr] !== undefined) {
+            dayMap[dateStr]++;
+          }
+        }
+      }
+
+      labels30d = Object.keys(dayMap);
+      data30d = Object.values(dayMap);
 
       // Top links by click count
       const linkClickMap: Record<string, number> = {};
@@ -106,13 +134,19 @@ export default async function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Chart placeholder */}
+      {/* Chart */}
       <div className="panel" style={{ marginBottom: 24 }}>
         <div className="panel-header" style={{ marginBottom: 12 }}>
-          <div className="panel-title">Global Traffic Trend</div>
+          <div className="panel-title">Global Traffic Trend (Last 30 Days)</div>
         </div>
-        <div style={{ height: 300, display: "flex", alignItems: "center", justifyContent: "center", border: "1px dashed var(--border)", borderRadius: 8 }}>
-          <p style={{ color: "var(--text-2)", fontSize: 14 }}>Chart.js Integration Pending...</p>
+        <div style={{ height: 300 }}>
+          {labels30d.length > 0 ? (
+            <LineChart labels={labels30d} data={data30d} />
+          ) : (
+            <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", border: "1px dashed var(--border)", borderRadius: 8 }}>
+              <p style={{ color: "var(--text-2)", fontSize: 14 }}>No click data for the last 30 days.</p>
+            </div>
+          )}
         </div>
       </div>
 

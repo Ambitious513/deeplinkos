@@ -3,6 +3,8 @@ import { DashboardHeader } from "@/components/dashboard/header";
 
 const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://deeplinkos.com").split(",")[0].trim().replace(/\/+$/, "");
 
+import { LinksTable } from "@/components/dashboard/links-table";
+
 export default async function LinksPage() {
   const supabase = await createClient();
   const {
@@ -58,86 +60,7 @@ export default async function LinksPage() {
       <DashboardHeader title="Links Manager" />
 
       <div className="panel" id="links-populated">
-        <div className="panel-header">
-          <div className="panel-title">All Smart Links</div>
-          <div className="input-group">
-            <input
-              type="text"
-              className="input-field"
-              placeholder="Search links..."
-            />
-            <button className="btn-secondary">Filter</button>
-          </div>
-        </div>
-        <div className="table-responsive">
-          {links.length > 0 ? (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Link Name</th>
-                  <th>Short URL</th>
-                  <th>Destination</th>
-                  <th>Total Clicks</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {links.map((link) => (
-                  <tr key={link.id}>
-                    <td style={{ fontWeight: 500 }}>{link.title}</td>
-                    <td>
-                      <span className="link-short">
-                        {siteUrl}/r/{link.slug}
-                      </span>
-                    </td>
-                    <td>
-                      <span
-                        style={{
-                          color: "var(--text-2)",
-                          maxWidth: "150px",
-                          display: "inline-block",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {link.desktop_url ?? "—"}
-                      </span>
-                    </td>
-                    <td>{link.clickCount.toLocaleString()}</td>
-                    <td>
-                      <span className="badge-active">
-                        {link.is_active ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <button
-                        className="btn-secondary"
-                        style={{ padding: "4px 10px" }}
-                      >
-                        Stats
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div
-              style={{
-                padding: "48px 16px",
-                textAlign: "center",
-                color: "var(--text-2)",
-                fontSize: "14px",
-              }}
-            >
-              {user
-                ? "No links yet. Create your first smart link!"
-                : "Sign in to manage your links."}
-            </div>
-          )}
-        </div>
+        <LinksTable links={links} siteUrl={siteUrl} />
       </div>
     </>
   );

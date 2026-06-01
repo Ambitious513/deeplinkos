@@ -41,6 +41,9 @@ export type CreateLinkInput = {
   androidStoreUrl?: string;
   desktopUrl?: string;
   campaign?: string;
+  password?: string;
+  expiresAt?: string;
+  abTestUrl?: string;
 };
 
 export type ResolvedDestination = {
