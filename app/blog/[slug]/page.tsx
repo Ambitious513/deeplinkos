@@ -3,10 +3,11 @@ import type { Metadata } from "next";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import { getPost, getAllSlugs } from "@/lib/blog";
-import { SiteHeader } from "@/components/site-header";
+import { BlogHeader } from "@/components/blog-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BlogToc } from "@/components/blog-toc";
 import { BlogFaq } from "@/components/blog-faq";
+import { GoogleOneTap } from "@/components/google-one-tap";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -145,7 +146,8 @@ export default async function BlogPostPage({
 
   return (
     <>
-      <SiteHeader />
+      <BlogHeader />
+      <GoogleOneTap />
 
       <script type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />

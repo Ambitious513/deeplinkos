@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/blog";
 import { BlogCard } from "@/components/blog-card";
-import { SiteHeader } from "@/components/site-header";
+import { BlogHeader } from "@/components/blog-header";
 import { SiteFooter } from "@/components/site-footer";
 import { NewsletterForm } from "@/components/newsletter-form";
+import { GoogleOneTap } from "@/components/google-one-tap";
 
 export const metadata: Metadata = {
   title:       "Blog: Deep Linking Tips, Guides & News",
@@ -36,7 +37,8 @@ export default function BlogIndexPage() {
 
   return (
     <>
-      <SiteHeader />
+      <BlogHeader />
+      <GoogleOneTap />
 
       <main id="main-content">
         {/* Hero */}

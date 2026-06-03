@@ -9,44 +9,38 @@ type Theme = "light" | "dark";
 
 const MoonIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-    <path
-      d="M13.5 9.5A6 6 0 0 1 6.5 2.5a6 6 0 1 0 7 7z"
-      stroke="currentColor" strokeWidth="1.6"
-      strokeLinecap="round" strokeLinejoin="round"
-    />
+    <path d="M13.5 9.5A6 6 0 0 1 6.5 2.5a6 6 0 1 0 7 7z"
+      stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const SunIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-    <circle cx="8" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.5"/>
-    <path
-      d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3"
-      stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
-    />
+    <circle cx="8" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3"
+      stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 );
 
-const navLinks = [
-  { href: "#how-it-works", label: "How It Works" },
-  { href: "#platforms",    label: "Platforms"    },
-  { href: "#features",     label: "Features"     },
-  { href: "/blog",         label: "Blog"         },
+// Real page links — no anchor #hash links that only work on homepage
+const blogNavLinks = [
+  { href: "/",          label: "Home"     },
+  { href: "/#features", label: "Features" },
+  { href: "/blog",      label: "Blog"     },
+  { href: "/contact",   label: "Contact"  },
 ];
 
-export function SiteHeader() {
+export function BlogHeader() {
   const [scrolled,  setScrolled]  = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [theme,     setTheme]     = useState<Theme>("light");
   const [authOpen,  setAuthOpen]  = useState(false);
 
-  /* Read theme that was set by the anti-flash script */
   useEffect(() => {
     const stored = document.documentElement.getAttribute("data-theme") as Theme | null;
     setTheme(stored === "dark" ? "dark" : "light");
   }, []);
 
-  /* Scroll detection */
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", fn, { passive: true });
@@ -54,14 +48,12 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
-  /* Close mobile menu on desktop resize */
   useEffect(() => {
     const fn = () => { if (window.innerWidth > 768) setMenuOpen(false); };
     window.addEventListener("resize", fn, { passive: true });
     return () => window.removeEventListener("resize", fn);
   }, []);
 
-  /* Lock body scroll when mobile menu is open */
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -78,31 +70,25 @@ export function SiteHeader() {
 
   return (
     <>
-      {/* ── Fixed nav ──────────────────────────────────────────── */}
       <nav
         className={`nav${scrolled ? " nav--scrolled" : ""}`}
         role="navigation"
-        aria-label="Main navigation"
+        aria-label="Blog navigation"
       >
         <div className="container">
           <div className="nav__inner">
-
-            {/* Logo — shared BrandLogo component */}
             <BrandLogo variant="nav" />
 
-            {/* Desktop nav links */}
+            {/* Desktop nav — real links, no hash anchors */}
             <div className="nav__links" aria-label="Site sections">
-              {navLinks.map((l) => (
+              {blogNavLinks.map((l) => (
                 <Link key={l.href} href={l.href as any}>{l.label}</Link>
               ))}
             </div>
 
-            {/* Right controls */}
             <div className="nav__right">
-
-              {/* Theme toggle */}
               <button
-                id="theme-toggle-btn"
+                id="blog-theme-toggle-btn"
                 className="theme-toggle"
                 onClick={toggleTheme}
                 aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
@@ -111,22 +97,24 @@ export function SiteHeader() {
                 {theme === "light" ? <MoonIcon /> : <SunIcon />}
               </button>
 
-              {/* Desktop CTA */}
-              <button className="nav__cta" id="nav-cta-btn" onClick={() => setAuthOpen(true)}>
+              <button
+                className="nav__cta"
+                id="blog-nav-cta-btn"
+                onClick={() => setAuthOpen(true)}
+              >
                 Try for Free
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style={{ marginLeft: 6 }}>
-                  <path d="M2 6h8M6.5 2.5L10 6l-3.5 3.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 6h8M6.5 2.5L10 6l-3.5 3.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
 
-              {/* Hamburger — shown on mobile via CSS */}
               <button
-                id="mobile-menu-btn"
+                id="blog-mobile-menu-btn"
                 className={`nav__hamburger${menuOpen ? " is-open" : ""}`}
                 onClick={() => setMenuOpen((v) => !v)}
                 aria-label={menuOpen ? "Close menu" : "Open menu"}
                 aria-expanded={menuOpen}
-                aria-controls="mobile-nav-menu"
+                aria-controls="blog-mobile-nav-menu"
               >
                 <span aria-hidden="true" />
                 <span aria-hidden="true" />
@@ -137,36 +125,32 @@ export function SiteHeader() {
         </div>
       </nav>
 
-      {/* ── Mobile slide-in menu ───────────────────────────────── */}
+      {/* Mobile menu */}
       <div
-        id="mobile-nav-menu"
+        id="blog-mobile-nav-menu"
         className={`nav__mobile-menu${menuOpen ? " is-open" : ""}`}
         aria-hidden={!menuOpen}
         role="dialog"
         aria-label="Mobile navigation"
       >
         <nav className="nav__mobile-links" aria-label="Mobile site navigation">
-          {navLinks.map((l) => (
-            <Link key={l.href} href={l.href as any} onClick={closeMenu}>
-              {l.label}
-            </Link>
+          {blogNavLinks.map((l) => (
+            <Link key={l.href} href={l.href as any} onClick={closeMenu}>{l.label}</Link>
           ))}
         </nav>
-
-        <Link href="#composer" className="nav__mobile-cta" onClick={closeMenu} id="mobile-cta-btn">
-          Try It Free →
-        </Link>
+        <button
+          className="nav__mobile-cta"
+          onClick={() => { closeMenu(); setAuthOpen(true); }}
+          id="blog-mobile-cta-btn"
+        >
+          Try for Free →
+        </button>
       </div>
 
       {menuOpen && (
-        <div
-          className="nav__backdrop"
-          onClick={closeMenu}
-          aria-hidden="true"
-        />
+        <div className="nav__backdrop" onClick={closeMenu} aria-hidden="true" />
       )}
 
-      {/* Auth Modal */}
       <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} defaultSignUp />
     </>
   );
