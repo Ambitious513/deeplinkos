@@ -153,9 +153,13 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <Link href="#composer" className="nav__mobile-cta" onClick={closeMenu} id="mobile-cta-btn">
+        <button
+          className="nav__mobile-cta"
+          onClick={() => { closeMenu(); setAuthOpen(true); }}
+          id="mobile-cta-btn"
+        >
           Try It Free →
-        </Link>
+        </button>
       </div>
 
       {menuOpen && (
