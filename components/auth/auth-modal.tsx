@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import isDisposableEmail from "is-disposable-email";
 
 export function AuthModal({
   isOpen,
@@ -47,6 +48,12 @@ export function AuthModal({
     e.preventDefault();
     setLoading(true); setMessage("");
     if (isSignUp) {
+      if (isDisposableEmail(email)) {
+        setMessage("Error: Please use a genuine personal or business email address.");
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signUp({
         email, password,
         options: {
