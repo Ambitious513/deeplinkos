@@ -19,88 +19,69 @@ export default async function DashboardOverview() {
   let data7d: number[] = [];
 
   if (user) {
-    // Fetch all user links
-    const { data: links } = await supabase
-      .from("deep_links")
-      .select("id, title, slug, is_active, created_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+    // 1. Fetch fast summary analytics via RPC
+    const { data: summaryData } = await supabase.rpc("get_dashboard_analytics", {
+      user_uuid: user.id,
+      days_ago: 30,
+    });
 
-    const allLinks = links ?? [];
-    const linkIds = allLinks.map((l) => l.id);
+    if (summaryData && summaryData.length > 0) {
+      const summary = summaryData[0];
+      totalClicks30d = Number(summary.total_clicks || 0);
+      uniqueVisitors = Number(summary.unique_visitors || 0);
+      activeLinks = Number(summary.active_links || 0);
+    }
 
-    // Active links count
-    activeLinks = allLinks.filter((l) => l.is_active).length;
+    // 2. Fetch chart data via RPC (7 days)
+    const { data: chartData } = await supabase.rpc("get_clicks_by_day", {
+      user_uuid: user.id,
+      days_ago: 7,
+    });
 
-    if (linkIds.length > 0) {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      const since = thirtyDaysAgo.toISOString();
+    // Initialize 7 days of empty data
+    const dayMap: Record<string, number> = {};
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      dayMap[dateStr] = 0;
+    }
 
-      // Total clicks in last 30 days
-      const { count: clickCount } = await supabase
-        .from("clicks")
-        .select("id", { count: "exact", head: true })
-        .in("link_id", linkIds)
-        .gte("timestamp", since);
-
-      totalClicks30d = clickCount ?? 0;
-
-      // Unique visitors (distinct ip_hash) in last 30 days
-      const { data: visitorRows } = await supabase
-        .from("clicks")
-        .select("ip_hash")
-        .in("link_id", linkIds)
-        .gte("timestamp", since);
-
-      if (visitorRows) {
-        const uniqueHashes = new Set(visitorRows.map((r) => r.ip_hash));
-        uniqueVisitors = uniqueHashes.size;
-      }
-
-      // 7-day chart data
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      const since7d = sevenDaysAgo.toISOString();
-
-      const { data: chartRows } = await supabase
-        .from("clicks")
-        .select("timestamp")
-        .in("link_id", linkIds)
-        .gte("timestamp", since7d);
-
-      if (chartRows) {
-        const dayMap: Record<string, number> = {};
-        for (let i = 6; i >= 0; i--) {
-          const d = new Date();
-          d.setDate(d.getDate() - i);
-          const dateStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-          dayMap[dateStr] = 0;
+    if (chartData && chartData.length > 0) {
+      chartData.forEach((row: any) => {
+        // row.click_date is YYYY-MM-DD
+        // Add timezone offset to prevent date shifting backwards
+        const d = new Date(row.click_date);
+        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+        const dateStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        if (dayMap[dateStr] !== undefined) {
+          dayMap[dateStr] = Number(row.click_count);
         }
+      });
+    }
 
-        chartRows.forEach((r) => {
-          const dateStr = new Date(r.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
-          if (dayMap[dateStr] !== undefined) {
-            dayMap[dateStr]++;
-          }
-        });
+    labels7d = Object.keys(dayMap);
+    data7d = Object.values(dayMap);
 
-        labels7d = Object.keys(dayMap);
-        data7d = Object.values(dayMap);
-      }
+    // 3. Fetch 5 most recent links for Quick Links panel
+    const { data: top5 } = await supabase
+      .from("deep_links")
+      .select("id, title, slug")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(5);
 
-      // Click counts per link for the 5 most recent links
-      const top5 = allLinks.slice(0, 5);
+    if (top5 && top5.length > 0) {
       const top5Ids = top5.map((l) => l.id);
-
-      const { data: clickRows } = await supabase
+      // Fetch click counts only for these 5 links
+      const { data: clickCounts } = await supabase
         .from("clicks")
         .select("link_id")
         .in("link_id", top5Ids);
 
       const clickMap: Record<string, number> = {};
-      if (clickRows) {
-        for (const row of clickRows) {
+      if (clickCounts) {
+        for (const row of clickCounts) {
           clickMap[row.link_id] = (clickMap[row.link_id] ?? 0) + 1;
         }
       }

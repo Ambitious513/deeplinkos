@@ -102,3 +102,99 @@ $$;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- 1. Create Indexes for fast querying
+CREATE INDEX IF NOT EXISTS idx_clicks_link_timestamp ON clicks (link_id, timestamp);
+CREATE INDEX IF NOT EXISTS idx_clicks_ip_hash ON clicks (ip_hash);
+
+-- 2. RPC: Get Dashboard Analytics Summary (Total Clicks, Unique Visitors, Active Links)
+CREATE OR REPLACE FUNCTION get_dashboard_analytics(user_uuid UUID, days_ago INT)
+RETURNS TABLE (
+  total_clicks BIGINT,
+  unique_visitors BIGINT,
+  active_links BIGINT
+) LANGUAGE plpgsql AS $$
+BEGIN
+  RETURN QUERY
+  WITH user_links AS (
+    SELECT id, is_active FROM deep_links WHERE user_id = user_uuid
+  ),
+  active_count AS (
+    SELECT COUNT(*) AS count FROM user_links WHERE is_active = true
+  ),
+  clicks_data AS (
+    SELECT ip_hash 
+    FROM clicks 
+    WHERE link_id IN (SELECT id FROM user_links) 
+      AND timestamp >= NOW() - (days_ago || ' days')::interval
+  )
+  SELECT 
+    (SELECT COUNT(*) FROM clicks_data) AS total_clicks,
+    (SELECT COUNT(DISTINCT ip_hash) FROM clicks_data) AS unique_visitors,
+    (SELECT count FROM active_count) AS active_links;
+END;
+$$;
+
+-- 3. RPC: Get Chart Data (Clicks per day for the last N days)
+CREATE OR REPLACE FUNCTION get_clicks_by_day(user_uuid UUID, days_ago INT)
+RETURNS TABLE (
+  click_date DATE,
+  click_count BIGINT
+) LANGUAGE plpgsql AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    DATE(timestamp) AS click_date,
+    COUNT(*) AS click_count
+  FROM clicks
+  WHERE link_id IN (SELECT id FROM deep_links WHERE user_id = user_uuid)
+    AND timestamp >= NOW() - (days_ago || ' days')::interval
+  GROUP BY DATE(timestamp)
+  ORDER BY click_date ASC;
+END;
+$$;
+
+-- 4. RPC: Get Global Analytics Breakdown (Top links, Devices, Referrers)
+CREATE OR REPLACE FUNCTION get_global_analytics(user_uuid UUID)
+RETURNS JSON LANGUAGE plpgsql AS $$
+DECLARE
+  result JSON;
+BEGIN
+  WITH user_links AS (
+    SELECT id, title, slug FROM deep_links WHERE user_id = user_uuid
+  ),
+  device_counts AS (
+    SELECT device, COUNT(*) as count
+    FROM clicks
+    WHERE link_id IN (SELECT id FROM user_links)
+      AND device IS NOT NULL
+    GROUP BY device
+    ORDER BY count DESC
+  ),
+  referrer_counts AS (
+    SELECT referrer, COUNT(*) as count
+    FROM clicks
+    WHERE link_id IN (SELECT id FROM user_links)
+      AND referrer IS NOT NULL
+      AND referrer != ''
+    GROUP BY referrer
+    ORDER BY count DESC
+    LIMIT 10
+  ),
+  top_links AS (
+    SELECT l.id, l.title, l.slug, COUNT(c.id) as count
+    FROM user_links l
+    LEFT JOIN clicks c ON c.link_id = l.id
+    GROUP BY l.id, l.title, l.slug
+    ORDER BY count DESC
+    LIMIT 5
+  )
+  SELECT json_build_object(
+    'devices', (SELECT COALESCE(json_agg(row_to_json(d)), '[]'::json) FROM device_counts d),
+    'referrers', (SELECT COALESCE(json_agg(row_to_json(r)), '[]'::json) FROM referrer_counts r),
+    'top_links', (SELECT COALESCE(json_agg(row_to_json(t)), '[]'::json) FROM top_links t)
+  ) INTO result;
+  
+  RETURN result;
+END;
+$$;
