@@ -85,10 +85,13 @@ export const dynamic = "force-dynamic";
 
 export default async function DeepLinkPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ pw?: string }>;
 }) {
   const { slug } = await params;
+  const { pw } = await searchParams;
   const record = await getLink(slug);
 
   if (!record) redirect("/missing");
@@ -98,6 +101,63 @@ export default async function DeepLinkPage({
 
   // Expired link
   if (record.expiresAt && new Date(record.expiresAt) < new Date()) redirect("/missing");
+
+  // Password-protected link
+  if (record.password) {
+    if (!pw || pw !== record.password) {
+      const wrongPassword = !!pw && pw !== record.password;
+      return (
+        <div style={{
+          minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
+          background: "#f0f4ff", fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",
+          padding: "2rem",
+        }}>
+          <div style={{
+            background: "#fff", borderRadius: 16, padding: "40px 36px",
+            maxWidth: 360, width: "100%", boxShadow: "0 8px 40px rgba(0,0,0,.10)",
+            textAlign: "center",
+          }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
+            <h1 style={{ fontSize: 20, fontWeight: 700, color: "#0d1f3c", marginBottom: 6 }}>
+              {record.title || "Protected Link"}
+            </h1>
+            <p style={{ fontSize: 14, color: "#6b7280", marginBottom: 24 }}>
+              This link is password protected. Enter the password to continue.
+            </p>
+
+            <form method="GET" action={`/r/${slug}`} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <input
+                name="pw"
+                type="password"
+                required
+                autoFocus
+                placeholder="Enter password"
+                style={{
+                  width: "100%", padding: "12px 14px", borderRadius: 10, fontSize: 15,
+                  border: wrongPassword ? "1.5px solid #ef4444" : "1.5px solid #e5e7eb",
+                  outline: "none", boxSizing: "border-box" as const,
+                }}
+              />
+              {wrongPassword && (
+                <p style={{ color: "#ef4444", fontSize: 13, margin: 0, textAlign: "left" }}>
+                  Incorrect password. Please try again.
+                </p>
+              )}
+              <button
+                type="submit"
+                style={{
+                  padding: "13px", borderRadius: 10, background: "#3b82f6", color: "#fff",
+                  border: "none", fontSize: 15, fontWeight: 600, cursor: "pointer",
+                }}
+              >
+                Continue →
+              </button>
+            </form>
+          </div>
+        </div>
+      );
+    }
+  }
 
   const headersList = await headers();
   const ua       = headersList.get("user-agent") ?? "";
