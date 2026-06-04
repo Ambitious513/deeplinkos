@@ -88,6 +88,12 @@ export default async function DeepLinkPage({
 
   if (!record) redirect("/missing");
 
+  // Deactivated link
+  if (record.isActive === false) redirect("/missing");
+
+  // Expired link
+  if (record.expiresAt && new Date(record.expiresAt) < new Date()) redirect("/missing");
+
   const headersList = await headers();
   const ua       = headersList.get("user-agent") ?? "";
   const ip       = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";

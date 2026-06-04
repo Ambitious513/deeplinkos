@@ -16,7 +16,10 @@ export type LinkRecord = {
   slug: string;
   title: string;
   preset: PresetKey;
-  status: "active";
+  status: "active" | "inactive";
+  isActive: boolean;
+  expiresAt?: string | null;
+  password?: string | null;
   iosDeepLink?: string;
   iosStoreUrl?: string;
   androidDeepLink?: string;

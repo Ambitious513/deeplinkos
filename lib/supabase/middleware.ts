@@ -64,29 +64,27 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // Protect pro routes
-  const isDashboardRoute = request.nextUrl.pathname.startsWith('/dashboard') || 
-                           request.nextUrl.pathname.startsWith('/analytics') || 
-                           request.nextUrl.pathname.startsWith('/settings');
-  
+  const isDashboardRoute =
+    request.nextUrl.pathname.startsWith('/dashboard') ||
+    request.nextUrl.pathname.startsWith('/analytics') ||
+    request.nextUrl.pathname.startsWith('/settings')
+
+  // Protect dashboard routes — redirect unauthenticated users to home (auth modal opens via ?auth=required)
   if (isDashboardRoute && !user) {
-    // TEMPORARY BYPASS: Allow access without login for testing routing
-    // const url = request.nextUrl.clone()
-    // url.pathname = '/login'
-    // return NextResponse.redirect(url)
+    const url = request.nextUrl.clone()
+    url.pathname = '/'
+    url.searchParams.set('auth', 'required')
+    return NextResponse.redirect(url)
   }
 
-  // Enforced Onboarding Check
+  // Enforce onboarding — users without first/last name go to /onboarding first
   if (isDashboardRoute && user) {
-    // Fast check: we look at user_metadata which supabase auth populates
-    // If they haven't set first_name/last_name, redirect to onboarding
-    const meta = user.user_metadata || {};
+    const meta = user.user_metadata || {}
     if (!meta.first_name || !meta.last_name) {
       if (!request.nextUrl.pathname.startsWith('/onboarding')) {
-        // TEMPORARY BYPASS: Allow access without onboarding
-        // const url = request.nextUrl.clone()
-        // url.pathname = '/onboarding'
-        // return NextResponse.redirect(url)
+        const url = request.nextUrl.clone()
+        url.pathname = '/onboarding'
+        return NextResponse.redirect(url)
       }
     }
   }

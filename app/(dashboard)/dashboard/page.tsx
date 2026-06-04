@@ -19,24 +19,30 @@ export default async function DashboardOverview() {
   let data7d: number[] = [];
 
   if (user) {
-    // 1. Fetch fast summary analytics via RPC
-    const { data: summaryData } = await supabase.rpc("get_dashboard_analytics", {
-      user_uuid: user.id,
-      days_ago: 30,
-    });
+    // ── All 3 queries in parallel — ~3× faster than sequential ──
+    const [summaryResult, chartResult, top5Result] = await Promise.all([
+      supabase.rpc("get_dashboard_analytics", {
+        user_uuid: user.id,
+        days_ago: 30,
+      }),
+      supabase.rpc("get_clicks_by_day", {
+        user_uuid: user.id,
+        days_ago: 7,
+      }),
+      supabase
+        .from("deep_links")
+        .select("id, title, slug")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(5),
+    ]);
 
-    if (summaryData && summaryData.length > 0) {
-      const summary = summaryData[0];
+    if (summaryResult.data && summaryResult.data.length > 0) {
+      const summary = summaryResult.data[0];
       totalClicks30d = Number(summary.total_clicks || 0);
       uniqueVisitors = Number(summary.unique_visitors || 0);
       activeLinks = Number(summary.active_links || 0);
     }
-
-    // 2. Fetch chart data via RPC (7 days)
-    const { data: chartData } = await supabase.rpc("get_clicks_by_day", {
-      user_uuid: user.id,
-      days_ago: 7,
-    });
 
     // Initialize 7 days of empty data
     const dayMap: Record<string, number> = {};
@@ -47,10 +53,8 @@ export default async function DashboardOverview() {
       dayMap[dateStr] = 0;
     }
 
-    if (chartData && chartData.length > 0) {
-      chartData.forEach((row: any) => {
-        // row.click_date is YYYY-MM-DD
-        // Add timezone offset to prevent date shifting backwards
+    if (chartResult.data && chartResult.data.length > 0) {
+      chartResult.data.forEach((row: any) => {
         const d = new Date(row.click_date);
         d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
         const dateStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -63,26 +67,18 @@ export default async function DashboardOverview() {
     labels7d = Object.keys(dayMap);
     data7d = Object.values(dayMap);
 
-    // 3. Fetch 5 most recent links for Quick Links panel
-    const { data: top5 } = await supabase
-      .from("deep_links")
-      .select("id, title, slug")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(5);
-
-    if (top5 && top5.length > 0) {
+    const top5 = top5Result.data ?? [];
+    if (top5.length > 0) {
       const top5Ids = top5.map((l) => l.id);
-      // Fetch click counts only for these 5 links
       const { data: clickCounts } = await supabase
         .from("clicks")
-        .select("link_id")
+        .select("link_id, count:link_id.count()")
         .in("link_id", top5Ids);
 
       const clickMap: Record<string, number> = {};
       if (clickCounts) {
-        for (const row of clickCounts) {
-          clickMap[row.link_id] = (clickMap[row.link_id] ?? 0) + 1;
+        for (const row of clickCounts as any[]) {
+          clickMap[row.link_id] = Number(row.count);
         }
       }
 

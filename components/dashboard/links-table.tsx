@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useToast } from "@/lib/toast";
 
 interface LinkItem {
   id: string;
@@ -41,8 +42,10 @@ export function LinksTable({ links: initialLinks, siteUrl }: { links: LinkItem[]
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { show: toast } = useToast();
 
   const filterActive = searchParams.get("filter") === "active";
 
@@ -64,6 +67,31 @@ export function LinksTable({ links: initialLinks, siteUrl }: { links: LinkItem[]
       (l.desktop_url && l.desktop_url.toLowerCase().includes(search.toLowerCase()))
     );
 
+  async function handleToggle(e: React.MouseEvent, link: LinkItem) {
+    e.stopPropagation();
+    setTogglingId(link.id);
+    const newActive = !link.is_active;
+    setLinks(prev => prev.map(l => l.id === link.id ? { ...l, is_active: newActive } : l));
+    try {
+      const res = await fetch(`/api/links/${link.slug}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_active: newActive }),
+      });
+      if (!res.ok) {
+        setLinks(prev => prev.map(l => l.id === link.id ? { ...l, is_active: !newActive } : l));
+        toast("Failed to update link status.", "error");
+      } else {
+        toast(newActive ? "Link activated." : "Link deactivated.", "success");
+      }
+    } catch {
+      setLinks(prev => prev.map(l => l.id === link.id ? { ...l, is_active: !newActive } : l));
+      toast("Connection error — try again.", "error");
+    } finally {
+      setTogglingId(null);
+    }
+  }
+
   async function handleDelete(link: LinkItem) {
     if (confirmId !== link.id) {
       setConfirmId(link.id);
@@ -75,8 +103,13 @@ export function LinksTable({ links: initialLinks, siteUrl }: { links: LinkItem[]
       const res = await fetch(`/api/links/${link.slug}`, { method: "DELETE" });
       if (res.ok) {
         setLinks((prev) => prev.filter((l) => l.id !== link.id));
+        toast("Link deleted.", "success");
+      } else {
+        toast("Failed to delete link.", "error");
+        router.refresh();
       }
     } catch {
+      toast("Connection error — try again.", "error");
       router.refresh();
     } finally {
       setDeletingId(null);
@@ -87,6 +120,7 @@ export function LinksTable({ links: initialLinks, siteUrl }: { links: LinkItem[]
     e.stopPropagation();
     await navigator.clipboard.writeText(`${siteUrl}/r/${slug}`);
     setCopiedSlug(slug);
+    toast("Link copied to clipboard!", "success");
     setTimeout(() => setCopiedSlug(null), 2000);
   }
 
@@ -188,6 +222,27 @@ export function LinksTable({ links: initialLinks, siteUrl }: { links: LinkItem[]
                   </td>
                   <td onClick={(e) => e.stopPropagation()}>
                     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      {/* Active toggle */}
+                      <button
+                        title={link.is_active ? "Deactivate link" : "Activate link"}
+                        onClick={(e) => handleToggle(e, link)}
+                        disabled={togglingId === link.id}
+                        style={{
+                          width: 36, height: 20, borderRadius: 10, border: "none",
+                          background: link.is_active ? "var(--blue)" : "var(--border-hi)",
+                          cursor: "pointer", position: "relative", flexShrink: 0,
+                          transition: "background .2s", opacity: togglingId === link.id ? 0.6 : 1,
+                        }}
+                      >
+                        <span style={{
+                          position: "absolute", top: 2,
+                          left: link.is_active ? 18 : 2,
+                          width: 16, height: 16, borderRadius: "50%",
+                          background: "#fff", transition: "left .2s",
+                          boxShadow: "0 1px 3px rgba(0,0,0,.25)",
+                        }} />
+                      </button>
+
                       <button
                         title="View Stats"
                         className="btn-secondary"
