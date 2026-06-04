@@ -160,20 +160,28 @@ export function CreateLinkModal({ isOpen, onClose }: { isOpen: boolean; onClose:
   if (!isOpen) return null;
 
   return (
-    <div className={`modal-overlay${isOpen ? " open" : ""}`} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal-content" style={{
-        position: "fixed",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: "min(520px, 92vw)",
-        maxHeight: "88vh",
-        overflowY: "auto",
-        overflowX: "hidden",
-        borderRadius: 20,
-        padding: 0,
-      }}>
-        {/* Header */}
+    <div
+      className="modal-overlay open"
+      style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div
+        className="modal-content"
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "min(520px, 92vw)",
+          maxHeight: "88vh",
+          overflowY: "auto",
+          overflowX: "hidden",
+          borderRadius: 20,
+          padding: 0,
+        }}
+      >
+        {/* Drag handle — visible only on mobile */}
+        <div className="modal-sheet-handle" />
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "20px 24px", borderBottom: "1px solid var(--border)"

@@ -4,7 +4,44 @@ import { after } from "next/server";
 
 import { getLink } from "@/lib/links";
 import { detectPlatform } from "@/lib/routing";
-import { createClient } from "@/lib/supabase/server";
+import { createTrackingClient } from "@/lib/supabase/tracking";
+
+/* ── Helpers ─────────────────────────────────────────────────── */
+
+function detectBrowser(ua: string): string {
+  const u = ua.toLowerCase();
+  if (u.includes("edg/"))    return "Edge";
+  if (u.includes("opr/") || u.includes("opera")) return "Opera";
+  if (u.includes("samsungbrowser")) return "Samsung";
+  if (u.includes("firefox")) return "Firefox";
+  if (u.includes("chrome"))  return "Chrome";
+  if (u.includes("safari"))  return "Safari";
+  return "Other";
+}
+
+function detectOS(ua: string): string {
+  const u = ua.toLowerCase();
+  if (u.includes("iphone") || u.includes("ipad") || u.includes("ipod")) return "iOS";
+  if (u.includes("android"))  return "Android";
+  if (u.includes("windows"))  return "Windows";
+  if (u.includes("macintosh")) return "macOS";
+  if (u.includes("linux"))    return "Linux";
+  return "Unknown";
+}
+
+/**
+ * Hash the IP into a short anonymous string — never store raw IPs.
+ * We XOR-fold the bytes for a fast, deterministic 8-char hex token.
+ */
+function hashIp(ip: string): string {
+  let h = 0;
+  for (let i = 0; i < ip.length; i++) {
+    h = (Math.imul(31, h) + ip.charCodeAt(i)) | 0;
+  }
+  return (h >>> 0).toString(16).padStart(8, "0");
+}
+
+/* ── Page ────────────────────────────────────────────────────── */
 
 export default async function DeepLinkPage({
   params,
@@ -17,22 +54,36 @@ export default async function DeepLinkPage({
   if (!record) redirect("/missing");
 
   const headersList = await headers();
-  const ua = headersList.get("user-agent") ?? "";
-  const platform = detectPlatform(ua);
+  const ua        = headersList.get("user-agent") ?? "";
+  const ip        = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const referer   = headersList.get("referer") ?? null;
+  const platform  = detectPlatform(ua);
+  const browser   = detectBrowser(ua);
+  const os        = detectOS(ua);
+  const ipHash    = hashIp(ip);
 
-  // Track the click asynchronously without blocking the redirect response
+  // ── Track click AFTER response — uses cookie-free tracking client
+  //    so it works correctly even after redirect() fires.
   after(async () => {
-    const supabase = await createClient();
-    const ip = headersList.get("x-forwarded-for") ?? "unknown";
-    await supabase.from('clicks').insert({
-      link_id: record.id,
-      device: platform,
-      os: platform, // approximate for now
-      browser: ua.includes("Chrome") ? "Chrome" : ua.includes("Safari") ? "Safari" : "Other",
-      ip_hash: ip.substring(0, 10), // anonymized
-      referrer: headersList.get("referer") ?? null
-    });
+    try {
+      const supabase = createTrackingClient();
+      const { error } = await supabase.from("clicks").insert({
+        link_id:  record.id,
+        device:   platform,      // "ios" | "android" | "desktop" | "unknown"
+        os,                      // "iOS" | "Android" | "Windows" | "macOS" | ...
+        browser,                 // "Chrome" | "Safari" | "Firefox" | ...
+        ip_hash:  ipHash,        // anonymised 8-char hex, used for unique-visitor counts
+        referrer: referer,
+      });
+      if (error) {
+        console.error("[click-tracking] insert error:", error.message);
+      }
+    } catch (err) {
+      console.error("[click-tracking] unexpected error:", err);
+    }
   });
+
+  /* ── Build redirect URLs ─────────────────────────────────── */
 
   const appScheme =
     platform === "ios"
@@ -41,23 +92,30 @@ export default async function DeepLinkPage({
       ? record.androidDeepLink
       : undefined;
 
-  const webFallback = record.desktopUrl || record.iosStoreUrl || record.androidStoreUrl || "/";
+  const webFallback =
+    record.desktopUrl ||
+    record.iosStoreUrl ||
+    record.androidStoreUrl ||
+    "/";
 
+  // Desktop: fast server-side redirect (no JS needed)
   if (platform === "desktop") redirect(webFallback as any);
 
-  const safeScheme = appScheme ? JSON.stringify(appScheme) : "null";
+  /* ── Mobile: JS interstitial for deep-link launch ─────── */
+
+  const safeScheme   = appScheme ? JSON.stringify(appScheme) : "null";
   const safeFallback = JSON.stringify(webFallback);
-  const safeIos = record.iosStoreUrl ? JSON.stringify(record.iosStoreUrl) : safeFallback;
-  const safeAndroid = record.androidStoreUrl ? JSON.stringify(record.androidStoreUrl) : safeFallback;
-  const isIos = platform === "ios";
+  const safeIos      = record.iosStoreUrl ? JSON.stringify(record.iosStoreUrl) : safeFallback;
+  const safeAndroid  = record.androidStoreUrl ? JSON.stringify(record.androidStoreUrl) : safeFallback;
+  const isIos        = platform === "ios";
   const storeFallback = isIos ? safeIos : safeAndroid;
 
   const redirectScript = `
 (function() {
-  var appScheme   = ${safeScheme};
-  var webFallback = ${safeFallback};
-  var storeFallback = ${storeFallback};
-  var isIos = ${isIos};
+  var appScheme    = ${safeScheme};
+  var webFallback  = ${safeFallback};
+  var storeFallback= ${storeFallback};
+  var isIos        = ${isIos};
 
   function launchApp() {
     if (!appScheme) {
@@ -65,22 +123,19 @@ export default async function DeepLinkPage({
       return;
     }
 
+    // Try the deep-link scheme
     var a = document.getElementById('__dl_anchor__');
-    if (a) {
-      a.href = appScheme;
-      a.click();
-    }
-
+    if (a) { a.href = appScheme; a.click(); }
     try { window.location.href = appScheme; } catch(e) {}
 
-    var fallbackDelay = isIos ? 2500 : 2000;
+    // If the app didn't open, fall back to the store after a delay
+    var delay     = isIos ? 2500 : 2000;
     var startTime = Date.now();
-
     setTimeout(function() {
       if (document.hidden || document.webkitHidden) return;
-      if (Date.now() - startTime < fallbackDelay - 200) return;
+      if (Date.now() - startTime < delay - 200)    return;
       window.location.href = storeFallback !== webFallback ? storeFallback : webFallback;
-    }, fallbackDelay);
+    }, delay);
   }
 
   if (document.readyState === 'loading') {
@@ -89,10 +144,11 @@ export default async function DeepLinkPage({
     launchApp();
   }
 })();
-  `.trim();
+`.trim();
 
   return (
     <>
+      {/* Hidden anchor used by the deep-link launcher */}
       <a
         id="__dl_anchor__"
         href={appScheme ?? webFallback}
@@ -112,6 +168,7 @@ export default async function DeepLinkPage({
           background: "var(--bg, #f0f4ff)",
         }}
       >
+        {/* Spinner */}
         <div
           style={{
             width: 56,
@@ -133,7 +190,7 @@ export default async function DeepLinkPage({
             marginBottom: "0.5rem",
           }}
         >
-          Opening {record.title || "your link"}...
+          Opening {record.title || "your link"}…
         </h1>
         <p style={{ color: "var(--text-2, #4a617d)", fontSize: "0.95rem" }}>
           You&apos;ll be redirected to the app automatically.
@@ -148,7 +205,7 @@ export default async function DeepLinkPage({
         </p>
       </div>
 
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
       <script dangerouslySetInnerHTML={{ __html: redirectScript }} />
     </>
   );

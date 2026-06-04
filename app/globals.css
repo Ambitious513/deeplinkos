@@ -1951,3 +1951,66 @@ body {
   .header-create-btn-text { display: none; }
 }
 
+/* ── Smooth momentum scrolling everywhere ──────────────────────── */
+.dashboard-main,
+.modal-content,
+.bottom-sheet {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Prevent pull-to-refresh fighting with the app scroll */
+body {
+  overscroll-behavior-y: none;
+}
+.dashboard-main {
+  overscroll-behavior: contain;
+}
+
+/* ── Modal — desktop centred, mobile bottom sheet ──────────────── */
+.modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.22);
+  /* desktop defaults are set inline in the component */
+}
+
+/* On mobile, turn the modal into a full bottom sheet */
+@media (max-width: 640px) {
+  .modal-overlay {
+    align-items: flex-end !important;
+  }
+  .modal-content {
+    position: fixed !important;
+    top: auto !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92vh !important;
+    border-radius: 24px 24px 0 0 !important;
+    animation: sheetUp 0.32s cubic-bezier(0.16,1,0.3,1);
+  }
+  .modal-sheet-handle {
+    display: block;
+  }
+}
+
+/* Handle visible only on mobile */
+.modal-sheet-handle {
+  display: none;
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-hi);
+  margin: 12px auto 0;
+  flex-shrink: 0;
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
