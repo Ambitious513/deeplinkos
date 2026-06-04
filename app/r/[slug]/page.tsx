@@ -65,12 +65,17 @@ function detectReferrer(ua: string, refererHeader: string | null): string {
   return "direct";
 }
 
-function hashIp(ip: string): string {
-  let h = 0;
-  for (let i = 0; i < ip.length; i++) {
-    h = (Math.imul(31, h) + ip.charCodeAt(i)) | 0;
-  }
-  return (h >>> 0).toString(16).padStart(8, "0");
+/** SHA-256 hash of the IP — 16 hex chars (64-bit), salted for rainbow-table protection.
+ * async because Web Crypto subtle.digest() is Promise-based. */
+async function hashIp(ip: string): Promise<string> {
+  const salt = process.env.IP_HASH_SALT || "dl-default-salt";
+  const enc = new TextEncoder();
+  const data = enc.encode(ip + salt);
+  const buf = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(buf))
+    .slice(0, 8)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join(""); // 16 hex chars = 64-bit = negligible collision risk
 }
 
 /* ── Page ────────────────────────────────────────────────────── */
@@ -101,7 +106,7 @@ export default async function DeepLinkPage({
   const platform = detectPlatform(ua);
   const browser  = detectBrowser(ua);
   const os       = detectOS(ua);
-  const ipHash   = hashIp(ip);
+  const ipHash   = await hashIp(ip);
   const source   = detectReferrer(ua, referer);
 
   // Track click after response — cookie-free client so after() works
