@@ -1992,6 +1992,9 @@ body {
     max-height: 92vh !important;
     border-radius: 24px 24px 0 0 !important;
     animation: sheetUp 0.32s cubic-bezier(0.16,1,0.3,1);
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
   }
   .modal-sheet-handle {
     display: block;

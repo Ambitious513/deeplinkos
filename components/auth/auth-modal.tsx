@@ -219,12 +219,22 @@ export function AuthModal({
       style={{ display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div style={{
-        background: "var(--bg-card, #fff)", borderRadius: 20,
-        width: "min(440px, 94vw)", padding: "28px 28px 24px",
-        position: "relative", border: "1px solid var(--border-card, rgba(0,0,0,.08))",
-        boxShadow: "0 24px 80px rgba(0,0,0,.18)",
-      }}>
+      <div
+        className="modal-content"
+        style={{
+          background: "var(--bg-card, #fff)",
+          borderRadius: 20,
+          width: "min(440px, 94vw)",
+          padding: "28px 24px 24px",
+          position: "relative",
+          border: "1px solid var(--border-card, rgba(0,0,0,.08))",
+          boxShadow: "0 24px 80px rgba(0,0,0,.18)",
+          overflowY: "auto",
+          maxHeight: "90vh",
+        }}
+      >
+        {/* Bottom sheet handle — visible only on mobile */}
+        <div className="modal-sheet-handle" style={{ marginBottom: 8 }} />
         {/* Close */}
         <button onClick={onClose} style={{
           position: "absolute", top: 14, right: 14, background: "none", border: "none",
@@ -276,7 +286,7 @@ export function AuthModal({
         {/* Form */}
         <form onSubmit={handleAuth} style={{ display: "flex", flexDirection: "column", gap: 11 }}>
           {isSignUp && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 }}>
               <div>
                 <label style={lbl}>First Name</label>
                 <input style={inp} placeholder="John" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
