@@ -90,6 +90,7 @@ function mapToLinkRecord(row: any): LinkRecord {
     isActive: row.is_active ?? true,
     expiresAt: row.expires_at ?? null,
     password: row.password ?? null,
+    abTestUrl: row.ab_test_url ?? null,
     iosDeepLink: row.ios_deep_link,
     iosStoreUrl: row.ios_store_url,
     androidDeepLink: row.android_deep_link,

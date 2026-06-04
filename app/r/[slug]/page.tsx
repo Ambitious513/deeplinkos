@@ -173,6 +173,10 @@ export default async function DeepLinkPage({
   // Falls back to null if not available — no external API call needed
   const country  = headersList.get("cf-ipcountry") ?? null;
 
+  // A/B test variant — randomly assigned 50/50 if ab_test_url is set
+  const variant  = record!.abTestUrl ? (Math.random() < 0.5 ? "a" : "b") : null;
+  const abDest   = variant === "b" ? record!.abTestUrl! : null;
+
   // Track click after response — cookie-free client so after() works
   after(async () => {
     try {
@@ -185,6 +189,7 @@ export default async function DeepLinkPage({
         ip_hash:  ipHash,
         referrer: source,
         country,
+        variant,
       });
       if (error) console.error("[click-tracking]", error.message);
     } catch (err) {
@@ -195,9 +200,10 @@ export default async function DeepLinkPage({
   /* ── Destination resolution ──────────────────────────────── */
 
   const webFallback =
-    record.desktopUrl ||
-    record.iosStoreUrl ||
-    record.androidStoreUrl ||
+    abDest ||
+    record!.desktopUrl ||
+    record!.iosStoreUrl ||
+    record!.androidStoreUrl ||
     "/";
 
   // ① Desktop → instant server-side 307 redirect (no page render at all)

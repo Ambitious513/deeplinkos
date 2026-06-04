@@ -20,6 +20,7 @@ export type LinkRecord = {
   isActive: boolean;
   expiresAt?: string | null;
   password?: string | null;
+  abTestUrl?: string | null;
   iosDeepLink?: string;
   iosStoreUrl?: string;
   androidDeepLink?: string;
