@@ -39,7 +39,7 @@ export function AuthModal({
     setGoogleLoading(true);
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${siteUrl}/auth/callback` },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
     setGoogleLoading(false);
   }
@@ -57,7 +57,7 @@ export function AuthModal({
       const { error } = await supabase.auth.signUp({
         email, password,
         options: {
-          emailRedirectTo: `${siteUrl}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: { first_name: firstName, last_name: lastName },
         },
       });
