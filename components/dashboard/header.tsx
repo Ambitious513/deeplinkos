@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { CreateLinkModal } from "@/components/dashboard/create-link-modal";
+import { ProfileModal }   from "@/components/dashboard/profile-modal";
 import Link from "next/link";
 
 type Profile = {
@@ -24,6 +25,7 @@ function getInitials(profile: Profile): string {
 export function DashboardHeader({ title = "Overview" }: { title?: string }) {
   const [theme, setTheme] = useState("light");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [profile, setProfile] = useState<Profile>({
     first_name: null, last_name: null, avatar_url: null, email: null,
@@ -188,6 +190,7 @@ export function DashboardHeader({ title = "Overview" }: { title?: string }) {
                   )}
                 </div>
                 <button
+                  onClick={() => { setDropdownOpen(false); setProfileModalOpen(true); }}
                   style={{ width: "100%", textAlign: "left", padding: "9px 14px", background: "none", border: "none", color: "var(--text)", cursor: "pointer", fontSize: 14, borderRadius: 9, display: "flex", alignItems: "center", gap: 10, fontWeight: 500 }}
                   onMouseOver={e => (e.currentTarget.style.background = "var(--blue-dim)")}
                   onMouseOut={e => (e.currentTarget.style.background = "none")}
@@ -211,6 +214,13 @@ export function DashboardHeader({ title = "Overview" }: { title?: string }) {
       </header>
 
       <CreateLinkModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+
+      <ProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        initialProfile={profile}
+        onSaved={(updated) => setProfile(prev => ({ ...prev, ...updated }))}
+      />
     </>
   );
 }

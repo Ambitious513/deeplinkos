@@ -169,17 +169,22 @@ export default async function DeepLinkPage({
   const ipHash   = await hashIp(ip);
   const source   = detectReferrer(ua, referer);
 
+  // Country from Cloudflare header (zero latency when behind CF/Coolify proxy)
+  // Falls back to null if not available — no external API call needed
+  const country  = headersList.get("cf-ipcountry") ?? null;
+
   // Track click after response — cookie-free client so after() works
   after(async () => {
     try {
       const db = createTrackingClient();
       const { error } = await db.from("clicks").insert({
-        link_id:  record.id,
+        link_id:  record!.id,
         device:   platform,
         os,
         browser,
         ip_hash:  ipHash,
         referrer: source,
+        country,
       });
       if (error) console.error("[click-tracking]", error.message);
     } catch (err) {
