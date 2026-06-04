@@ -77,6 +77,22 @@ function AuthErrorToast() {
   );
 }
 
+/** Auto-opens the auth modal when middleware redirects with ?auth=required */
+function AuthRequiredTrigger({ onTrigger }: { onTrigger: () => void }) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("auth") === "required") {
+      onTrigger();
+      // Clean URL without reload
+      const clean = window.location.pathname;
+      window.history.replaceState({}, "", clean);
+    }
+  }, [searchParams, onTrigger]);
+
+  return null;
+}
+
 export default function HomePage() {
   const [authOpen, setAuthOpen] = useState(false);
 
@@ -85,12 +101,17 @@ export default function HomePage() {
       {/* Fixed nav */}
       <SiteHeader />
 
-      {/* Auth Modal — triggered by homepage CTAs */}
-      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} defaultSignUp />
+      {/* Auth Modal — triggered by homepage CTAs and ?auth=required redirect */}
+      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} defaultSignUp={false} />
 
       {/* Auth error toast — reads ?auth_error=true&msg=... from URL */}
       <Suspense fallback={null}>
         <AuthErrorToast />
+      </Suspense>
+
+      {/* Auto-open modal when middleware redirects unauthenticated users here */}
+      <Suspense fallback={null}>
+        <AuthRequiredTrigger onTrigger={() => setAuthOpen(true)} />
       </Suspense>
 
       {/* ── Hero ─────────────────────────────────────────────────── */}

@@ -21,13 +21,15 @@ export default function OnboardingPage() {
     });
 
     if (!error && data.user) {
-      // Also update the public.profiles table
-      await supabase.from('profiles').update({
+      // Upsert — creates the row if it doesn't exist yet (new OAuth users)
+      await supabase.from("profiles").upsert({
+        id: data.user.id,
         first_name: firstName,
-        last_name: lastName
-      }).eq('id', data.user.id);
-      
-      router.push('/dashboard');
+        last_name: lastName,
+        updated_at: new Date().toISOString(),
+      });
+
+      router.push("/dashboard");
     }
     setLoading(false);
   }
