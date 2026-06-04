@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { AdUnit }           from "@/components/ad-unit";
 import { CtaSection }        from "@/components/cta-section";
 import { FeaturesSection }   from "@/components/features-section";
@@ -13,6 +14,69 @@ import { SiteHeader }        from "@/components/site-header";
 import { StatsBar }          from "@/components/stats-bar";
 import { AuthModal }         from "@/components/auth/auth-modal";
 
+function AuthErrorToast() {
+  const searchParams = useSearchParams();
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    const err = searchParams.get("auth_error");
+    const msg = searchParams.get("msg");
+    if (err === "true") {
+      // Determine if it's the PKCE/in-app browser error
+      const isPKCE = msg?.toLowerCase().includes("pkce") || msg?.toLowerCase().includes("verifier");
+      const isInApp = msg?.toLowerCase().includes("in-app") || msg?.toLowerCase().includes("browser");
+
+      if (isPKCE || isInApp) {
+        setToast("⚠️ Google Sign‑In failed. Please open deeplinkos.com directly in Safari or Chrome — it doesn't work inside Instagram, TikTok or Facebook.");
+      } else if (msg === "no_code") {
+        setToast("⚠️ Sign‑in was cancelled. Please try again.");
+      } else {
+        setToast(`⚠️ Sign‑in error: ${decodeURIComponent(msg || "Unknown error")}. Please try again.`);
+      }
+
+      // Clean the URL without reloading
+      const clean = window.location.pathname;
+      window.history.replaceState({}, "", clean);
+    }
+  }, [searchParams]);
+
+  if (!toast) return null;
+
+  return (
+    <div
+      onClick={() => setToast(null)}
+      style={{
+        position: "fixed",
+        bottom: 24,
+        left: "50%",
+        transform: "translateX(-50%)",
+        zIndex: 99999,
+        maxWidth: "min(520px, 94vw)",
+        width: "100%",
+        background: "rgba(239,68,68,0.97)",
+        color: "#fff",
+        borderRadius: 14,
+        padding: "14px 20px",
+        fontSize: 14,
+        fontWeight: 500,
+        lineHeight: 1.5,
+        boxShadow: "0 8px 32px rgba(0,0,0,.25)",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 10,
+        animation: "slideUp .3s ease",
+      }}
+    >
+      <span style={{ flex: 1 }}>{toast}</span>
+      <span style={{ fontSize: 18, lineHeight: 1, opacity: 0.7, flexShrink: 0 }}>×</span>
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+      ` }} />
+    </div>
+  );
+}
+
 export default function HomePage() {
   const [authOpen, setAuthOpen] = useState(false);
 
@@ -23,6 +87,11 @@ export default function HomePage() {
 
       {/* Auth Modal — triggered by homepage CTAs */}
       <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} defaultSignUp />
+
+      {/* Auth error toast — reads ?auth_error=true&msg=... from URL */}
+      <Suspense fallback={null}>
+        <AuthErrorToast />
+      </Suspense>
 
       {/* ── Hero ─────────────────────────────────────────────────── */}
       <section className="hero" id="home" aria-labelledby="hero-heading">

@@ -1,8 +1,124 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import isDisposableEmail from "is-disposable-email";
+
+/** Returns true if the user is inside an in-app browser (Instagram, TikTok, Facebook, etc.) */
+function isInAppBrowser(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  return (
+    // Instagram
+    /Instagram/i.test(ua) ||
+    // Facebook in-app
+    /FBAN|FBAV|FB_IAB|FB4A|FBIOS/i.test(ua) ||
+    // TikTok
+    /musical_ly|TikTok/i.test(ua) ||
+    // Twitter/X
+    /TwitterAndroid|Twitter for/i.test(ua) ||
+    // Snapchat
+    /Snapchat/i.test(ua) ||
+    // LinkedIn
+    /LinkedInApp/i.test(ua) ||
+    // WeChat
+    /MicroMessenger/i.test(ua) ||
+    // Line
+    /Line\//i.test(ua) ||
+    // WhatsApp
+    /WhatsApp/i.test(ua) ||
+    // Generic webview signals
+    (/wv/.test(ua) && /Android/i.test(ua)) ||
+    /GSA\//i.test(ua) // Google Search App
+  );
+}
+
+function InAppBrowserWarning({ onClose }: { onClose: () => void }) {
+  const currentUrl = typeof window !== "undefined" ? window.location.href : "https://deeplinkos.com";
+
+  function copyLink() {
+    navigator.clipboard?.writeText(currentUrl).catch(() => {});
+  }
+
+  return (
+    <div
+      className="modal-overlay open"
+      style={{ display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div style={{
+        background: "var(--bg-card, #fff)", borderRadius: 20,
+        width: "min(400px, 94vw)", padding: "28px 24px",
+        position: "relative", border: "1px solid var(--border-card, rgba(0,0,0,.08))",
+        boxShadow: "0 24px 80px rgba(0,0,0,.18)", textAlign: "center",
+      }}>
+        <button onClick={onClose} style={{
+          position: "absolute", top: 14, right: 14, background: "none", border: "none",
+          fontSize: 20, cursor: "pointer", color: "var(--text-2)", lineHeight: 1,
+          width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6,
+        }}>×</button>
+
+        {/* Icon */}
+        <div style={{ fontSize: 44, marginBottom: 12 }}>📱</div>
+
+        <h2 style={{
+          fontSize: 18, fontWeight: 800, margin: "0 0 10px", letterSpacing: "-0.02em",
+          color: "var(--text)",
+        }}>
+          Open in Your Browser
+        </h2>
+
+        <p style={{ color: "var(--text-2)", fontSize: 14, lineHeight: 1.6, margin: "0 0 20px" }}>
+          Google Sign&#8209;In doesn&apos;t work inside in-app browsers (Instagram, TikTok, etc.) due to browser security restrictions.
+        </p>
+
+        <p style={{ color: "var(--text-2)", fontSize: 13, lineHeight: 1.5, margin: "0 0 20px" }}>
+          Please open <strong>deeplinkos.com</strong> in <strong>Safari</strong> or <strong>Chrome</strong> to sign in with Google.
+        </p>
+
+        {/* Instructions */}
+        <div style={{
+          background: "rgba(59,130,246,.06)", border: "1px solid rgba(59,130,246,.15)",
+          borderRadius: 12, padding: "14px 16px", marginBottom: 20, textAlign: "left",
+        }}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", margin: "0 0 8px" }}>How to open:</p>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: "var(--text-2)", lineHeight: 1.7 }}>
+            <li>Tap the <strong>⋯</strong> or <strong>☰</strong> menu in the top-right corner</li>
+            <li>Select <strong>&quot;Open in Browser&quot;</strong> or <strong>&quot;Open in Safari/Chrome&quot;</strong></li>
+          </ul>
+        </div>
+
+        {/* Copy Link */}
+        <button
+          onClick={copyLink}
+          style={{
+            width: "100%", padding: "11px 16px", borderRadius: 10, marginBottom: 10,
+            border: "1.5px solid rgba(59,130,246,.3)",
+            background: "rgba(59,130,246,.08)", color: "#3b82f6",
+            fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+          }}
+        >
+          📋 Copy Link to Open Manually
+        </button>
+
+        <p style={{ fontSize: 11, color: "var(--text-3, #aaa)", margin: 0 }}>
+          Or use <strong>email & password</strong> sign-in below — that works in any browser.
+        </p>
+
+        <button
+          onClick={onClose}
+          style={{
+            marginTop: 12, background: "none", border: "none", color: "#3b82f6",
+            fontWeight: 700, cursor: "pointer", fontSize: 13, fontFamily: "inherit",
+          }}
+        >
+          Continue with email instead →
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export function AuthModal({
   isOpen,
@@ -21,13 +137,22 @@ export function AuthModal({
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [showInAppWarning, setShowInAppWarning] = useState(false);
   const supabase = createClient();
+
+  useEffect(() => {
+    // Check for in-app browser on mount
+    if (isOpen && isInAppBrowser()) {
+      setShowInAppWarning(true);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL?.split(",")[0].trim().replace(/\/+$/, "") ||
-    window.location.origin;
+  // Show in-app browser warning overlay
+  if (showInAppWarning) {
+    return <InAppBrowserWarning onClose={() => setShowInAppWarning(false)} />;
+  }
 
   function reset() {
     setFirstName(""); setLastName(""); setEmail(""); setPassword(""); setMessage("");
@@ -36,6 +161,11 @@ export function AuthModal({
   function switchMode() { setIsSignUp((v) => !v); reset(); }
 
   async function handleGoogleAuth() {
+    // Check in-app browser at click time too
+    if (isInAppBrowser()) {
+      setShowInAppWarning(true);
+      return;
+    }
     setGoogleLoading(true);
     await supabase.auth.signInWithOAuth({
       provider: "google",
