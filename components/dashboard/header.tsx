@@ -38,35 +38,42 @@ export function DashboardHeader({ title = "Overview" }: { title?: string }) {
 
   useEffect(() => {
     async function loadProfile() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase
-        .from("profiles")
-        .select("first_name, last_name, avatar_url")
-        .eq("id", user.id)
-        .single();
-      const meta = user.user_metadata ?? {};
-      const avatarUrl =
-        data?.avatar_url ||
-        (meta.avatar_url as string | null) ||
-        (meta.picture as string | null) ||
-        null;
-      const firstName =
-        data?.first_name ||
-        (meta.first_name as string | null) ||
-        (meta.given_name as string | null) ||
-        null;
-      const lastName =
-        data?.last_name ||
-        (meta.last_name as string | null) ||
-        (meta.family_name as string | null) ||
-        null;
-      setProfile({
-        first_name: firstName,
-        last_name: lastName,
-        avatar_url: avatarUrl,
-        email: user.email ?? null,
-      });
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Use maybeSingle() — returns null (not an error) when no profile row exists yet
+        const { data } = await supabase
+          .from("profiles")
+          .select("first_name, last_name, avatar_url")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        const meta = user.user_metadata ?? {};
+        const avatarUrl =
+          data?.avatar_url ||
+          (meta.avatar_url as string | null) ||
+          (meta.picture as string | null) ||
+          null;
+        const firstName =
+          data?.first_name ||
+          (meta.first_name as string | null) ||
+          (meta.given_name as string | null) ||
+          null;
+        const lastName =
+          data?.last_name ||
+          (meta.last_name as string | null) ||
+          (meta.family_name as string | null) ||
+          null;
+        setProfile({
+          first_name: firstName,
+          last_name: lastName,
+          avatar_url: avatarUrl,
+          email: user.email ?? null,
+        });
+      } catch {
+        // Non-critical — UI still works with initials fallback
+      }
     }
     loadProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps

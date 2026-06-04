@@ -30,6 +30,65 @@ function detectOS(ua: string): string {
 }
 
 /**
+ * Derive traffic source from the HTTP Referer header OR from the User-Agent
+ * when apps like WhatsApp, Telegram, Instagram don't send a Referer.
+ * Returns a human-readable source string stored in the `referrer` column.
+ */
+function detectReferrer(ua: string, refererHeader: string | null): string | null {
+  // 1. Prefer the real HTTP Referer when present
+  if (refererHeader) {
+    try {
+      const host = new URL(refererHeader).hostname.replace(/^www\./, "");
+      // Map known social domains to clean labels
+      const domainMap: Record<string, string> = {
+        "t.co":           "Twitter / X",
+        "x.com":          "Twitter / X",
+        "twitter.com":    "Twitter / X",
+        "facebook.com":   "Facebook",
+        "fb.com":         "Facebook",
+        "l.facebook.com": "Facebook",
+        "instagram.com":  "Instagram",
+        "l.instagram.com":"Instagram",
+        "tiktok.com":     "TikTok",
+        "wa.me":          "WhatsApp",
+        "whatsapp.com":   "WhatsApp",
+        "t.me":           "Telegram",
+        "telegram.org":   "Telegram",
+        "reddit.com":     "Reddit",
+        "out.reddit.com": "Reddit",
+        "linkedin.com":   "LinkedIn",
+        "lnkd.in":        "LinkedIn",
+        "youtube.com":    "YouTube",
+        "youtu.be":       "YouTube",
+        "snapchat.com":   "Snapchat",
+        "pinterest.com":  "Pinterest",
+      };
+      return domainMap[host] ?? host;
+    } catch {
+      return refererHeader;
+    }
+  }
+
+  // 2. No Referer? Fall back to UA sniffing for in-app browsers
+  const u = ua;
+  if (/WhatsApp\//i.test(u))                      return "WhatsApp";
+  if (/FBAN|FBAV|FB_IAB|FBIOS|FB4A/i.test(u))    return "Facebook";
+  if (/Instagram/i.test(u))                        return "Instagram";
+  if (/musical_ly|TikTok/i.test(u))               return "TikTok";
+  if (/Snapchat/i.test(u))                         return "Snapchat";
+  if (/Twitter|XiaoMi\/MiuiBrowser/i.test(u))     return "Twitter / X";
+  if (/Telegram/i.test(u))                         return "Telegram";
+  if (/LinkedInApp/i.test(u))                      return "LinkedIn";
+  if (/Pinterest/i.test(u))                        return "Pinterest";
+  if (/Reddit/i.test(u))                           return "Reddit";
+  if (/Line\//i.test(u))                           return "Line";
+  if (/MicroMessenger/i.test(u))                   return "WeChat";
+
+  // 3. Truly direct — user typed the URL or used a bookmark
+  return "direct";
+}
+
+/**
  * Hash the IP into a short anonymous string — never store raw IPs.
  * We XOR-fold the bytes for a fast, deterministic 8-char hex token.
  */
@@ -61,6 +120,7 @@ export default async function DeepLinkPage({
   const browser   = detectBrowser(ua);
   const os        = detectOS(ua);
   const ipHash    = hashIp(ip);
+  const source    = detectReferrer(ua, referer);
 
   // ── Track click AFTER response — uses cookie-free tracking client
   //    so it works correctly even after redirect() fires.
@@ -73,7 +133,7 @@ export default async function DeepLinkPage({
         os,                      // "iOS" | "Android" | "Windows" | "macOS" | ...
         browser,                 // "Chrome" | "Safari" | "Firefox" | ...
         ip_hash:  ipHash,        // anonymised 8-char hex, used for unique-visitor counts
-        referrer: referer,
+        referrer: source,        // "WhatsApp" | "Instagram" | "direct" | domain | ...
       });
       if (error) {
         console.error("[click-tracking] insert error:", error.message);
