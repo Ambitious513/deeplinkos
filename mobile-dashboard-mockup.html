@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DeepLinkOS — Mobile Dashboard Mockup</title>
+<meta name="description" content="DeepLinkOS mobile dashboard — premium dark-mode app mockup with analytics, smart links, pixels and settings." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  background: radial-gradient(ellipse at 20% 20%, #0d1b3e 0%, #060a18 40%, #0a0f1e 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  overflow-x: hidden;
+}
+
+/* ===== DESKTOP BACKGROUND DECORATION ===== */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 50%, rgba(59,130,246,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 85% 20%, rgba(6,182,212,0.06) 0%, transparent 45%),
+    radial-gradient(circle at 50% 90%, rgba(139,92,246,0.04) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== PHONE FRAME ===== */
+.phone-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.phone-label {
+  color: rgba(255,255,255,0.35);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.phone-frame {
+  width: 390px;
+  height: 844px;
+  background: #0f1117;
+  border-radius: 55px;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  box-shadow:
+    0 0 0 8px #0a0d18,
+    0 0 0 10px rgba(255,255,255,0.07),
+    0 60px 120px rgba(0,0,0,0.9),
+    0 30px 60px rgba(0,0,0,0.7),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== NOTCH ===== */
+.notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 126px;
+  height: 37px;
+  background: #080b12;
+  border-radius: 0 0 24px 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.notch-camera {
+  width: 10px; height: 10px;
+  background: #1a1f2e;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.notch-speaker {
+  width: 48px; height: 5px;
+  background: #1a1f2e;
+  border-radius: 3px;
+}
+
+/* ===== STATUS BAR ===== */
+.status-bar {
+  height: 48px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 28px 4px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+.status-time { font-size: 15px; font-weight: 600; color: #fff; }
+.status-icons { display: flex; align-items: center; gap: 6px; }
+.status-icons svg { color: #fff; }
+
+/* ===== APP CONTAINER ===== */
+.app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===== HEADER ===== */
+.header {
+  background: rgba(15,17,23,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 10px 16px 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  position: relative;
+  z-index: 50;
+}
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(59,130,246,0.4);
+  flex-shrink: 0;
+}
+.logo-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.icon-btn {
+  width: 32px; height: 32px;
+  border: none;
+  background: rgba(255,255,255,0.05);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgba(255,255,255,0.6);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.new-btn {
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 0 16px rgba(59,130,246,0.35);
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.new-btn:hover { transform: scale(1.04); box-shadow: 0 0 24px rgba(59,130,246,0.5); }
+.avatar-btn {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(59,130,246,0.3);
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.avatar-btn:hover { transform: scale(1.08); }
+
+/* ===== PROFILE DROPDOWN ===== */
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 12px;
+  width: 220px;
+  background: #1a1f2e;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
+  z-index: 200;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.95);
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+.profile-dropdown.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: all;
+}
+.dropdown-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 6px;
+}
+.dropdown-avatar {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.dropdown-name { font-size: 13px; font-weight: 600; color: #fff; }
+.dropdown-email { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 1px; }
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.8);
+}
+.dropdown-item:hover { background: rgba(255,255,255,0.06); }
+.dropdown-item.danger { color: #f87171; }
+.dropdown-item svg { color: currentColor; flex-shrink: 0; }
+.dropdown-pro-badge {
+  margin-left: auto;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}
+
+/* ===== SCROLLABLE CONTENT ===== */
+.screen-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: relative;
+}
+.screen-content::-webkit-scrollbar { display: none; }
+
+/* ===== TAB SCREENS ===== */
+.tab-screen {
+  display: none;
+  padding: 14px 14px 80px;
+  min-height: 100%;
+  animation: fadeUp 0.3s ease;
+}
+.tab-screen.active { display: block; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== SECTION HEADER ===== */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+.section-action {
+  font-size: 12px;
+  font-weight: 600;
+  color: #3b82f6;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.section-action:hover { color: #06b6d4; }
+
+/* ===== STAT CARDS GRID ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.stat-card {
+  background: #1a1f2e;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 14px 13px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(59,130,246,0.08), transparent 60%);
+  pointer-events: none;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+.stat-number {
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin-bottom: 2px;
+}
+.stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 8px;
+}
+.stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 20px;
+  width: fit-content;
+}
+.badge-green { background: rgba(34,197,94,0.15); color: #4ade80; }
+.badge-grey { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.4); }
+.badge-blue { background: rgba(59,130,246,0.15); color: #60a5fa; cursor: pointer; }
+.badge-amber { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.stat-icon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px; height: 28px;
+  background: rgba(59,130,246,0.1);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6;
+}
+
+/* ===== CHART CARD ===== */
+.chart-card {
+  background: #1a1f2e;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.chart-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 60%; height: 100%;
+  background: radial-gradient(ellipse at 80% 50%, rgba(6,182,212,0.05), transparent 70%);
+  pointer-events: none;
+}
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.chart-pill {
+  background: rgba(59,130,246,0.15);
+  color: #60a5fa;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+.chart-area {
+  height: 110px;
+  position: relative;
+}
+.chart-area svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.chart-x-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  padding: 0 2px;
+}
+.chart-x-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  font-weight: 500;
+}
+
+/* Tooltip on chart hover */
+.chart-tooltip {
+  position: absolute;
+  background: #1e2640;
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 8px;
+  padding: 5px 9px;
+  font-size: 11px;
+  color: #fff;
+  font-weight: 600;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.chart-area:hover .chart-tooltip { opacity: 1; }
+
+/* ===== QUICK LINKS ===== */
+.quick-links-card {
+  background: #1a1f2e;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.link-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.link-row:last-child { border-bottom: none; }
+.link-row:hover { background: rgba(255,255,255,0.03); }
+.link-row:active { background: rgba(59,130,246,0.06); }
+.platform-icon {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.platform-yt { background: rgba(239,68,68,0.15); }
+.platform-ig { background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(245,158,11,0.15)); }
+.platform-tt { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); }
+.link-info { flex: 1; min-width: 0; }
+.link-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.link-slug {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.click-badge {
+  background: rgba(59,130,246,0.12);
+  color: #60a5fa;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ===== TAB BAR ===== */
+.tab-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 72px;
+  background: #1a1f2e;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: flex-start;
+  padding-top: 8px;
+  z-index: 60;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  transition: all 0.2s;
+  position: relative;
+}
+.tab-icon {
+  width: 28px; height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  transition: all 0.25s;
+  position: relative;
+}
+.tab-item.active .tab-icon {
+  background: rgba(59,130,246,0.15);
+  box-shadow: 0 0 16px rgba(59,130,246,0.25);
+}
+.tab-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  transition: color 0.2s;
+  letter-spacing: 0.02em;
+}
+.tab-item.active .tab-label {
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.tab-item svg {
+  color: rgba(255,255,255,0.3);
+  transition: color 0.2s;
+}
+.tab-item.active svg {
+  color: #3b82f6;
+}
+.tab-indicator {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg, #3b82f6, #06b6d4);
+  opacity: 0;
+  transition: opacity 0.2s;
+  box-shadow: 0 0 10px rgba(59,130,246,0.6);
+}
+.tab-item.active .tab-indicator { opacity: 1; }
+
+/* ===== FAB ===== */
+.fab {
+  position: absolute;
+  bottom: 84px;
+  right: 18px;
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 4px rgba(59,130,246,0.15),
+    0 8px 24px rgba(59,130,246,0.45),
+    0 4px 12px rgba(0,0,0,0.4);
+  z-index: 55;
+  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  color: #fff;
+}
+.fab:hover { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(59,130,246,0.15), 0 12px 32px rgba(59,130,246,0.55); }
+.fab:active { transform: scale(0.95); }
+.fab-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1px solid rgba(59,130,246,0.25);
+  animation: fabPulse 2.5s ease-in-out infinite;
+}
+@keyframes fabPulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.15); opacity: 0; }
+}
+
+/* ===== BOTTOM SHEET ===== */
+.bottom-sheet-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 70;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.bottom-sheet-overlay.open { opacity: 1; pointer-events: all; }
+.bottom-sheet {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: #1a1f2e;
+  border-radius: 24px 24px 0 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-bottom: none;
+  padding: 0 18px 30px;
+  z-index: 80;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  box-shadow: 0 -20px 60px rgba(0,0,0,0.6);
+}
+.bottom-sheet.open { transform: translateY(0); }
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  margin: 12px auto 20px;
+}
+.sheet-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sheet-title-icon {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.form-group { margin-bottom: 12px; }
+.form-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.form-input-wrap { position: relative; }
+.form-input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 11px 12px;
+  color: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-input::placeholder { color: rgba(255,255,255,0.25); }
+.form-input:focus { border-color: rgba(59,130,246,0.5); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+.detect-badge {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(34,197,94,0.15);
+  color: #4ade80;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.compose-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  border: none;
+  border-radius: 14px;
+  padding: 14px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 0 24px rgba(59,130,246,0.35);
+  margin-top: 16px;
+  transition: all 0.2s;
+  letter-spacing: -0.01em;
+}
+.compose-btn:hover { transform: scale(1.02); box-shadow: 0 0 32px rgba(59,130,246,0.5); }
+
+/* ===== LINKS TAB ===== */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1a1f2e;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 13px;
+  padding: 10px 13px;
+  margin-bottom: 14px;
+}
+.search-bar input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 13px;
+  font-family: inherit;
+}
+.search-bar input::placeholder { color: rgba(255,255,255,0.25); }
+.links-filter-row {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.links-filter-row::-webkit-scrollbar { display: none; }
+.filter-chip {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.filter-chip.active {
+  background: rgba(59,130,246,0.15);
+  border-color: rgba(59,130,246,0.3);
+  color: #60a5fa;
+}
+.link-card-full {
+  background: #1a1f2e;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 13px 14px;
+  margin-bottom: 9px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.link-card-full:hover { border-color: rgba(59,130,246,0.2); background: rgba(26,31,46,0.8); }
+.link-card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.link-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.link-url-text {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.link-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.link-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  font-weight: 500;
+}
+.link-stat-item strong { color: rgba(255,255,255,0.7); font-weight: 600; }
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px #4ade80;
+}
+
+/* ===== ANALYTICS TAB ===== */
+.analytics-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.analytics-mini {
+  background: #1a1f2e;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 13px;
+  padding: 12px 10px;
+  text-align: center;
+}
+.analytics-mini-num {
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.03em;
+}
+.analytics-mini-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  font-weight: 500;
+  margin-top: 2px;
+}
+.donut-card {
+  background: #1a1f2e;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.donut-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.donut-svg { flex-shrink: 0; }
+.donut-legend { flex: 1; }
+.donut-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.donut-label { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 500; }
+.donut-value { margin-left: auto; font-size: 12px; font-weight: 700; color: #fff; }
+.top-links-table {
+  background: #1a1f2e;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.table-head {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.table-head span { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.08em; }
+.table-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.table-row:last-child { border-bottom: none; }
+.table-row:hover { background: rgba(255,255,255,0.02); }
+.table-link-name { font-size: 12px; font-weight: 600; color: #fff; }
+.table-clicks { font-size: 12px; font-weight: 700; color: #60a5fa; text-align: right; }
+.table-ctr { font-size: 11px; color: rgba(255,255,255,0.35); text-align: right; }
+.trend-up { color: #4ade80; font-size: 10px; }
+
+/* ===== PIXELS TAB ===== */
+.coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  gap: 12px;
+}
+.coming-soon-icon {
+  width: 80px; height: 80px;
+  background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(6,182,212,0.15));
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.coming-soon h2 { font-size: 20px; font-weight: 800; color: #fff; }
+.coming-soon p { font-size: 13px; color: rgba(255,255,255,0.4); max-width: 220px; line-height: 1.6; }
+.coming-soon-badge {
+  background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(6,182,212,0.2));
+  border: 1px solid rgba(59,130,246,0.3);
+  color: #60a5fa;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-top: 8px;
+}
+
+/* ===== SETTINGS TAB ===== */
+.profile-hero {
+  background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(6,182,212,0.08));
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 18px;
+  padding: 20px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.profile-hero::before {
+  content: '';
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 100px; height: 100px;
+  background: radial-gradient(circle, rgba(59,130,246,0.2), transparent 70%);
+  pointer-events: none;
+}
+.profile-hero-avatar {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  box-shadow: 0 0 20px rgba(59,130,246,0.4);
+  flex-shrink: 0;
+}
+.profile-hero-name { font-size: 16px; font-weight: 700; color: #fff; }
+.profile-hero-email { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.profile-hero-plan {
+  margin-left: auto;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+.settings-section {
+  background: #1a1f2e;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.settings-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 10px 14px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row:hover { background: rgba(255,255,255,0.03); }
+.settings-row-icon {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.icon-bg-blue { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.icon-bg-green { background: rgba(34,197,94,0.12); color: #4ade80; }
+.icon-bg-amber { background: rgba(245,158,11,0.12); color: #fbbf24; }
+.icon-bg-red { background: rgba(239,68,68,0.12); color: #f87171; }
+.icon-bg-purple { background: rgba(139,92,246,0.12); color: #a78bfa; }
+.settings-row-label { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); flex: 1; }
+.settings-row-value { font-size: 12px; color: rgba(255,255,255,0.3); }
+.settings-chevron { color: rgba(255,255,255,0.2); }
+.domain-card {
+  background: rgba(59,130,246,0.07);
+  border: 1px dashed rgba(59,130,246,0.25);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.domain-card:hover { background: rgba(59,130,246,0.12); }
+.domain-plus {
+  width: 36px; height: 36px;
+  background: rgba(59,130,246,0.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.domain-text { font-size: 13px; font-weight: 600; color: #60a5fa; }
+.domain-subtext { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 2px; }
+.signout-btn {
+  width: 100%;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 14px;
+  padding: 14px;
+  color: #f87171;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  margin-top: 4px;
+  font-family: inherit;
+}
+.signout-btn:hover { background: rgba(239,68,68,0.15); }
+
+/* ===== RESPONSIVE — FILL SCREEN ON MOBILE ===== */
+@media (max-width: 500px) {
+  body { padding: 0; align-items: flex-start; background: #0f1117; }
+  body::before { display: none; }
+  .phone-wrap { gap: 0; }
+  .phone-label { display: none; }
+  .phone-frame {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.glow-text {
+  background: linear-gradient(90deg, #3b82f6, #06b6d4, #3b82f6);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Toggle animation for bottom sheet */
+.fab-rotate svg { transition: transform 0.3s; }
+.fab-rotate.open svg { transform: rotate(45deg); }
+
+/* Pulse dot for live indicator */
+.live-dot {
+  width: 6px; height: 6px;
+  background: #4ade80;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 4px;
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.7); }
+}
+</style>
+</head>
+<body>
+
+<!-- Desktop wrapper -->
+<div class="phone-wrap">
+  <span class="phone-label">DeepLinkOS · Mobile Preview · 390px</span>
+
+  <!-- PHONE FRAME -->
+  <div class="phone-frame" id="phoneFrame">
+    <!-- Notch -->
+    <div class="notch">
+      <div class="notch-camera"></div>
+      <div class="notch-speaker"></div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <!-- Signal -->
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+          <rect x="0" y="6" width="3" height="5" rx="1" fill="white"/>
+          <rect x="4" y="4" width="3" height="7" rx="1" fill="white"/>
+          <rect x="8" y="2" width="3" height="9" rx="1" fill="white"/>
+          <rect x="12" y="0" width="3" height="11" rx="1" fill="white"/>
+        </svg>
+        <!-- WiFi -->
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="white">
+          <path d="M8 9.5a1 1 0 110 2 1 1 0 010-2z"/>
+          <path d="M4.5 7.5a5 5 0 017 0" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <path d="M1.5 4.5a9 9 0 0113 0" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+        </svg>
+        <!-- Battery -->
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="none">
+          <rect x="0.5" y="0.5" width="20" height="11" rx="3.5" stroke="white" stroke-opacity="0.35"/>
+          <rect x="2" y="2" width="16" height="8" rx="2" fill="white"/>
+          <path d="M21.5 4v4a2 2 0 000-4z" fill="white" opacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- APP -->
+    <div class="app">
+
+      <!-- HEADER -->
+      <div class="header">
+        <div class="header-logo">
+          <div class="logo-mark">D</div>
+          <span class="logo-text">DeepLinkOS</span>
+        </div>
+        <div class="header-actions">
+          <!-- Theme toggle -->
+          <button class="icon-btn" title="Toggle theme">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+            </svg>
+          </button>
+          <!-- New button -->
+          <button class="new-btn" onclick="openSheet()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New
+          </button>
+          <!-- Avatar -->
+          <button class="avatar-btn" id="avatarBtn" onclick="toggleDropdown()">JD</button>
+        </div>
+
+        <!-- Profile Dropdown -->
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="dropdown-user">
+            <div class="dropdown-avatar">JD</div>
+            <div>
+              <div class="dropdown-name">John Doe</div>
+              <div class="dropdown-email">john@gmail.com</div>
+            </div>
+          </div>
+          <div class="dropdown-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Edit Profile
+          </div>
+          <div class="dropdown-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Upgrade to Pro
+            <span class="dropdown-pro-badge">PRO</span>
+          </div>
+          <div class="dropdown-item danger">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+          </div>
+        </div>
+      </div>
+
+      <!-- SCROLLABLE SCREEN -->
+      <div class="screen-content">
+
+        <!-- ====== DASHBOARD TAB ====== -->
+        <div class="tab-screen active" id="screen-dashboard">
+          <!-- Stats Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+              <div class="stat-number">2,847</div>
+              <div class="stat-label">Total Clicks</div>
+              <div class="stat-badge badge-green">↑ 12% this week</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+              </div>
+              <div class="stat-number">1,203</div>
+              <div class="stat-label">Unique Visitors</div>
+              <div class="stat-badge badge-grey">Last 30 days</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+              </div>
+              <div class="stat-number">12</div>
+              <div class="stat-label">Active Links</div>
+              <div class="stat-badge badge-blue">→ View all</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+              </div>
+              <div class="stat-number" style="font-size:22px; letter-spacing:-0.02em;">N/A</div>
+              <div class="stat-label">Avg CTR</div>
+              <div class="stat-badge badge-amber">Coming soon</div>
+            </div>
+          </div>
+
+          <!-- Chart Card -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="section-title">Click Analytics</div>
+              <span class="chart-pill">7 days</span>
+            </div>
+            <div class="chart-area" id="chartArea">
+              <!-- Tooltip -->
+              <div class="chart-tooltip" id="chartTooltip" style="left:58%; top:4px;">Thu · 612 clicks</div>
+              <svg viewBox="0 0 340 100" preserveAspectRatio="none" id="chartSvg">
+                <defs>
+                  <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.35"/>
+                    <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#3b82f6"/>
+                    <stop offset="100%" stop-color="#06b6d4"/>
+                  </linearGradient>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                    <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                  </filter>
+                </defs>
+                <!-- Grid lines -->
+                <line x1="0" y1="25" x2="340" y2="25" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                <line x1="0" y1="50" x2="340" y2="50" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                <line x1="0" y1="75" x2="340" y2="75" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                <!-- Fill area (hardcoded nice curve) -->
+                <path d="M0,72 C30,68 50,55 80,45 C110,35 130,60 160,38 C190,16 210,28 240,12 C270,0 300,18 340,22 L340,100 L0,100 Z"
+                  fill="url(#fillGrad)" opacity="0.8"/>
+                <!-- Line -->
+                <path d="M0,72 C30,68 50,55 80,45 C110,35 130,60 160,38 C190,16 210,28 240,12 C270,0 300,18 340,22"
+                  fill="none" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linecap="round" filter="url(#glow)"/>
+                <!-- Data points -->
+                <circle cx="0" cy="72" r="3.5" fill="#3b82f6" stroke="#0f1117" stroke-width="1.5"/>
+                <circle cx="57" cy="48" r="3.5" fill="#3b82f6" stroke="#0f1117" stroke-width="1.5"/>
+                <circle cx="113" cy="42" r="3.5" fill="#3b82f6" stroke="#0f1117" stroke-width="1.5"/>
+                <circle cx="170" cy="34" r="3.5" fill="#3b82f6" stroke="#0f1117" stroke-width="1.5"/>
+                <circle cx="226" cy="12" r="5" fill="#06b6d4" stroke="#0f1117" stroke-width="2"/>
+                <circle cx="283" cy="18" r="3.5" fill="#3b82f6" stroke="#0f1117" stroke-width="1.5"/>
+                <circle cx="340" cy="22" r="3.5" fill="#3b82f6" stroke="#0f1117" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="chart-x-labels">
+              <span class="chart-x-label">Mon</span>
+              <span class="chart-x-label">Tue</span>
+              <span class="chart-x-label">Wed</span>
+              <span class="chart-x-label">Thu</span>
+              <span class="chart-x-label">Fri</span>
+              <span class="chart-x-label">Sat</span>
+              <span class="chart-x-label">Sun</span>
+            </div>
+          </div>
+
+          <!-- Recent Links -->
+          <div class="section-header">
+            <span class="section-title">Recent Links</span>
+            <span class="section-action" onclick="switchTab('links')">View All →</span>
+          </div>
+          <div class="quick-links-card">
+            <div class="link-row">
+              <div class="platform-icon platform-yt">
+                <!-- YouTube icon -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#ef4444"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>
+              </div>
+              <div class="link-info">
+                <div class="link-name">My YouTube Channel</div>
+                <div class="link-slug">deeplinkos.com/r/yt-chan</div>
+              </div>
+              <div class="click-badge">847</div>
+            </div>
+            <div class="link-row">
+              <div class="platform-icon platform-ig">
+                <!-- Instagram icon -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <defs>
+                    <linearGradient id="igGrad" x1="0" y1="1" x2="1" y2="0">
+                      <stop offset="0%" stop-color="#f59e0b"/>
+                      <stop offset="50%" stop-color="#ec4899"/>
+                      <stop offset="100%" stop-color="#8b5cf6"/>
+                    </linearGradient>
+                  </defs>
+                  <rect x="2" y="2" width="20" height="20" rx="5" fill="url(#igGrad)"/>
+                  <circle cx="12" cy="12" r="4" stroke="white" stroke-width="1.5" fill="none"/>
+                  <circle cx="17.5" cy="6.5" r="1" fill="white"/>
+                </svg>
+              </div>
+              <div class="link-info">
+                <div class="link-name">Instagram Profile</div>
+                <div class="link-slug">deeplinkos.com/r/ig-prof</div>
+              </div>
+              <div class="click-badge">432</div>
+            </div>
+            <div class="link-row">
+              <div class="platform-icon platform-tt">
+                <!-- TikTok icon -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                  <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/>
+                </svg>
+              </div>
+              <div class="link-info">
+                <div class="link-name">TikTok Videos</div>
+                <div class="link-slug">deeplinkos.com/r/tktk</div>
+              </div>
+              <div class="click-badge">219</div>
+            </div>
+          </div>
+
+          <!-- Live Indicator -->
+          <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:6px; padding:8px;">
+            <span class="live-dot"></span>
+            <span style="font-size:11px; color:rgba(255,255,255,0.3); font-weight:500;">Live data · Last updated just now</span>
+          </div>
+        </div>
+
+        <!-- ====== LINKS TAB ====== -->
+        <div class="tab-screen" id="screen-links">
+          <!-- Search bar -->
+          <div class="search-bar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search links…" readonly />
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg>
+          </div>
+          <!-- Filters -->
+          <div class="links-filter-row">
+            <div class="filter-chip active">All (12)</div>
+            <div class="filter-chip">Active (10)</div>
+            <div class="filter-chip">Paused (2)</div>
+            <div class="filter-chip">YouTube</div>
+            <div class="filter-chip">Instagram</div>
+          </div>
+          <!-- Link cards -->
+          <div class="link-card-full">
+            <div class="link-card-top">
+              <div class="platform-icon platform-yt" style="width:30px;height:30px;border-radius:8px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="#ef4444"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>
+              </div>
+              <div class="link-info">
+                <div class="link-name">My YouTube Channel</div>
+              </div>
+              <div class="status-dot"></div>
+            </div>
+            <div class="link-card-meta">
+              <div class="link-url-text">deeplinkos.com/r/yt-chan</div>
+              <div class="link-stats-row">
+                <div class="link-stat-item"><strong>847</strong> clicks</div>
+                <div class="link-stat-item"><strong>4.2%</strong> CTR</div>
+              </div>
+            </div>
+          </div>
+          <div class="link-card-full">
+            <div class="link-card-top">
+              <div class="platform-icon platform-ig" style="width:30px;height:30px;border-radius:8px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" fill="url(#igGrad)"/><circle cx="12" cy="12" r="4" stroke="white" stroke-width="1.5" fill="none"/><circle cx="17.5" cy="6.5" r="1" fill="white"/></svg>
+              </div>
+              <div class="link-info">
+                <div class="link-name">Instagram Profile</div>
+              </div>
+              <div class="status-dot"></div>
+            </div>
+            <div class="link-card-meta">
+              <div class="link-url-text">deeplinkos.com/r/ig-prof</div>
+              <div class="link-stats-row">
+                <div class="link-stat-item"><strong>432</strong> clicks</div>
+                <div class="link-stat-item"><strong>2.8%</strong> CTR</div>
+              </div>
+            </div>
+          </div>
+          <div class="link-card-full">
+            <div class="link-card-top">
+              <div class="platform-icon platform-tt" style="width:30px;height:30px;border-radius:8px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
+              </div>
+              <div class="link-info">
+                <div class="link-name">TikTok Videos</div>
+              </div>
+              <div class="status-dot"></div>
+            </div>
+            <div class="link-card-meta">
+              <div class="link-url-text">deeplinkos.com/r/tktk</div>
+              <div class="link-stats-row">
+                <div class="link-stat-item"><strong>219</strong> clicks</div>
+                <div class="link-stat-item"><strong>1.4%</strong> CTR</div>
+              </div>
+            </div>
+          </div>
+          <div class="link-card-full" style="opacity:0.55;">
+            <div class="link-card-top">
+              <div class="platform-icon" style="width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.06);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </div>
+              <div class="link-info">
+                <div class="link-name">Twitter / X Profile</div>
+              </div>
+              <div style="width:6px;height:6px;border-radius:50%;background:rgba(245,158,11,0.7);box-shadow:0 0 6px rgba(245,158,11,0.5);"></div>
+            </div>
+            <div class="link-card-meta">
+              <div class="link-url-text">deeplinkos.com/r/twitter</div>
+              <div class="link-stats-row">
+                <div class="link-stat-item" style="background:rgba(245,158,11,0.1);color:#fbbf24;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:600;">Paused</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== ANALYTICS TAB ====== -->
+        <div class="tab-screen" id="screen-analytics">
+          <!-- Mini stats row -->
+          <div class="analytics-row">
+            <div class="analytics-mini">
+              <div class="analytics-mini-num glow-text">2.8K</div>
+              <div class="analytics-mini-label">Clicks</div>
+            </div>
+            <div class="analytics-mini">
+              <div class="analytics-mini-num" style="color:#4ade80;">↑18%</div>
+              <div class="analytics-mini-label">vs last wk</div>
+            </div>
+            <div class="analytics-mini">
+              <div class="analytics-mini-num" style="color:#fbbf24;">2.9%</div>
+              <div class="analytics-mini-label">Avg CTR</div>
+            </div>
+          </div>
+
+          <!-- Device Donut -->
+          <div class="donut-card">
+            <div class="section-header" style="margin-bottom:14px;">
+              <span class="section-title">Device Breakdown</span>
+              <span class="chart-pill">30 days</span>
+            </div>
+            <div class="donut-wrap">
+              <svg class="donut-svg" width="100" height="100" viewBox="0 0 100 100">
+                <defs>
+                  <linearGradient id="donutBlue" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#3b82f6"/>
+                    <stop offset="100%" stop-color="#06b6d4"/>
+                  </linearGradient>
+                </defs>
+                <!-- Background ring -->
+                <circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="14"/>
+                <!-- iOS: 52% — stroke-dasharray = 2*pi*36 ≈ 226.2 -->
+                <circle cx="50" cy="50" r="36" fill="none" stroke="url(#donutBlue)" stroke-width="14"
+                  stroke-dasharray="117.6 108.6" stroke-dashoffset="56.5" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                <!-- Android: 31% -->
+                <circle cx="50" cy="50" r="36" fill="none" stroke="#8b5cf6" stroke-width="14"
+                  stroke-dasharray="70 156.2" stroke-dashoffset="-61.1" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                <!-- Desktop: 17% -->
+                <circle cx="50" cy="50" r="36" fill="none" stroke="#f59e0b" stroke-width="14"
+                  stroke-dasharray="38.5 187.7" stroke-dashoffset="-131.1" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                <!-- Center text -->
+                <text x="50" y="46" text-anchor="middle" font-size="14" font-weight="800" fill="white" font-family="Inter, sans-serif">52%</text>
+                <text x="50" y="59" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.4)" font-family="Inter, sans-serif">iOS</text>
+              </svg>
+              <div class="donut-legend">
+                <div class="donut-item">
+                  <div class="donut-dot" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);"></div>
+                  <span class="donut-label">iOS</span>
+                  <span class="donut-value">52%</span>
+                </div>
+                <div class="donut-item">
+                  <div class="donut-dot" style="background:#8b5cf6;"></div>
+                  <span class="donut-label">Android</span>
+                  <span class="donut-value">31%</span>
+                </div>
+                <div class="donut-item">
+                  <div class="donut-dot" style="background:#f59e0b;"></div>
+                  <span class="donut-label">Desktop</span>
+                  <span class="donut-value">17%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Links Table -->
+          <div class="section-header">
+            <span class="section-title">Top Links</span>
+          </div>
+          <div class="top-links-table">
+            <div class="table-head">
+              <span>Link</span>
+              <span>Clicks</span>
+              <span>CTR</span>
+            </div>
+            <div class="table-row">
+              <div class="table-link-name">YouTube Channel</div>
+              <div class="table-clicks">847</div>
+              <div class="table-ctr">4.2% <span class="trend-up">↑</span></div>
+            </div>
+            <div class="table-row">
+              <div class="table-link-name">Instagram Profile</div>
+              <div class="table-clicks">432</div>
+              <div class="table-ctr">2.8% <span class="trend-up">↑</span></div>
+            </div>
+            <div class="table-row">
+              <div class="table-link-name">TikTok Videos</div>
+              <div class="table-clicks">219</div>
+              <div class="table-ctr">1.4% <span style="color:#f87171;font-size:10px;">↓</span></div>
+            </div>
+            <div class="table-row">
+              <div class="table-link-name">Portfolio Site</div>
+              <div class="table-clicks">164</div>
+              <div class="table-ctr">0.9% <span class="trend-up">↑</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== PIXELS TAB ====== -->
+        <div class="tab-screen" id="screen-pixels">
+          <div class="coming-soon">
+            <div class="coming-soon-icon">
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="url(#rocketGrad)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <defs>
+                  <linearGradient id="rocketGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#3b82f6"/>
+                    <stop offset="100%" stop-color="#06b6d4"/>
+                  </linearGradient>
+                </defs>
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/>
+                <path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/>
+                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+              </svg>
+            </div>
+            <h2>Pixel Tracking</h2>
+            <p>Connect retargeting pixels from Meta, Google, TikTok and more to your deep links.</p>
+            <div class="coming-soon-badge">🚀 Coming in Q3 2025</div>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+              <div style="background:#1a1f2e;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#3b82f6"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.17 11.86l-5 3a.75.75 0 01-1.17-.62V7.76a.75.75 0 011.17-.62l5 3a.75.75 0 010 1.24z"/></svg>
+                <span style="font-size:11px;color:rgba(255,255,255,0.5);">Meta Pixel</span>
+              </div>
+              <div style="background:#1a1f2e;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#4ade80"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span style="font-size:11px;color:rgba(255,255,255,0.5);">GA4</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== SETTINGS TAB ====== -->
+        <div class="tab-screen" id="screen-settings">
+          <!-- Profile hero -->
+          <div class="profile-hero">
+            <div class="profile-hero-avatar">JD</div>
+            <div>
+              <div class="profile-hero-name">John Doe</div>
+              <div class="profile-hero-email">john@gmail.com</div>
+            </div>
+            <div class="profile-hero-plan">FREE</div>
+          </div>
+
+          <!-- Account settings -->
+          <div class="settings-section">
+            <div class="settings-section-title">Account</div>
+            <div class="settings-row">
+              <div class="settings-row-icon icon-bg-blue">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <span class="settings-row-label">Edit Profile</span>
+              <svg class="settings-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-icon icon-bg-amber">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              </div>
+              <span class="settings-row-label">Change Password</span>
+              <svg class="settings-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-icon icon-bg-green">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 13a19.79 19.79 0 01-3.07-8.67A2 2 0 012 2.18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+              </div>
+              <span class="settings-row-label">Notifications</span>
+              <div class="settings-row-value">All on</div>
+              <svg class="settings-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+
+          <!-- Custom domains -->
+          <div class="settings-section-title" style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;padding:8px 4px;margin-bottom:8px;">Custom Domains</div>
+          <div class="domain-card">
+            <div class="domain-plus">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+            <div>
+              <div class="domain-text">Connect Custom Domain</div>
+              <div class="domain-subtext">Use your own domain for all smart links</div>
+            </div>
+          </div>
+
+          <!-- Plan -->
+          <div class="settings-section">
+            <div class="settings-section-title">Plan &amp; Billing</div>
+            <div class="settings-row">
+              <div class="settings-row-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(249,115,22,0.2));color:#fbbf24;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <div style="flex:1;">
+                <span class="settings-row-label" style="display:block;">Upgrade to Pro</span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.3);">Unlock pixels, custom domains &amp; more</span>
+              </div>
+              <span style="background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;">$9/mo</span>
+            </div>
+          </div>
+
+          <!-- App -->
+          <div class="settings-section">
+            <div class="settings-section-title">App</div>
+            <div class="settings-row">
+              <div class="settings-row-icon icon-bg-purple">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+              </div>
+              <span class="settings-row-label">App Version</span>
+              <div class="settings-row-value">v2.4.1</div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-icon icon-bg-blue">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <span class="settings-row-label">Privacy &amp; Data</span>
+              <svg class="settings-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+
+          <button class="signout-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+          </button>
+        </div>
+
+      </div><!-- end .screen-content -->
+
+      <!-- FAB -->
+      <button class="fab fab-rotate" id="fabBtn" onclick="toggleSheet()" title="Create new link">
+        <div class="fab-ring"></div>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+
+      <!-- TAB BAR -->
+      <div class="tab-bar">
+        <button class="tab-item active" id="tab-dashboard" onclick="switchTab('dashboard')">
+          <div class="tab-indicator"></div>
+          <div class="tab-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </div>
+          <span class="tab-label">Dashboard</span>
+        </button>
+        <button class="tab-item" id="tab-links" onclick="switchTab('links')">
+          <div class="tab-indicator"></div>
+          <div class="tab-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <span class="tab-label">Links</span>
+        </button>
+        <button class="tab-item" id="tab-analytics" onclick="switchTab('analytics')">
+          <div class="tab-indicator"></div>
+          <div class="tab-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <span class="tab-label">Analytics</span>
+        </button>
+        <button class="tab-item" id="tab-pixels" onclick="switchTab('pixels')">
+          <div class="tab-indicator"></div>
+          <div class="tab-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <span class="tab-label">Pixels</span>
+        </button>
+        <button class="tab-item" id="tab-settings" onclick="switchTab('settings')">
+          <div class="tab-indicator"></div>
+          <div class="tab-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+          </div>
+          <span class="tab-label">Settings</span>
+        </button>
+      </div>
+
+      <!-- BOTTOM SHEET OVERLAY -->
+      <div class="bottom-sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+
+      <!-- BOTTOM SHEET -->
+      <div class="bottom-sheet" id="bottomSheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">
+          <div class="sheet-title-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          Create Smart Link
+        </div>
+        <div class="form-group">
+          <div class="form-label">Destination URL</div>
+          <div class="form-input-wrap">
+            <input class="form-input" type="text" placeholder="https://youtube.com/…" value="https://youtube.com/c/johndoe" style="padding-right:130px;" readonly />
+            <div class="detect-badge">
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              YouTube Detected
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Custom Slug</div>
+          <div class="form-input-wrap">
+            <input class="form-input" type="text" placeholder="e.g. yt-main" value="yt-main" readonly />
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Link Title</div>
+          <div class="form-input-wrap">
+            <input class="form-input" type="text" placeholder="My YouTube Channel" value="My YouTube Channel" readonly />
+          </div>
+        </div>
+        <button class="compose-btn">
+          Compose Link
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+
+    </div><!-- end .app -->
+  </div><!-- end .phone-frame -->
+
+  <span class="phone-label" style="margin-top:4px;">Click tabs to switch screens · Avatar for profile menu</span>
+</div>
+
+<script>
+// =====================
+// TAB SWITCHING
+// =====================
+function switchTab(name) {
+  // Deactivate all
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-screen').forEach(s => s.classList.remove('active'));
+
+  // Activate chosen
+  const tabEl = document.getElementById('tab-' + name);
+  const screenEl = document.getElementById('screen-' + name);
+  if (tabEl) tabEl.classList.add('active');
+  if (screenEl) screenEl.classList.add('active');
+
+  // Scroll content to top
+  const content = document.querySelector('.screen-content');
+  if (content) content.scrollTop = 0;
+
+  // Close any open sheet / dropdown
+  closeSheet();
+  closeDropdown();
+}
+
+// =====================
+// BOTTOM SHEET
+// =====================
+let sheetOpen = false;
+
+function openSheet() {
+  sheetOpen = true;
+  document.getElementById('bottomSheet').classList.add('open');
+  document.getElementById('sheetOverlay').classList.add('open');
+  document.getElementById('fabBtn').classList.add('open');
+}
+
+function closeSheet() {
+  sheetOpen = false;
+  document.getElementById('bottomSheet').classList.remove('open');
+  document.getElementById('sheetOverlay').classList.remove('open');
+  document.getElementById('fabBtn').classList.remove('open');
+}
+
+function toggleSheet() {
+  if (sheetOpen) closeSheet(); else openSheet();
+}
+
+// =====================
+// PROFILE DROPDOWN
+// =====================
+let dropdownOpen = false;
+
+function toggleDropdown() {
+  dropdownOpen = !dropdownOpen;
+  document.getElementById('profileDropdown').classList.toggle('open', dropdownOpen);
+}
+
+function closeDropdown() {
+  dropdownOpen = false;
+  document.getElementById('profileDropdown').classList.remove('open');
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', function(e) {
+  const avatarBtn = document.getElementById('avatarBtn');
+  const dropdown = document.getElementById('profileDropdown');
+  if (dropdownOpen && !avatarBtn.contains(e.target) && !dropdown.contains(e.target)) {
+    closeDropdown();
+  }
+});
+
+// =====================
+// CHART INTERACTION
+// =====================
+const chartData = [
+  { day: 'Mon', val: 312 },
+  { day: 'Tue', val: 448 },
+  { day: 'Wed', val: 395 },
+  { day: 'Thu', val: 612 },
+  { day: 'Fri', val: 520 },
+  { day: 'Sat', val: 489 },
+  { day: 'Sun', val: 476 },
+];
+const tooltip = document.getElementById('chartTooltip');
+const chartArea = document.getElementById('chartArea');
+const circles = document.querySelectorAll('#chartSvg circle');
+
+circles.forEach((c, i) => {
+  c.style.cursor = 'pointer';
+  c.addEventListener('mouseenter', (e) => {
+    const d = chartData[i];
+    const rect = chartArea.getBoundingClientRect();
+    const svgRect = document.getElementById('chartSvg').getBoundingClientRect();
+    const cx = parseFloat(c.getAttribute('cx'));
+    const pct = cx / 340;
+    tooltip.textContent = d.day + ' · ' + d.val + ' clicks';
+    tooltip.style.left = Math.min(Math.max(pct * 100, 5), 70) + '%';
+    tooltip.style.opacity = '1';
+    c.setAttribute('r', '5');
+  });
+  c.addEventListener('mouseleave', () => {
+    tooltip.style.opacity = '0';
+    c.setAttribute('r', i === 4 ? '5' : '3.5');
+  });
+});
+
+// =====================
+// ANIMATED COUNTER
+// =====================
+function animateCounter(el, target, duration) {
+  let start = 0;
+  const increment = target / (duration / 16);
+  const timer = setInterval(() => {
+    start += increment;
+    if (start >= target) { start = target; clearInterval(timer); }
+    el.textContent = Math.round(start).toLocaleString();
+  }, 16);
+}
+
+// Trigger counters when dashboard is visible
+const statNums = document.querySelectorAll('.stat-number');
+const targets = [2847, 1203, 12];
+targets.forEach((t, i) => {
+  if (statNums[i]) animateCounter(statNums[i], t, 1200);
+});
+
+// =====================
+// FILTER CHIP TOGGLE
+// =====================
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', function() {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// =====================
+// LINK ROW HIGHLIGHT
+// =====================
+document.querySelectorAll('.link-row').forEach(row => {
+  row.addEventListener('click', function() {
+    this.style.background = 'rgba(59,130,246,0.08)';
+    setTimeout(() => { this.style.background = ''; }, 300);
+  });
+});
+</script>
+</body>
+</html>
