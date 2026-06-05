@@ -78,6 +78,65 @@ async function hashIp(ip: string): Promise<string> {
     .join(""); // 16 hex chars = 64-bit = negligible collision risk
 }
 
+/* ── Bot / prefetch filter ──────────────────────────────────── */
+
+/**
+ * Returns true for known bots, crawlers, link-preview scrapers, and
+ * monitoring agents. These must not be counted as real user clicks.
+ */
+function isBot(ua: string): boolean {
+  if (!ua) return true; // no UA = headless / scripted
+  const u = ua.toLowerCase();
+  return (
+    // Search crawlers
+    u.includes("googlebot") ||
+    u.includes("bingbot") ||
+    u.includes("slurp") ||          // Yahoo
+    u.includes("duckduckbot") ||
+    u.includes("baiduspider") ||
+    u.includes("yandexbot") ||
+    u.includes("sogou") ||
+    u.includes("exabot") ||
+    u.includes("ia_archiver") ||
+    // SEO / monitoring tools
+    u.includes("ahrefsbot") ||
+    u.includes("semrushbot") ||
+    u.includes("mj12bot") ||
+    u.includes("dotbot") ||
+    u.includes("rogerbot") ||
+    u.includes("uptimerobot") ||
+    u.includes("pingdom") ||
+    u.includes("datadoghq") ||
+    u.includes("newrelic") ||
+    // Social / link-preview bots (THE main culprit for inflated counts)
+    u.includes("facebookexternalhit") ||
+    u.includes("facebot") ||
+    u.includes("twitterbot") ||
+    u.includes("linkedinbot") ||
+    u.includes("slackbot") ||
+    u.includes("discordbot") ||
+    u.includes("telegrambot") ||
+    u.includes("whatsapp") ||
+    u.includes("applebot") ||
+    u.includes("pinterest") ||
+    u.includes("redditbot") ||
+    u.includes("tumblr") ||
+    // Generic headless / scripted
+    u.includes("headlesschrome") ||
+    u.includes("phantomjs") ||
+    u.includes("python-requests") ||
+    u.includes("python-urllib") ||
+    u.includes("axios") ||
+    u.includes("node-fetch") ||
+    u.includes("go-http-client") ||
+    u.includes("java/") ||
+    u.includes("curl/") ||
+    u.includes("wget/") ||
+    // Catchall: contains "bot" or "crawler" or "spider"
+    /\b(bot|crawler|spider|scraper|checker|validator)\b/.test(u)
+  );
+}
+
 /* ── Page ────────────────────────────────────────────────────── */
 
 // Force dynamic — never cache redirect pages
@@ -170,32 +229,50 @@ export default async function DeepLinkPage({
   const source   = detectReferrer(ua, referer);
 
   // Country from Cloudflare header (zero latency when behind CF/Coolify proxy)
-  // Falls back to null if not available — no external API call needed
   const country  = headersList.get("cf-ipcountry") ?? null;
 
   // A/B test variant — randomly assigned 50/50 if ab_test_url is set
   const variant  = record!.abTestUrl ? (Math.random() < 0.5 ? "a" : "b") : null;
   const abDest   = variant === "b" ? record!.abTestUrl! : null;
 
-  // Track click after response — cookie-free client so after() works
-  after(async () => {
-    try {
-      const db = createTrackingClient();
-      const { error } = await db.from("clicks").insert({
-        link_id:  record!.id,
-        device:   platform,
-        os,
-        browser,
-        ip_hash:  ipHash,
-        referrer: source,
-        country,
-        variant,
-      });
-      if (error) console.error("[click-tracking]", error.message);
-    } catch (err) {
-      console.error("[click-tracking]", err);
-    }
-  });
+  // ── Layer 1: Bot / crawler filter ───────────────────────────
+  // ── Layer 2: Prefetch / speculative request filter ───────────
+  const isPrefetch = (
+    headersList.get("purpose")     === "prefetch" ||
+    headersList.get("x-purpose")   === "preview"  ||
+    headersList.get("sec-purpose") === "prefetch"
+  );
+
+  const shouldTrack = !isBot(ua) && !isPrefetch;
+
+  // Track click after response — only for real human clicks
+  // Layer 3 dedup: DB unique index on (link_id, ip_hash, minute) prevents
+  // counting the same IP more than once per 60 seconds at DB level.
+  if (shouldTrack) {
+    after(async () => {
+      try {
+        const db = createTrackingClient();
+        // ignoreDuplicates: true means ON CONFLICT DO NOTHING
+        // The unique index on (link_id, ip_hash, date_trunc('minute', timestamp))
+        // is the DB-level dedup guard — no pre-check query needed.
+        const { error } = await db.from("clicks").insert({
+          link_id:  record!.id,
+          device:   platform,
+          os,
+          browser,
+          ip_hash:  ipHash,
+          referrer: source,
+          country,
+          variant,
+        }, { ignoreDuplicates: true } as any);
+        if (error && error.code !== "23505") { // 23505 = unique_violation (expected)
+          console.error("[click-tracking]", error.message);
+        }
+      } catch (err) {
+        console.error("[click-tracking]", err);
+      }
+    });
+  }
 
   /* ── Destination resolution ──────────────────────────────── */
 

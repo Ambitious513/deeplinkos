@@ -233,8 +233,6 @@ export function AuthModal({
           maxHeight: "90vh",
         }}
       >
-        {/* Bottom sheet handle — visible only on mobile */}
-        <div className="modal-sheet-handle" style={{ marginBottom: 8 }} />
         {/* Close */}
         <button onClick={onClose} style={{
           position: "absolute", top: 14, right: 14, background: "none", border: "none",
