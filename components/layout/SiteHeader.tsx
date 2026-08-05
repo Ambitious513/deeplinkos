@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LogoMark } from "@/components/brand/logo-mark";
 
 const navItems = [
   { label: "Features", href: "/#features" },
@@ -45,7 +46,21 @@ export function SiteHeader({ onLogin, onSignup }: SiteHeaderProps) {
     <>
       <header className="site-header">
         <Link href="/" className="logo" aria-label="DeepLinkOS home">
-          <span className="logo-mark">D</span>
+          <span
+            style={{
+              display: 'grid',
+              width: 36,
+              height: 36,
+              flexShrink: 0,
+              placeItems: 'center',
+              borderRadius: 10,
+              background: 'linear-gradient(135deg, #2563eb, #0ea5e9)',
+              color: '#fff',
+              boxShadow: '0 4px 16px rgba(37, 99, 235, 0.35)',
+            }}
+          >
+            <LogoMark className="size-[22px]" />
+          </span>
           <span className="logo-name">DeepLinkOS</span>
         </Link>
 

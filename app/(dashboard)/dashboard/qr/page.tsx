@@ -1,216 +1,314 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { PageFrame } from "@/components/dashboard/page-frame";
-import { DownloadIcon } from "@/components/dashboard/icons";
+import { useCallback, useEffect, useRef, useState, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+import QRCode from 'qrcode'
+import { Download, QrCode } from 'lucide-react'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { Panel, PanelHeader } from '@/components/dashboard/primitives'
+import { Field, SelectInput, TextInput } from '@/components/dashboard/form'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { mapLinkRecordToDashboardLink, shortUrlForSlug } from '@/lib/dashboard-adapters'
+import type { DeepLink } from '@/lib/dashboard-types'
+import type { LinkRecord } from '@/lib/types'
 
-const FG_PRESETS = [
-  { label: "Charcoal", value: "#11131a" },
-  { label: "Orange", value: "#ef7a22" },
-  { label: "Navy", value: "#1a2744" },
-  { label: "Forest", value: "#1d5c3a" },
-];
+// ─── Presets ──────────────────────────────────────────────────────────────────
 
-/* ── QR block art (SVG grid placeholder) ────────────────────── */
-function QrPreviewSvg({ fg, bg, size }: { fg: string; bg: string; size: number }) {
-  // A static 9x9 QR-like pattern — purely decorative placeholder
-  const PATTERN = [
-    [1,1,1,1,1,1,1,0,1],
-    [1,0,0,0,0,0,1,0,0],
-    [1,0,1,1,1,0,1,0,1],
-    [1,0,1,1,1,0,1,0,0],
-    [1,0,1,1,1,0,1,0,1],
-    [1,0,0,0,0,0,1,0,0],
-    [1,1,1,1,1,1,1,0,1],
-    [0,0,0,0,0,0,0,0,0],
-    [1,0,1,1,0,1,1,0,1],
-  ];
-  const cell = size / 11;
-  const pad = cell;
+const presets = [
+  { name: 'Sunset',   fg: '#ea6a1c', bg: '#ffffff' },
+  { name: 'Forest',   fg: '#168558', bg: '#ffffff' },
+  { name: 'Ink',      fg: '#14171d', bg: '#ffffff' },
+  { name: 'Ocean',    fg: '#2563eb', bg: '#eaf1ff' },
+  { name: 'Inverted', fg: '#ffffff', bg: '#14171d' },
+]
+
+// ─── Real QR canvas preview ───────────────────────────────────────────────────
+
+function QrCanvas({
+  value, fg, bg, canvasRef,
+}: {
+  value: string
+  fg: string
+  bg: string
+  canvasRef: React.RefObject<HTMLCanvasElement | null>
+}) {
+  useEffect(() => {
+    if (!canvasRef.current || !value) return
+    QRCode.toCanvas(canvasRef.current, value, {
+      width: 208,
+      margin: 2,
+      color: { dark: fg, light: bg },
+      errorCorrectionLevel: 'H',
+    }).catch(() => {/* ignore */})
+  }, [value, fg, bg, canvasRef])
+
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      role="img"
+    <canvas
+      ref={canvasRef}
+      className="rounded-xl"
+      style={{ width: 208, height: 208 }}
       aria-label="QR code preview"
-      style={{ display: "block", borderRadius: 8 }}
-    >
-      <rect width={size} height={size} fill={bg} />
-      {PATTERN.map((row, ri) =>
-        row.map((cell_, ci) =>
-          cell_ ? (
-            <rect
-              key={`${ri}-${ci}`}
-              x={pad + ci * cell}
-              y={pad + ri * cell}
-              width={cell - 1}
-              height={cell - 1}
-              rx={2}
-              fill={fg}
-            />
-          ) : null,
-        ),
-      )}
-    </svg>
-  );
+    />
+  )
 }
 
-function DownloadButton({ fg, bg, size }: { fg: string; bg: string; size: number }) {
-  function handleDownload() {
-    // In production: render to canvas and export. Here we export the SVG.
-    const svgEl = document.querySelector("[aria-label='QR code preview']");
-    if (!svgEl) return;
-    const svgData = new XMLSerializer().serializeToString(svgEl);
-    const blob = new Blob([svgData], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `qr-code-${size}px.svg`;
-    a.click();
-    URL.revokeObjectURL(url);
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function QrDesignerPage() {
+  return (
+    <Suspense fallback={<div className="h-96 animate-pulse rounded-2xl bg-muted" />}>
+      <QrDesigner />
+    </Suspense>
+  )
+}
+
+function QrDesigner() {
+  const searchParams  = useSearchParams()
+  const preSlug       = searchParams.get('slug')
+  const [links, setLinks]             = useState<DeepLink[]>([])
+  const [loading, setLoading]         = useState(true)
+  const [linkId, setLinkId]           = useState('')
+  const [destination, setDestination] = useState('')
+  const [fg, setFg]                   = useState('#ea6a1c')
+  const [bg, setBg]                   = useState('#ffffff')
+  const [exportSize, setExportSize]   = useState(512)
+  const [downloading, setDownloading] = useState(false)
+
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  // ── Full short URL (needs https:// so scanners resolve it) ───────────────
+  const qrValue = destination
+    ? destination.startsWith('http')
+      ? destination
+      : `https://${destination}`
+    : ''
+
+  // ── Load real links ──────────────────────────────────────────────────────
+  useEffect(() => {
+    fetch('/api/links', { cache: 'no-store' })
+      .then((r) => { if (!r.ok) throw new Error(); return r.json() })
+      .then((data: { links?: LinkRecord[] }) => {
+        const live = (data.links || []).map((l) => mapLinkRecordToDashboardLink(l, 0))
+        if (live.length) {
+          setLinks(live)
+          // Pre-select the slug from URL param, or default to first link
+          const target = preSlug
+            ? (live.find((l) => l.slug === preSlug) ?? live[0])
+            : live[0]
+          setLinkId(target.id)
+          setDestination(shortUrlForSlug(target.slug))
+        }
+      })
+      .catch(() => { /* leave empty */ })
+      .finally(() => setLoading(false))
+  }, [])
+
+  const handleLinkChange = (id: string) => {
+    setLinkId(id)
+    const found = links.find((l) => l.id === id)
+    if (found) setDestination(shortUrlForSlug(found.slug))
   }
 
+  // ── Download: re-render at full export size, then save PNG ──────────────
+  const downloadPng = useCallback(async () => {
+    if (!qrValue) return
+    setDownloading(true)
+    try {
+      const dataUrl = await QRCode.toDataURL(qrValue, {
+        width: exportSize,
+        margin: 2,
+        color: { dark: fg, light: bg },
+        errorCorrectionLevel: 'H',
+        type: 'image/png',
+      })
+      const a    = document.createElement('a')
+      a.href     = dataUrl
+      a.download = `qr-${destination.replace(/[^a-z0-9]/gi, '-')}.png`
+      a.click()
+    } catch (err) {
+      console.error('QR export failed', err)
+    } finally {
+      setDownloading(false)
+    }
+  }, [qrValue, exportSize, fg, bg, destination])
+
+  const noLinks = !loading && links.length === 0
+
   return (
-    <button
-      type="button"
-      className="btn btn-primary"
-      onClick={handleDownload}
-      id="qr-download"
-      data-testid="qr-download"
-      aria-label="Download QR code as PNG"
-    >
-      <DownloadIcon />
-      Download PNG
-    </button>
-  );
-}
+    <div className="grid gap-6">
+      <PageHeader
+        eyebrow="Design"
+        title="QR Designer"
+        description="Generate scannable, branded QR codes for any smart link and export print-ready PNGs."
+      />
 
-export default function QrPage() {
-  const [fg, setFg] = useState(FG_PRESETS[0].value);
-  const [bg, setBg] = useState("#ffffff");
-  const [size, setSize] = useState(256);
-  const [selectedLink, setSelectedLink] = useState("");
-
-  return (
-    <PageFrame
-      eyebrow="Dashboard"
-      title="QR Designer"
-      description="Generate a branded QR code for any smart link. Choose colors, size, and export."
-    >
-      <div className="qr-layout">
-        {/* Preview panel */}
-        <div className="qr-preview-frame panel">
-          <div className="qr-svg-block" style={{ width: Math.min(size, 240), height: Math.min(size, 240) }}>
-            <QrPreviewSvg fg={fg} bg={bg} size={Math.min(size, 240)} />
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,360px)_1fr] lg:items-start">
+        {/* ── Preview panel ───────────────────────────────────────────── */}
+        <Panel className="flex flex-col items-center gap-4 p-6">
+          <div className="grid w-full place-items-center rounded-2xl border border-dashed border-border bg-muted/40 py-8">
+            {loading ? (
+              <div className="grid h-[208px] w-[208px] animate-pulse place-items-center rounded-xl bg-muted">
+                <QrCode className="size-16 text-muted-foreground/30" />
+              </div>
+            ) : noLinks ? (
+              <div className="grid h-[208px] w-[208px] place-items-center gap-2 rounded-xl border border-border bg-background/60 text-center">
+                <QrCode className="size-10 text-muted-foreground/40" />
+                <p className="max-w-[140px] text-xs text-muted-foreground">
+                  Create a smart link first to generate a QR code.
+                </p>
+              </div>
+            ) : (
+              <QrCanvas
+                value={qrValue}
+                fg={fg}
+                bg={bg}
+                canvasRef={canvasRef}
+              />
+            )}
           </div>
 
-          <div style={{ textAlign: "center" }}>
-            <p style={{ margin: "0 0 4px", fontWeight: 700, fontSize: "0.92rem" }}>
-              {selectedLink ? selectedLink : "No link selected"}
+          <div className="w-full text-center">
+            <p className="truncate text-sm font-semibold">
+              {loading ? 'Loading…' : qrValue || 'No link selected'}
             </p>
-            <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--text-soft)" }}>
-              {size}×{size}px · {fg} on {bg}
-            </p>
-          </div>
-
-          {/* Single Download PNG action — only here, not in topbar */}
-          <DownloadButton fg={fg} bg={bg} size={size} />
-        </div>
-
-        {/* Controls panel */}
-        <div className="qr-controls panel">
-          <div className="form-field">
-            <label className="form-label" htmlFor="qr-link-select">Smart link</label>
-            <select
-              id="qr-link-select"
-              className="form-input"
-              value={selectedLink}
-              onChange={(e) => setSelectedLink(e.target.value)}
-            >
-              <option value="">— Select a link —</option>
-              <option value="go.dlos.io/amazon">go.dlos.io/amazon</option>
-              <option value="go.dlos.io/summer">go.dlos.io/summer</option>
-              <option value="go.dlos.io/affiliate">go.dlos.io/affiliate</option>
-            </select>
-            <p style={{ fontSize: "0.78rem", color: "var(--text-soft)", margin: "4px 0 0" }}>
-              Your live smart links will appear here once connected.
+            <p className="text-xs text-muted-foreground">
+              {exportSize} × {exportSize}px • PNG • Error correction: High
             </p>
           </div>
 
-          <div className="form-field">
-            <span className="form-label">Foreground color</span>
-            <div className="qr-color-swatches">
-              {FG_PRESETS.map((preset) => (
-                <button
-                  key={preset.value}
-                  type="button"
-                  className={`qr-color-swatch${fg === preset.value ? " is-selected" : ""}`}
-                  style={{ background: preset.value }}
-                  onClick={() => setFg(preset.value)}
-                  aria-label={`Set foreground to ${preset.label}`}
-                  title={preset.label}
+          <Button
+            className="h-11 w-full rounded-xl"
+            onClick={downloadPng}
+            disabled={loading || noLinks || !qrValue || downloading}
+          >
+            <Download className="size-4" />
+            {downloading ? 'Exporting…' : 'Download PNG'}
+          </Button>
+        </Panel>
+
+        {/* ── Controls panel ──────────────────────────────────────────── */}
+        <Panel className="p-6">
+          <PanelHeader title="Customize" subtitle="Link, destination, colors and export size" />
+          <div className="mt-5 grid gap-5">
+
+            {/* Link selector + custom destination */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Smart link">
+                {loading ? (
+                  <div className="h-10 animate-pulse rounded-xl bg-muted" />
+                ) : noLinks ? (
+                  <div className="flex h-10 items-center rounded-xl border border-border px-3 text-sm text-muted-foreground">
+                    No links yet
+                  </div>
+                ) : (
+                  <SelectInput value={linkId} onChange={(e) => handleLinkChange(e.target.value)}>
+                    {links.map((l) => (
+                      <option key={l.id} value={l.id}>{l.title}</option>
+                    ))}
+                  </SelectInput>
+                )}
+              </Field>
+
+              <Field label="Custom URL">
+                <TextInput
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                  placeholder="deeplinkos.com/my-link"
+                  disabled={loading}
                 />
-              ))}
-              <input
-                type="color"
-                value={fg}
-                onChange={(e) => setFg(e.target.value)}
-                title="Custom foreground color"
-                aria-label="Custom foreground color"
-                style={{ width: 34, height: 34, padding: 2, borderRadius: 10, border: "1px solid var(--border)", cursor: "pointer" }}
-              />
+              </Field>
             </div>
-          </div>
 
-          <div className="form-field">
-            <label className="form-label" htmlFor="qr-bg-color">Background color</label>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <input
-                id="qr-bg-color"
-                type="color"
-                value={bg}
-                onChange={(e) => setBg(e.target.value)}
-                style={{ width: 40, height: 40, padding: 2, borderRadius: 10, border: "1px solid var(--border)", cursor: "pointer" }}
-                aria-label="Background color picker"
-              />
-              <input
-                className="form-input"
-                style={{ flex: 1 }}
-                value={bg}
-                onChange={(e) => setBg(e.target.value)}
-                placeholder="#ffffff"
-                maxLength={7}
-                aria-label="Background hex color"
-              />
+            {/* Color presets */}
+            <div className="grid gap-2">
+              <span className="text-sm font-semibold">Color presets</span>
+              <div className="flex flex-wrap gap-2">
+                {presets.map((p) => {
+                  const active = p.fg === fg && p.bg === bg
+                  return (
+                    <button
+                      key={p.name}
+                      type="button"
+                      onClick={() => { setFg(p.fg); setBg(p.bg) }}
+                      aria-pressed={active}
+                      className={cn(
+                        'flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors',
+                        active
+                          ? 'border-brand bg-brand/10 text-brand'
+                          : 'border-border hover:bg-muted',
+                      )}
+                    >
+                      <span
+                        className="size-4 rounded-full border border-border"
+                        style={{ background: p.fg }}
+                      />
+                      {p.name}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
-          </div>
 
-          <div className="form-field">
-            <label className="form-label" htmlFor="qr-size-slider">
-              Size — {size}px
-            </label>
-            <input
-              id="qr-size-slider"
-              type="range"
-              min={128}
-              max={512}
-              step={32}
-              value={size}
-              onChange={(e) => setSize(Number(e.target.value))}
-              className="qr-size-slider"
-              aria-label={`QR code size: ${size}px`}
-            />
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.74rem", color: "var(--text-soft)" }}>
-              <span>128px</span><span>512px</span>
+            {/* Color pickers */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Foreground (dark modules)">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={fg}
+                    onChange={(e) => setFg(e.target.value)}
+                    aria-label="Foreground color"
+                    className="size-10 shrink-0 cursor-pointer rounded-lg border border-border bg-transparent"
+                  />
+                  <TextInput value={fg} onChange={(e) => setFg(e.target.value)} />
+                </div>
+              </Field>
+              <Field label="Background (light modules)">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={bg}
+                    onChange={(e) => setBg(e.target.value)}
+                    aria-label="Background color"
+                    className="size-10 shrink-0 cursor-pointer rounded-lg border border-border bg-transparent"
+                  />
+                  <TextInput value={bg} onChange={(e) => setBg(e.target.value)} />
+                </div>
+              </Field>
             </div>
-          </div>
 
-          <div style={{ padding: "12px 14px", borderRadius: 14, background: "rgba(44,107,237,0.08)", border: "1px solid rgba(44,107,237,0.18)", fontSize: "0.82rem", color: "var(--blue)", lineHeight: 1.55 }}>
-            <strong>Note:</strong> Downloading exports as SVG in this preview. PNG export requires a canvas-based library wired to your live data.
+            {/* Export size slider */}
+            <Field label={`Export size — ${exportSize}px`}>
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min={256}
+                  max={1024}
+                  step={64}
+                  value={exportSize}
+                  onChange={(e) => setExportSize(Number(e.target.value))}
+                  className="w-full accent-brand"
+                  aria-label="QR export size"
+                />
+                <span className="w-16 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+                  {exportSize}px
+                </span>
+              </div>
+              <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+                <span>256 (web)</span>
+                <span>640 (social)</span>
+                <span>1024 (print)</span>
+              </div>
+            </Field>
+
+            {/* Info note */}
+            <p className="rounded-xl border border-border bg-muted/40 px-3 py-2.5 text-xs text-muted-foreground">
+              <span className="font-semibold text-foreground">Error correction: High (30%)</span> — QR codes remain scannable even if up to 30% of the image is obscured or damaged, ideal for printed materials.
+            </p>
           </div>
-        </div>
+        </Panel>
       </div>
-    </PageFrame>
-  );
+    </div>
+  )
 }

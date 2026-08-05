@@ -83,6 +83,7 @@ async function toInsert(input: CreateLinkInput, userId: string): Promise<LinkIns
 
   return {
     user_id: userId,
+    domain_id: merged.domainId ?? null,
     slug,
     title: merged.title?.trim() || "Custom smart link",
     description: merged.description ?? null,
@@ -195,6 +196,32 @@ export async function listLinksForUser(userId: string) {
   return data.map(mapToLinkRecord);
 }
 
+/**
+ * Returns a map of { linkId → clickCount } for the given link IDs.
+ * Filters out bot and prefetch traffic. Single DB round-trip.
+ */
+export async function getClickCountsForLinks(
+  linkIds: string[]
+): Promise<Record<string, number>> {
+  if (linkIds.length === 0) return {};
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("clicks")
+    .select("link_id")
+    .in("link_id", linkIds)
+    .eq("is_bot", false)
+    .eq("is_prefetch", false);
+
+  if (!data) return {};
+
+  return data.reduce<Record<string, number>>((acc, row) => {
+    const id = row.link_id as string;
+    acc[id] = (acc[id] ?? 0) + 1;
+    return acc;
+  }, {});
+}
+
 export async function findOwnedLinkBySlug(slug: string, userId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -209,8 +236,17 @@ export async function findOwnedLinkBySlug(slug: string, userId: string) {
 }
 
 function isDefaultAppHost(hostname: string) {
-  return !hostname || hostname === "localhost" || hostname === "127.0.0.1" || hostname === "deeplinkos.com" || hostname === "www.deeplinkos.com" || hostname.endsWith(".deeplinkos.com");
+  const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || "deeplinkos.com";
+  return (
+    !hostname ||
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === appDomain ||
+    hostname === `www.${appDomain}` ||
+    hostname.endsWith(`.${appDomain}`)
+  );
 }
+
 
 export async function findActiveLinkForRedirect(slug: string, hostname = "") {
   const supabase = await createClient();

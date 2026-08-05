@@ -140,6 +140,7 @@ export type CreateLinkInput = {
   utmTerm?: string;
   utmContent?: string;
   tags?: string[];
+  domainId?: string | null;
 };
 
 export type UpdateLinkInput = Partial<CreateLinkInput> & {

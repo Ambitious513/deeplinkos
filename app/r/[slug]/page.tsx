@@ -6,7 +6,15 @@ import { hashIp, verifyPassword } from "@/lib/crypto";
 import { findActiveLinkForRedirect } from "@/lib/links";
 import { detectPlatform, isInAppWebView, resolveDestination } from "@/lib/routing";
 import { createTrackingClient } from "@/lib/supabase/tracking";
-import { detectBrowser, detectOS, detectReferrer, deviceLabel, isBot, isPrefetch } from "@/lib/request-insights";
+import {
+  detectBrowser,
+  detectOS,
+  detectReferrer,
+  deviceLabel,
+  isBot,
+  isPrefetch,
+  detectIABSource,
+} from "@/lib/request-insights";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +70,18 @@ function pickVariant(abTestUrl: string | null, abTestWeight: number): { variant:
 function minuteBucket(date = new Date()) {
   date.setSeconds(0, 0);
   return date.toISOString();
+}
+
+/** Converts https://... to x-safari-https://... for iOS IAB escape-to-Safari trick */
+function toSafariEscape(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === "https:") return `x-safari-https://${parsed.host}${parsed.pathname}${parsed.search}`;
+    if (parsed.protocol === "http:") return `x-safari-http://${parsed.host}${parsed.pathname}${parsed.search}`;
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 function PasswordGate({
@@ -139,6 +159,7 @@ export default async function DeepLinkRedirectPage({
   const userAgent = headersList.get("user-agent") ?? "";
   const platform = detectPlatform(userAgent);
   const referer = headersList.get("referer");
+  const xRequestedWith = headersList.get("x-requested-with");
   const ip = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() || headersList.get("x-real-ip") || "unknown";
   const { variant, variantUrl } = pickVariant(record.abTestUrl, record.abTestWeight);
   const destination = resolveDestination(record, userAgent, variantUrl);
@@ -156,6 +177,13 @@ export default async function DeepLinkRedirectPage({
   const prefetch = isPrefetch(headersList);
   const bot = isBot(userAgent);
 
+  // ── IAB detection ──────────────────────────────────────────────────────────
+  const iabSource = detectIABSource(userAgent);
+  const isIAB = iabSource !== null || isInAppWebView(userAgent, xRequestedWith, referer);
+  const isDeepLink = destination.reason === "deep-link";
+  const isIntentUri = finalDestination.startsWith("intent://");
+
+  // ── Click analytics (non-blocking via after()) ─────────────────────────────
   if (!bot && !prefetch) {
     after(async () => {
       try {
@@ -166,7 +194,9 @@ export default async function DeepLinkRedirectPage({
           variant,
           device: deviceLabel(platform),
           os: detectOS(userAgent),
-          browser: detectBrowser(userAgent),
+          // When in IAB, label the browser as "Instagram IAB", "TikTok IAB" etc.
+          // so the analytics page shows social IAB traffic accurately.
+          browser: iabSource ? `${iabSource} IAB` : detectBrowser(userAgent),
           referrer: detectReferrer(userAgent, referer),
           country: headersList.get("cf-ipcountry"),
           ip_hash: await hashIp(ip),
@@ -188,30 +218,101 @@ export default async function DeepLinkRedirectPage({
     });
   }
 
-  const shouldServeInterstitial =
-    (platform === "ios" || platform === "android") &&
-    destination.reason === "deep-link" &&
-    isInAppWebView(userAgent, headersList.get("x-requested-with"), referer);
-
-  if (!shouldServeInterstitial) {
+  // ── Routing decision tree ──────────────────────────────────────────────────
+  //
+  //  Case 1: Not in an IAB, or not a deep-link → plain redirect (existing behaviour)
+  //  Case 2: Android IAB + intent:// URI      → direct 302, Android OS handles it → ZERO page shown
+  //  Case 3: iOS IAB (or Android without intent://) → serve interstitial with JS escape sequence
+  //
+  // Case 1 — plain redirect
+  if (!isIAB || !isDeepLink) {
     redirect(finalDestination);
   }
 
-  const fallback = appendUtm(record.iosStoreUrl || record.androidStoreUrl || record.fallbackUrl || record.desktopUrl || record.destinationUrl || finalDestination, storedUtm, incomingUtm);
-  const inlineScript = `(function(){var target=${JSON.stringify(finalDestination)};var fallback=${JSON.stringify(fallback)};var started=Date.now();window.location.href=target;setTimeout(function(){if(document.hidden||document.webkitHidden)return;if(Date.now()-started<1600)return;window.location.replace(fallback);},1800);}());`;
+  // Case 2 — Android + intent URI: pure OS-level redirect, no page rendered at all
+  // The Android OS intercepts intent:// before the browser can display anything.
+  // S.browser_fallback_url in the intent string handles the "app not installed" case.
+  if (platform === "android" && isIntentUri) {
+    redirect(finalDestination);
+  }
+
+  // Case 3 — interstitial for iOS IABs (and Android with custom scheme deep links)
+  const fallback = appendUtm(
+    record.iosStoreUrl || record.androidStoreUrl || record.fallbackUrl || record.desktopUrl || record.destinationUrl || finalDestination,
+    storedUtm,
+    incomingUtm,
+  );
+
+  // For iOS: after failing to open the app, try escaping the WebView into Safari
+  // using the x-safari-https:// scheme. Safari processes Universal Links, so the
+  // app can still open from there. URLgenius uses this same technique.
+  const safariEscape = platform === "ios" ? toSafariEscape(fallback) : null;
+
+  // Inline script fires synchronously before any pixels render.
+  // Timeline: script executes → tries deep link → 1200ms timeout:
+  //   • if document.hidden → app opened, stop (user is in the app)
+  //   • iOS: try Safari escape first (Universal Links), then web fallback
+  //   • Android: go straight to web fallback
+  const inlineScript = `(function(){
+  var target=${JSON.stringify(finalDestination)};
+  var fallback=${JSON.stringify(fallback)};
+  var safari=${JSON.stringify(safariEscape)};
+  var isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+  var started=Date.now();
+  window.location.href=target;
+  setTimeout(function(){
+    if(document.hidden||document.webkitHidden)return;
+    if(Date.now()-started<1100)return;
+    if(isIOS&&safari){
+      window.location.href=safari;
+      setTimeout(function(){
+        if(document.hidden||document.webkitHidden)return;
+        window.location.replace(fallback);
+      },500);
+    }else{
+      window.location.replace(fallback);
+    }
+  },1200);
+}());`;
 
   return (
     <>
+      {/* Script runs before body renders — effectively invisible when app opens */}
       <script dangerouslySetInnerHTML={{ __html: inlineScript }} />
       <main className="section">
-        <div className="card" style={{ maxWidth: 560, margin: "12vh auto 0", textAlign: "center" }}>
+        <div
+          className="card"
+          style={{
+            maxWidth: 480,
+            margin: "14vh auto 0",
+            textAlign: "center",
+            display: "grid",
+            gap: 16,
+          }}
+        >
+          {/* Pulsing brand indicator */}
+          <span
+            aria-hidden="true"
+            style={{
+              display: "block",
+              width: 48,
+              height: 48,
+              borderRadius: "50%",
+              background: "var(--accent, #ea6a1c)",
+              margin: "0 auto",
+              animation: "pulse 1.4s ease-in-out infinite",
+            }}
+          />
+          <style>{`@keyframes pulse{0%,100%{opacity:.9;transform:scale(1)}50%{opacity:.45;transform:scale(.88)}}`}</style>
           <div className="eyebrow">Opening link</div>
-          <h1 className="dashboard-page__title" style={{ fontSize: "clamp(2.25rem, 7vw, 4rem)" }}>
+          <h1 className="dashboard-page__title" style={{ fontSize: "clamp(1.75rem, 5vw, 2.75rem)", margin: 0 }}>
             {record.title}
           </h1>
-          <p className="dashboard-page__summary">If the app does not open automatically, continue with the fallback link.</p>
-          <a className="button button--primary" href={fallback} style={{ marginTop: 18 }}>
-            Continue
+          <p className="dashboard-page__summary" style={{ margin: 0 }}>
+            Taking you there now. If nothing happens, tap below.
+          </p>
+          <a className="button button--primary" href={fallback} style={{ marginTop: 8 }}>
+            Continue →
           </a>
         </div>
       </main>

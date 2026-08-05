@@ -1,153 +1,222 @@
+/**
+ * content/pricing.ts
+ *
+ * Single source of truth for public pricing page content.
+ * Prices and features are kept in sync with lib/polar.ts.
+ * When updating pricing, update lib/polar.ts first, then mirror here.
+ */
+
+// ─── Plan cards ───────────────────────────────────────────────────────────────
+
 export type PricingPlan = {
+  id: string;
   name: string;
-  monthlyPrice: string;
-  annualPrice: string;
+  price: string;
   suffix: string;
-  description: string;
+  tagline: string;
   cta: string;
+  href: string;
   highlighted?: boolean;
   badge?: string;
+  isOneTime?: boolean;
   features: Array<{ label: string; highlighted?: boolean }>;
-};
-
-export type ComparisonGroup = {
-  title: string;
-  rows: Array<{
-    feature: string;
-    free: string | boolean;
-    pro: string | boolean;
-    growth: string | boolean;
-  }>;
 };
 
 export const pricingPlans: PricingPlan[] = [
   {
-    name: "Indie / Free",
-    monthlyPrice: "$0",
-    annualPrice: "$0",
-    suffix: "/mo",
-    description: "The perfect start to see how smart links increase your conversions.",
-    cta: "Start for free",
+    id: "creator_trial",
+    name: "Creator",
+    price: "Free",
+    suffix: "",
+    tagline: "No credit card needed — start routing in 60 seconds.",
+    cta: "Start free",
+    href: "/signup",
     features: [
-      { label: "10,000 Lifetime Clicks", highlighted: true },
-      { label: "Natively opens iOS & Android apps" },
-      { label: "8+ platform auto-detection" },
-      { label: "30-day analytics history" },
-      { label: "Standard dlnk.os domain" },
-      { label: "Dynamic QR code generator" },
+      { label: "3 smart links (free trial)", highlighted: true },
+      { label: "50,000 clicks / month" },
+      { label: "1 custom domain" },
+      { label: "Smart IAB routing (iOS & Android)" },
+      { label: "QR code generator" },
+      { label: "Basic analytics" },
       { label: "PII-free privacy protection" },
     ],
   },
   {
-    name: "Pro",
-    monthlyPrice: "$14.99",
-    annualPrice: "$12",
+    id: "creator",
+    name: "Creator",
+    price: "$29",
     suffix: "/mo",
-    description: "For creators and sellers who need predictable routing and custom branding.",
-    cta: "Get Pro",
-    highlighted: true,
-    badge: "Best Deal",
+    tagline: "For content creators & influencers who want full control.",
+    cta: "Start 30-day free trial",
+    href: "/signup?plan=creator",
     features: [
-      { label: "Unlimited Clicks", highlighted: true },
-      { label: "Custom Branded Domains", highlighted: true },
-      { label: "Remove DeepLinkOS branding" },
-      { label: "1-year analytics history" },
-      { label: "Bot filtering & click fraud prevention" },
-      { label: "UTM campaign builder & tagging" },
-      { label: "Custom fallback URLs" },
+      { label: "250 smart links", highlighted: true },
+      { label: "50,000 clicks / month" },
+      { label: "3 custom domains" },
+      { label: "Smart IAB routing" },
+      { label: "Advanced analytics" },
       { label: "Password-protected links" },
-      { label: "Priority support" },
+      { label: "Link expiration" },
+      { label: "UTM builder" },
+      { label: "QR code generator" },
     ],
   },
   {
-    name: "Growth",
-    monthlyPrice: "$59",
-    annualPrice: "$49",
+    id: "scale",
+    name: "Scale",
+    price: "$79",
     suffix: "/mo",
-    description: "For teams and agencies running large-scale campaigns across multiple clients.",
-    cta: "Start Growth Trial",
+    tagline: "For growing brands & marketing teams.",
+    cta: "Start 30-day free trial",
+    href: "/signup?plan=scale",
+    highlighted: true,
+    badge: "Most Popular",
     features: [
-      { label: "Everything in Pro" },
-      { label: "Deep Attribution Tracking", highlighted: true },
-      { label: "Multiple branded domains" },
-      { label: "API Access & Webhooks" },
-      { label: "5 Team Seats included" },
-      { label: "Unlimited analytics history" },
-      { label: "Dedicated growth advisor" },
+      { label: "1,000 smart links", highlighted: true },
+      { label: "500,000 clicks / month", highlighted: true },
+      { label: "10 custom domains" },
+      { label: "Everything in Creator" },
+      { label: "A/B split testing" },
+      { label: "Pixel integrations (Meta, TikTok, GA4)" },
+      { label: "Priority support" },
+      { label: "Team members (coming soon)" },
+    ],
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    price: "$199",
+    suffix: "/mo",
+    tagline: "Unlimited power for agencies & large teams.",
+    cta: "Start 30-day free trial",
+    href: "/signup?plan=enterprise",
+    features: [
+      { label: "Unlimited smart links", highlighted: true },
+      { label: "Unlimited clicks", highlighted: true },
+      { label: "25 custom domains" },
+      { label: "Everything in Scale" },
+      { label: "White-label reports" },
+      { label: "Dedicated account manager" },
+      { label: "Custom integrations" },
+      { label: "SLA uptime guarantee" },
+    ],
+  },
+  {
+    id: "lifetime",
+    name: "Lifetime",
+    price: "$799",
+    suffix: "",
+    tagline: "Pay once. Yours forever. Limited to 500 founding seats.",
+    cta: "Claim lifetime access",
+    href: "/signup?plan=lifetime",
+    isOneTime: true,
+    badge: "Limited — 500 seats",
+    features: [
+      { label: "Unlimited smart links — forever", highlighted: true },
+      { label: "Unlimited clicks — forever", highlighted: true },
+      { label: "15 custom domains" },
+      { label: "Everything in Scale" },
+      { label: "All future updates included" },
+      { label: "No recurring payments — ever", highlighted: true },
+      { label: "Priority support for life" },
+      { label: "Founding member badge" },
     ],
   },
 ];
+
+// ─── Feature comparison table ─────────────────────────────────────────────────
+
+export type ComparisonRow = {
+  feature: string;
+  trial: string | boolean;
+  creator: string | boolean;
+  scale: string | boolean;
+  enterprise: string | boolean;
+};
+
+export type ComparisonGroup = {
+  title: string;
+  rows: ComparisonRow[];
+};
 
 export const comparisonGroups: ComparisonGroup[] = [
   {
-    title: "Core Routing & Links",
+    title: "Links & Routing",
     rows: [
-      { feature: "10,000 lifetime clicks included", free: true, pro: true, growth: true },
-      { feature: "Unlimited clicks after free tier", free: false, pro: true, growth: true },
-      { feature: "Deep link into iOS & Android apps natively", free: true, pro: true, growth: true },
-      { feature: "8+ platform auto-detection", free: true, pro: true, growth: true },
-      { feature: "Safe web fallback when app is not installed", free: true, pro: true, growth: true },
-      { feature: "Custom fallback URLs & App Store routing", free: false, pro: true, growth: true },
-      { feature: "Link expiry & scheduling", free: false, pro: true, growth: true },
-      { feature: "Password-protected links", free: false, pro: true, growth: true },
+      { feature: "Smart links",                          trial: "3 (trial)",  creator: "250",       scale: "1,000",     enterprise: "Unlimited" },
+      { feature: "Monthly clicks",                       trial: "50,000",     creator: "50,000",    scale: "500,000",   enterprise: "Unlimited" },
+      { feature: "iOS & Android deep linking",           trial: true,         creator: true,         scale: true,       enterprise: true },
+      { feature: "Smart IAB routing (no page flash)",    trial: true,         creator: true,         scale: true,       enterprise: true },
+      { feature: "App Store / Play Store fallback",      trial: true,         creator: true,         scale: true,       enterprise: true },
+      { feature: "Auto app-scheme detection",            trial: true,         creator: true,         scale: true,       enterprise: true },
+      { feature: "Link expiration & scheduling",         trial: false,        creator: true,         scale: true,       enterprise: true },
+      { feature: "Password-protected links",             trial: false,        creator: true,         scale: true,       enterprise: true },
+      { feature: "A/B split testing",                   trial: false,        creator: false,        scale: true,       enterprise: true },
     ],
   },
   {
-    title: "Brand & Customization",
+    title: "Branding & Domains",
     rows: [
-      { feature: "Standard shortlink (dlnk.os)", free: true, pro: true, growth: true },
-      { feature: "Dynamic QR Code Generator", free: true, pro: true, growth: true },
-      { feature: "Remove DeepLinkOS branding", free: false, pro: true, growth: true },
-      { feature: "Custom branded domain (yourbrand.com)", free: false, pro: true, growth: true },
-      { feature: "Multiple branded domains", free: false, pro: false, growth: true },
+      { feature: "Custom domains",                       trial: "1",          creator: "3",          scale: "10",       enterprise: "25" },
+      { feature: "QR code generator",                   trial: true,         creator: true,          scale: true,       enterprise: true },
+      { feature: "UTM campaign builder",                 trial: false,        creator: true,          scale: true,       enterprise: true },
     ],
   },
   {
-    title: "Analytics, Privacy & Security",
+    title: "Analytics & Privacy",
     rows: [
-      { feature: "PII-free privacy protection", free: true, pro: true, growth: true },
-      { feature: "Click analytics & referrer tracking", free: "30 Days", pro: "1 Year", growth: "Unlimited" },
-      { feature: "Bot filtering & click fraud prevention", free: false, pro: true, growth: true },
-      { feature: "UTM campaign builder & tagging", free: false, pro: true, growth: true },
-      { feature: "Deep attribution (install tracking)", free: false, pro: false, growth: true },
+      { feature: "PII-free IP anonymization",            trial: true,         creator: true,          scale: true,       enterprise: true },
+      { feature: "Bot & prefetch filtering",             trial: true,         creator: true,          scale: true,       enterprise: true },
+      { feature: "Device, browser & country analytics",  trial: true,         creator: true,          scale: true,       enterprise: true },
+      { feature: "Referrer & UTM attribution",           trial: true,         creator: true,          scale: true,       enterprise: true },
+      { feature: "Pixel integrations (Meta, TikTok)",   trial: false,        creator: false,         scale: true,       enterprise: true },
+      { feature: "White-label reports",                  trial: false,        creator: false,         scale: false,      enterprise: true },
     ],
   },
   {
-    title: "Support & Scale",
+    title: "Support & Team",
     rows: [
-      { feature: "Community support", free: true, pro: true, growth: true },
-      { feature: "Priority email support", free: false, pro: true, growth: true },
-      { feature: "API access & webhooks", free: false, pro: false, growth: true },
-      { feature: "Team seats", free: "1", pro: "1", growth: "5 Included" },
-      { feature: "Dedicated growth advisor", free: false, pro: false, growth: true },
+      { feature: "Community support",                    trial: true,         creator: true,          scale: true,       enterprise: true },
+      { feature: "Priority support",                     trial: false,        creator: false,         scale: true,       enterprise: true },
+      { feature: "Dedicated account manager",            trial: false,        creator: false,         scale: false,      enterprise: true },
+      { feature: "Team members",                         trial: "1",          creator: "1",           scale: "Coming soon", enterprise: "Unlimited" },
+      { feature: "Custom integrations",                  trial: false,        creator: false,         scale: false,      enterprise: true },
+      { feature: "SLA uptime guarantee",                 trial: false,        creator: false,         scale: false,      enterprise: true },
     ],
   },
 ];
 
+// ─── FAQ ──────────────────────────────────────────────────────────────────────
+
 export const pricingFaqs = [
   {
-    question: "What happens when I hit my 10,000 free clicks?",
+    question: "Do I need a credit card to start?",
     answer:
-      "Unlike competitors, we will never break your active links if a post goes viral. Once you hit the 10,000 lifetime click limit, your links will continue to safely route users, but your analytics dashboard will lock until you upgrade to Pro.",
+      "No. Sign up and create your first 3 smart links completely free — no payment details needed. Every paid plan also includes a 30-day free trial before your card is charged.",
   },
   {
-    question: "Do I need a credit card for the free tier?",
+    question: "What happens to my links if I cancel?",
     answer:
-      "No. You can sign up, create links, and route up to 10,000 clicks completely free without entering a credit card.",
+      "Your links never break. They continue to route visitors to the fallback URL indefinitely. Dashboard access and analytics revert to the free trial limits.",
   },
   {
-    question: 'What does "Unlimited Clicks" on Pro actually mean?',
+    question: "Do you charge per click like URLgenius?",
     answer:
-      "We do not charge per click like URLGenius. Your Pro subscription covers unlimited standard usage, subject to a 2 million clicks per month fair-use limit to prevent enterprise API abuse at consumer pricing.",
+      "Never. We charge flat monthly rates regardless of click volume. Whether your post gets 100 clicks or 500,000, your plan price never changes.",
   },
   {
-    question: "Can I connect my own domain name?",
+    question: "What is the Lifetime plan?",
     answer:
-      "Yes. The Pro tier includes one custom domain. Instead of dlnk.os/r/... you can use link.yourbrand.com/... to maximize trust and click-through rates.",
+      "A one-time payment of $799 gives you Scale-level features forever — no subscription, no monthly bills, all future updates included. Limited to 500 founding members.",
   },
   {
-    question: "Can I switch between monthly and annual billing?",
+    question: "Can I connect my own branded domain?",
     answer:
-      "Absolutely. You can switch at any time from your account settings. Switching to annual applies the 20% discount immediately on your next billing cycle.",
+      "Yes. Creator gets 3 custom domains, Scale gets 10, Enterprise gets 25. Your links become go.yourbrand.com/... instead of deeplinkos.com/r/... for maximum trust.",
+  },
+  {
+    question: "What is Smart IAB routing?",
+    answer:
+      "When someone clicks your link inside Instagram, TikTok, or another in-app browser, our system automatically redirects them directly to the native app (YouTube, Spotify, etc.) using intent:// URIs on Android and URI schemes on iOS — no visible interstitial page.",
   },
 ];

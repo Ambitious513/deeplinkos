@@ -16,6 +16,7 @@ import {
 
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { LogoMark } from "@/components/brand/logo-mark";
 import type { AuthProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/client";
 
@@ -284,6 +285,7 @@ function AuthModal({
   const [submittingProfile, setSubmittingProfile] = useState(false);
   const [submittingEmail, setSubmittingEmail] = useState(false);
   const [emailNotice, setEmailNotice] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const copy = modalCopy[modal.intent];
   const showProfileStep = Boolean(authState.user && !authState.onboarded);
   const isLogin = modal.intent === "login";
@@ -326,10 +328,10 @@ function AuthModal({
         type: "standard",
         theme: "outline",
         size: "large",
-        shape: "pill",
+        shape: "rectangular",
         text: modal.intent === "login" ? "signin_with" : "signup_with",
-        logo_alignment: "left",
-        width: 320,
+        logo_alignment: "center",
+        width: 400,
       });
     });
   }, [googleClientId, handleGoogleCredential, modal.intent, modal.next, modal.open, modal.pendingUrl, scriptReady, showProfileStep]);
@@ -448,19 +450,112 @@ function AuthModal({
           <CloseIcon />
         </button>
 
+        {/* Left visual panel */}
         <div className="auth-modal-visual" aria-hidden="true">
-          <span className="auth-modal-spark">D</span>
-          <span className="auth-modal-route auth-modal-route--one" />
-          <span className="auth-modal-route auth-modal-route--two" />
+          {/* Decorative arc */}
+          <div className="auth-modal-arc" />
+
+          <div className="auth-modal-brand">
+            <span className="auth-modal-logo-wrap">
+              <LogoMark className="auth-modal-logo-icon" />
+            </span>
+            <span className="auth-modal-logo-name">DeepLink<span>OS</span></span>
+          </div>
+
+          <div className="auth-modal-visual-body">
+            <h3 className="auth-modal-headline">
+              {isLogin ? (
+                <><em>Smarter</em>{" "}routes.<br /><em>Better</em>{" "}outcomes.</>
+              ) : (
+                <><em>Smarter</em>{" "}routing.<br /><em>Better</em>{" "}results.</>
+              )}
+            </h3>
+            <p className="auth-modal-subtitle">
+              DeepLinkOS helps you route every link intelligently&mdash;so you reach the right destination, every time.
+            </p>
+            <ul className="auth-modal-features">
+              <li>
+                <span className="auth-modal-feature-icon"><BoltIcon /></span>
+                <span>
+                  <strong>Smart deep links</strong>
+                  <span>Create and deploy intelligent links instantly.</span>
+                </span>
+              </li>
+              <li>
+                <span className="auth-modal-feature-icon"><BarChartIcon /></span>
+                <span>
+                  <strong>Real-time analytics</strong>
+                  <span>Track performance and optimize in real time.</span>
+                </span>
+              </li>
+              <li>
+                <span className="auth-modal-feature-icon"><GlobeIcon /></span>
+                <span>
+                  <strong>Global routing</strong>
+                  <span>Deliver the right experience everywhere.</span>
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Social proof */}
+          <div className="auth-modal-social-proof">
+            <div className="auth-modal-avatars">
+              <span className="auth-modal-avatar" style={{background:"#7c6fa0"}} />
+              <span className="auth-modal-avatar" style={{background:"#c97b63"}} />
+              <span className="auth-modal-avatar" style={{background:"#5b8c5a"}} />
+            </div>
+            <div>
+              <div className="auth-modal-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+              <p>Trusted by marketers<br />around the world</p>
+            </div>
+          </div>
         </div>
 
+        {/* Right content panel */}
         <div className="auth-modal-content">
-          <span className="auth-modal-kicker">{showProfileStep ? "Almost there" : copy.kicker}</span>
-          <h2 id="auth-modal-title">{showProfileStep ? "Tell us what to call you" : copy.title}</h2>
-          <p>{showProfileStep ? "Your workspace is ready. Add your name so the dashboard feels like yours from the first click." : copy.body}</p>
+          {/* Mobile-only drag handle + brand (left panel hidden on mobile) */}
+          <div className="auth-modal-drag-handle" aria-hidden="true" />
+          <div className="auth-modal-mobile-brand" aria-hidden="true">
+            <span className="auth-modal-logo-wrap">
+              <LogoMark className="auth-modal-logo-icon" />
+            </span>
+            <span className="auth-modal-logo-name">DeepLink<span>OS</span></span>
+          </div>
+
+          {/* Tab switcher */}
+          {!showProfileStep && modal.intent !== "generator" && (
+            <div className="auth-modal-tabs" role="tablist">
+              <button
+                role="tab" type="button" className="auth-modal-tab"
+                data-active={!isLogin ? "true" : "false"}
+                onClick={() => { setError(null); setEmailNotice(null); setModal((c) => ({ ...c, intent: "signup" })); }}
+              >
+                Sign up
+              </button>
+              <button
+                role="tab" type="button" className="auth-modal-tab"
+                data-active={isLogin ? "true" : "false"}
+                onClick={() => { setError(null); setEmailNotice(null); setModal((c) => ({ ...c, intent: "login" })); }}
+              >
+                Log in
+              </button>
+            </div>
+          )}
+
+          {/* Screen-reader label — visually hidden, keeps aria-labelledby working */}
+          <h2 id="auth-modal-title" className="auth-modal-sr-only">
+            {showProfileStep ? "Complete your profile" : isLogin ? "Log in to DeepLinkOS" : "Create your DeepLinkOS account"}
+          </h2>
+
+          {/* Profile step only: show a heading since there's no tab switcher */}
+          {showProfileStep && (
+            <p className="auth-modal-step-heading">Tell us what to call you</p>
+          )}
+
 
           {!authState.configured ? (
-            <p className="auth-modal-alert">Supabase env vars are not configured yet. Add them before testing Google auth.</p>
+            <p className="auth-modal-alert">Supabase env vars are not configured yet.</p>
           ) : !googleClientId && !showProfileStep ? (
             <p className="auth-modal-alert">Add NEXT_PUBLIC_GOOGLE_CLIENT_ID to enable Google sign-in.</p>
           ) : null}
@@ -470,15 +565,17 @@ function AuthModal({
 
           {showProfileStep ? (
             <form className="auth-modal-form" onSubmit={handleProfileSubmit}>
-              <label>
-                First name
-                <input name="first_name" autoComplete="given-name" defaultValue={authState.profile?.first_name ?? ""} required />
+              <label>First name
+                <div className="auth-modal-input-wrap"><PersonIcon />
+                  <input name="first_name" autoComplete="given-name" defaultValue={authState.profile?.first_name ?? ""} placeholder="Dana" required />
+                </div>
               </label>
-              <label>
-                Last name
-                <input name="last_name" autoComplete="family-name" defaultValue={authState.profile?.last_name ?? ""} required />
+              <label>Last name
+                <div className="auth-modal-input-wrap"><PersonIcon />
+                  <input name="last_name" autoComplete="family-name" defaultValue={authState.profile?.last_name ?? ""} placeholder="Lee" required />
+                </div>
               </label>
-              <button className="btn btn-primary auth-modal-submit" type="submit" disabled={submittingProfile}>
+              <button className="auth-modal-submit" type="submit" disabled={submittingProfile}>
                 {submittingProfile ? "Preparing your dashboard..." : "Continue to dashboard"}
               </button>
             </form>
@@ -487,57 +584,86 @@ function AuthModal({
               <form className="auth-modal-form" onSubmit={handleEmailSubmit}>
                 {!isLogin ? (
                   <div className="auth-modal-name-row">
-                    <label>
-                      First name
-                      <input name="first_name" autoComplete="given-name" placeholder="Dana" required />
+                    <label>First name
+                      <div className="auth-modal-input-wrap"><PersonIcon />
+                        <input name="first_name" autoComplete="given-name" placeholder="Dana" required />
+                      </div>
                     </label>
-                    <label>
-                      Last name
-                      <input name="last_name" autoComplete="family-name" placeholder="Lee" required />
+                    <label>Last name
+                      <div className="auth-modal-input-wrap"><PersonIcon />
+                        <input name="last_name" autoComplete="family-name" placeholder="Lee" required />
+                      </div>
                     </label>
                   </div>
                 ) : null}
-                <label>
-                  Email
-                  <input name="email" type="email" autoComplete="email" placeholder="you@example.com" required />
+                <label>Email address
+                  <div className="auth-modal-input-wrap"><MailIcon />
+                    <input name="email" type="email" autoComplete="email" placeholder="you@example.com" required />
+                  </div>
                 </label>
                 <label>
-                  Password
-                  <input
-                    name="password"
-                    type="password"
-                    autoComplete={isLogin ? "current-password" : "new-password"}
-                    minLength={8}
-                    placeholder={isLogin ? "Enter your password" : "Create a password"}
-                    required
-                  />
+                  <div className="auth-modal-pw-header">
+                    <span>Password</span>
+                    {isLogin && <button type="button" className="auth-modal-forgot">Forgot your password?</button>}
+                  </div>
+                  <div className="auth-modal-input-wrap"><LockIcon />
+                    <input
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete={isLogin ? "current-password" : "new-password"}
+                      minLength={8}
+                      placeholder={isLogin ? "Enter your password" : "Create a password"}
+                      required
+                    />
+                    <button type="button" className="auth-modal-eye" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"}>
+                      <EyeIcon open={!showPassword} />
+                    </button>
+                  </div>
                 </label>
-                <button className="btn btn-primary auth-modal-submit" type="submit" disabled={submittingEmail}>
-                  {submittingEmail ? (isLogin ? "Signing in..." : "Creating account...") : isLogin ? "Sign in" : "Create account"}
+                <button className="auth-modal-submit" type="submit" disabled={submittingEmail}>
+                  {submittingEmail
+                    ? (isLogin ? "Signing in..." : "Creating account...")
+                    : (isLogin ? "Log in" : "Create account")}
                 </button>
               </form>
 
-              <div className="auth-modal-switch">
-                {isLogin ? "New to DeepLinkOS?" : "Already have an account?"}{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setError(null);
-                    setEmailNotice(null);
-                    setModal((current) => ({ ...current, intent: isLogin ? "signup" : "login" }));
-                  }}
-                >
-                  {isLogin ? "Create an account" : "Log in"}
-                </button>
-              </div>
-
-              <div className="auth-modal-divider">
-                <span>Or continue with</span>
-              </div>
+              <div className="auth-modal-divider"><span>or continue with</span></div>
 
               <div className="auth-modal-google-wrap">
-                <div ref={buttonRef} className="auth-modal-google" />
-                {!scriptReady ? <span className="auth-modal-loading">Loading secure Google sign-in...</span> : null}
+                {/* Hidden Google button — handles actual OAuth credential flow */}
+                <div ref={buttonRef} className="auth-modal-google-hidden" aria-hidden="true" />
+                {/* Custom styled button that proxies the click */}
+                <button
+                  type="button"
+                  className="auth-modal-google-btn"
+                  disabled={!scriptReady || !googleClientId}
+                  onClick={() => {
+                    const iframe = buttonRef.current?.querySelector("iframe");
+                    if (iframe) {
+                      (iframe as HTMLIFrameElement).click();
+                    } else {
+                      const innerBtn = buttonRef.current?.querySelector("div[role='button']") as HTMLElement | null;
+                      innerBtn?.click();
+                    }
+                  }}
+                >
+                  <GoogleGIcon />
+                  <span>{modal.intent === "login" ? "Sign in with Google" : "Sign up with Google"}</span>
+                </button>
+                {!scriptReady && googleClientId ? (
+                  <span className="auth-modal-loading">Loading Google sign-in...</span>
+                ) : null}
+              </div>
+
+              <div className="auth-modal-footer">
+                {isLogin ? (
+                  <p>Don&apos;t have an account?{" "}<button type="button" className="auth-modal-footer-link" onClick={() => { setError(null); setEmailNotice(null); setModal((c) => ({ ...c, intent: "signup" })); }}>Sign up</button></p>
+                ) : (
+                  <>
+                    <p>Already have an account?{" "}<button type="button" className="auth-modal-footer-link" onClick={() => { setError(null); setEmailNotice(null); setModal((c) => ({ ...c, intent: "login" })); }}>Log in</button></p>
+                    <p className="auth-modal-tos">By signing up, you agree to our <a href="/terms" className="auth-modal-footer-link">Terms of Service</a> and <a href="/privacy" className="auth-modal-footer-link">Privacy Policy</a>.</p>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -554,17 +680,17 @@ function AuthModal({
 const modalCopy: Record<AuthIntent, { kicker: string; title: string; body: string }> = {
   login: {
     kicker: "Welcome back",
-    title: "Pick up your smart links where you left off",
-    body: "Sign in with your email and password, or use Google to jump back into your dashboard.",
+    title: "Welcome back",
+    body: "Log in to access your DeepLinkOS workspace and continue where you left off.",
   },
   signup: {
     kicker: "Start free",
     title: "Create your DeepLinkOS workspace",
-    body: "Add your name, email, and password to unlock the full onboarding and dashboard flow.",
+    body: "Add your details to unlock the full dashboard and start routing smarter links.",
   },
   generator: {
     kicker: "Experience the magic",
-    title: "Save this smart route to your workspace",
+    title: "Save this smart route",
     body: "Create an account to keep this generated link, add fallbacks, and turn it into a trackable campaign.",
   },
 };
@@ -584,8 +710,87 @@ function safeInternalPath(value: string) {
 
 function CloseIcon() {
   return (
-    <svg aria-hidden="true" width="18" height="18" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" viewBox="0 0 24 24">
+    <svg aria-hidden="true" width="16" height="16" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" viewBox="0 0 24 24">
       <path d="M18 6 6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
+function PersonIcon() {
+  return (
+    <svg className="auth-modal-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+    </svg>
+  );
+}
+
+function MailIcon() {
+  return (
+    <svg className="auth-modal-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="m2 7 10 7 10-7" />
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg className="auth-modal-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
+function BoltIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+    </svg>
+  );
+}
+
+function BarChartIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <line x1="12" y1="20" x2="12" y2="10" />
+      <line x1="18" y1="20" x2="18" y2="4" />
+      <line x1="6" y1="20" x2="6" y2="16" />
+    </svg>
+  );
+}
+
+function GlobeIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  );
+}
+
+function EyeIcon({ open }: { open: boolean }) {
+  return open ? (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ) : (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  );
+}
+
+function GoogleGIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
     </svg>
   );
 }

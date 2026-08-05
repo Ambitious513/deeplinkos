@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoMark } from "@/components/brand/logo-mark";
 
 const productLinks = [
   { label: "Features", href: "/#features" },
@@ -19,7 +20,21 @@ export function SiteFooter() {
       <div className="footer-grid">
         <div>
           <Link href="/" className="logo" aria-label="DeepLinkOS home">
-            <span className="logo-mark">D</span>
+            <span
+              style={{
+                display: 'grid',
+                width: 34,
+                height: 34,
+                flexShrink: 0,
+                placeItems: 'center',
+                borderRadius: 9,
+                background: 'linear-gradient(135deg, #2563eb, #0ea5e9)',
+                color: '#fff',
+                boxShadow: '0 4px 16px rgba(37, 99, 235, 0.35)',
+              }}
+            >
+              <LogoMark className="size-5" />
+            </span>
             <span className="logo-name">DeepLinkOS</span>
           </Link>
           <p className="footer-tagline">

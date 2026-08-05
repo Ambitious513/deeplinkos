@@ -1,206 +1,111 @@
-import { PageFrame } from "@/components/dashboard/page-frame";
+'use client'
 
-const INTEGRATIONS = [
-  {
-    id: "ga4",
-    name: "Google Analytics 4",
-    abbr: "GA",
-    color: "#f9ab00",
-    description: "Track link clicks as GA4 events. Requires a Measurement ID and API secret.",
-    status: "not_configured" as const,
-    checklist: [
-      "Create a GA4 property and note the Measurement ID",
-      "Generate a Measurement Protocol API secret in GA4",
-      "Enter both values in DeepLinkOS Pixel settings",
-    ],
-    events: ["page_view", "link_click", "custom_event"],
-  },
-  {
-    id: "meta",
-    name: "Meta Pixel",
-    abbr: "fb",
-    color: "#0866ff",
-    description: "Send conversion events to Meta for ads attribution. Requires a Pixel ID and access token.",
-    status: "not_configured" as const,
-    checklist: [
-      "Create or locate your Meta Pixel in Events Manager",
-      "Generate a Conversions API access token",
-      "Enter your Pixel ID and token in DeepLinkOS",
-    ],
-    events: ["PageView", "ViewContent", "Lead"],
-  },
-  {
-    id: "tiktok",
-    name: "TikTok Pixel",
-    abbr: "TK",
-    color: "#010101",
-    description: "Attribute TikTok ad conversions to your smart links. Requires a Pixel ID and Events API access token.",
-    status: "not_configured" as const,
-    checklist: [
-      "Create a TikTok Pixel in TikTok Ads Manager",
-      "Enable Events API and generate an access token",
-      "Add your Pixel ID and access token to DeepLinkOS",
-    ],
-    events: ["ViewContent", "ClickButton", "CompletePayment"],
-  },
-];
+import { Eye, MousePointerClick, ShoppingCart, Sparkles } from 'lucide-react'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { Panel, PanelHeader, Badge } from '@/components/dashboard/primitives'
+import { Button } from '@/components/ui/button'
+import type { PixelIntegration } from '@/lib/dashboard-types'
 
-function CheckDot({ done }: { done: boolean }) {
-  return done ? (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2.5" aria-hidden>
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  ) : (
-    <span
-      style={{ width: 14, height: 14, borderRadius: "50%", border: "1.5px solid var(--border)", display: "inline-block", flexShrink: 0 }}
-      aria-hidden
-    />
-  );
+const events = [
+  { id: 'pv', name: 'Page view', desc: 'Fires when a destination loads', icon: Eye, tone: 'info' as const },
+  { id: 'open', name: 'App open', desc: 'Fires on successful deep link open', icon: MousePointerClick, tone: 'brand' as const },
+  { id: 'conv', name: 'Conversion', desc: 'Fires on purchase or signup', icon: ShoppingCart, tone: 'success' as const },
+]
+
+// Static integration catalogue — real connection state will come from DB in Phase 3
+const pixels: PixelIntegration[] = [
+  { id: 'ga4',     name: 'Google Analytics 4', description: 'Send page views and conversions to GA4 measurement IDs.', status: 'available' },
+  { id: 'meta',    name: 'Meta Pixel',          description: 'Track app opens and purchases across Meta ad accounts.',  status: 'available' },
+  { id: 'tiktok',  name: 'TikTok Pixel',        description: 'Attribute creator-driven traffic to TikTok campaigns.',  status: 'available' },
+]
+
+const toneTile: Record<string, string> = {
+  info: 'bg-info-soft text-info',
+  brand: 'bg-brand-soft text-brand',
+  success: 'bg-success-soft text-success',
 }
 
 export default function PixelsPage() {
   return (
-    <PageFrame
-      eyebrow="Features"
-      title="Pixels"
-      description="Connect tracking pixels to send link events to your ad platforms and analytics tools."
-      badge={<span className="badge badge--beta">Beta</span>}
-    >
-      {/* Intro callout */}
-      <div
-        style={{
-          padding: "16px 20px",
-          borderRadius: 18,
-          background: "linear-gradient(135deg, rgba(239,122,34,0.08), rgba(44,107,237,0.07))",
-          border: "1px solid rgba(239,122,34,0.22)",
-          marginBottom: 20,
-          display: "flex",
-          alignItems: "flex-start",
-          gap: 14,
-        }}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" aria-hidden style={{ flexShrink: 0, marginTop: 1 }}>
-          <circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="16" x2="12" y2="12" />
-          <line x1="12" y1="8" x2="12.01" y2="8" />
-        </svg>
-        <div>
-          <strong style={{ fontSize: "0.92rem" }}>Pixels are in beta.</strong>
-          <p style={{ margin: "4px 0 0", fontSize: "0.86rem", color: "var(--text-soft)", lineHeight: 1.6 }}>
-            Server-side pixel firing is being built. Configure your integration details now so you are ready to activate when it launches. No data is sent yet.
-          </p>
-        </div>
-      </div>
+    <div className="grid gap-6">
+      <PageHeader
+        eyebrow="Features"
+        title="Pixels"
+        description="Attach tracking pixels to your smart links and forward conversion events to your ad platforms."
+        action={<Badge tone="brand">Beta</Badge>}
+      />
 
-      {/* Integration cards */}
-      <div style={{ display: "grid", gap: 14, marginBottom: 24 }}>
-        {INTEGRATIONS.map((integration) => (
-          <div key={integration.id} className="pixel-card panel">
-            <div className="pixel-card__head">
-              <div
-                className="pixel-card__logo"
-                style={{ background: integration.color, color: "#fff", fontFamily: "var(--font-display)" }}
-                aria-label={`${integration.name} logo`}
-              >
-                {integration.abbr}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                  <strong style={{ fontSize: "0.95rem" }}>{integration.name}</strong>
-                  <span className="badge badge--pending">Not configured</span>
-                </div>
-                <p style={{ margin: "3px 0 0", fontSize: "0.84rem", color: "var(--text-soft)", lineHeight: 1.55 }}>
-                  {integration.description}
-                </p>
-              </div>
+      {/* Hero / readiness */}
+      <Panel className="overflow-hidden border-transparent bg-success p-6 text-white sm:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-lg">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
+              <Sparkles className="size-3.5" /> Coming soon
             </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 16 }}>
-              {/* Setup checklist */}
-              <div>
-                <div style={{ fontSize: "0.74rem", fontWeight: 800, color: "var(--text-soft)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>
-                  Setup steps
-                </div>
-                <div className="pixel-checklist">
-                  {integration.checklist.map((step, i) => (
-                    <div key={i} className="pixel-checklist__item">
-                      <CheckDot done={false} />
-                      <span>{step}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Event preview */}
-              <div>
-                <div style={{ fontSize: "0.74rem", fontWeight: 800, color: "var(--text-soft)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>
-                  Events tracked
-                </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  {integration.events.map((ev) => (
-                    <code
-                      key={ev}
-                      style={{
-                        fontSize: "0.74rem",
-                        padding: "3px 8px",
-                        borderRadius: 8,
-                        background: "color-mix(in srgb, var(--surface-strong) 76%, transparent)",
-                        border: "1px solid var(--border)",
-                        color: "var(--text-soft)",
-                      }}
-                    >
-                      {ev}
-                    </code>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div style={{ paddingTop: 4 }}>
-              <button
-                type="button"
-                className="btn btn-ghost"
-                style={{ fontSize: "0.84rem", opacity: 0.6, cursor: "not-allowed" }}
-                disabled
-                aria-disabled="true"
-              >
-                Configure — coming soon
-              </button>
-            </div>
+            <h2 className="mt-3 text-xl font-bold tracking-tight sm:text-2xl">
+              Conversion tracking, built into every link
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-white/80">
+              We&apos;re finishing GA4, Meta, and TikTok pixel forwarding. Join the
+              beta to start firing events the moment it ships.
+            </p>
           </div>
-        ))}
-      </div>
+          <Button className="h-11 shrink-0 rounded-xl bg-white px-5 text-success hover:bg-white/90">
+            Join the beta
+          </Button>
+        </div>
+      </Panel>
 
-      {/* Roadmap */}
-      <div className="panel" style={{ padding: 20 }}>
-        <div className="eyebrow" style={{ marginBottom: 10 }}>Roadmap</div>
-        <div style={{ display: "grid", gap: 8 }}>
-          {[
-            { item: "Server-side pixel firing via DeepLinkOS redirect edge", done: false },
-            { item: "GA4 Measurement Protocol integration", done: false },
-            { item: "Meta Conversions API integration", done: false },
-            { item: "TikTok Events API integration", done: false },
-            { item: "Real-time event stream preview in this panel", done: false },
-          ].map(({ item, done }) => (
-            <div
-              key={item}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "8px 12px",
-                borderRadius: 12,
-                background: "color-mix(in srgb, var(--surface-strong) 72%, transparent)",
-                border: "1px solid var(--border)",
-                fontSize: "0.86rem",
-              }}
-            >
-              <CheckDot done={done} />
-              <span style={{ color: done ? "var(--text-soft)" : "var(--text)" }}>{item}</span>
-            </div>
+      {/* Integrations */}
+      <div>
+        <h3 className="mb-3 text-base font-semibold tracking-tight">Planned integrations</h3>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {pixels.map((p) => (
+            <Panel key={p.id} className="flex flex-col p-5">
+              <div className="flex items-center justify-between">
+                <span className="grid size-11 place-items-center rounded-xl bg-muted font-bold text-foreground">
+                  {p.name.slice(0, 2).toUpperCase()}
+                </span>
+                <Badge tone="neutral">Available soon</Badge>
+              </div>
+              <p className="mt-3 font-semibold">{p.name}</p>
+              <p className="mt-1 flex-1 text-sm leading-relaxed text-muted-foreground">
+                {p.description}
+              </p>
+              <Button variant="outline" className="mt-4 w-full" disabled>
+                Connect
+              </Button>
+            </Panel>
           ))}
         </div>
       </div>
-    </PageFrame>
-  );
+
+      {/* Event preview */}
+      <Panel className="p-5">
+        <PanelHeader
+          title="Event preview"
+          subtitle="Events that will be forwarded once a pixel is connected"
+        />
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {events.map((e) => {
+            const Icon = e.icon
+            return (
+              <div key={e.id} className="rounded-2xl border border-border bg-background/60 p-4">
+                <span
+                  className={`grid size-10 place-items-center rounded-xl ${toneTile[e.tone]}`}
+                >
+                  <Icon className="size-[18px]" />
+                </span>
+                <p className="mt-3 text-sm font-semibold">{e.name}</p>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{e.desc}</p>
+                <code className="mt-3 block truncate rounded-lg bg-muted/60 px-2 py-1 font-mono text-[11px] text-muted-foreground">
+                  dlos.track(&apos;{e.id}&apos;)
+                </code>
+              </div>
+            )
+          })}
+        </div>
+      </Panel>
+    </div>
+  )
 }

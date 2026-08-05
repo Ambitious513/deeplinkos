@@ -67,6 +67,11 @@ const linkFieldsSchema = z.object({
     utmTerm: optionalString(100),
     utmContent: optionalString(100),
     tags: z.array(z.string().trim().min(1).max(40)).max(12).optional(),
+    domainId: z.preprocess(
+      // Empty string from the form default option → null (platform domain)
+      (v) => (typeof v === 'string' && v.trim() === '' ? null : (v ?? null)),
+      z.string().uuid("Invalid domain ID.").nullable().optional()
+    ),
   });
 
 export const createLinkSchema = linkFieldsSchema

@@ -18,6 +18,10 @@ export type Database = {
           avatar_url: string | null;
           workspace_name: string | null;
           onboarding_completed_at: string | null;
+          plan: string;
+          polar_subscription_id: string | null;
+          polar_customer_id: string | null;
+          polar_current_period_end: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -29,6 +33,10 @@ export type Database = {
           avatar_url?: string | null;
           workspace_name?: string | null;
           onboarding_completed_at?: string | null;
+          plan?: string;
+          polar_subscription_id?: string | null;
+          polar_customer_id?: string | null;
+          polar_current_period_end?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -39,6 +47,10 @@ export type Database = {
           avatar_url?: string | null;
           workspace_name?: string | null;
           onboarding_completed_at?: string | null;
+          plan?: string;
+          polar_subscription_id?: string | null;
+          polar_customer_id?: string | null;
+          polar_current_period_end?: string | null;
           updated_at?: string;
         };
         Relationships: [];

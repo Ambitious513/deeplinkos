@@ -107,3 +107,27 @@ export function deviceLabel(platform: DevicePlatform) {
   if (platform === "ios" || platform === "android") return "mobile";
   return platform;
 }
+
+/**
+ * Returns the specific in-app browser name if the UA is a known social WebView,
+ * or null if it is a real browser. Used to power IAB-aware routing and analytics.
+ */
+export function detectIABSource(userAgent: string): string | null {
+  const ua = userAgent;
+  if (/Instagram/i.test(ua)) return "instagram";
+  if (/musical_ly|TikTok|BytedanceWebview/i.test(ua)) return "tiktok";
+  if (/FBAN|FBAV|FB_IAB|FBIOS|FB4A|FB_UI|FB_WebView/i.test(ua)) return "facebook";
+  if (/Messenger/i.test(ua)) return "messenger";
+  if (/\bTwitter\b/i.test(ua)) return "twitter";
+  if (/Snapchat/i.test(ua)) return "snapchat";
+  if (/MicroMessenger/i.test(ua)) return "wechat";
+  if (/LinkedInApp/i.test(ua)) return "linkedin";
+  if (/Pinterest/i.test(ua)) return "pinterest";
+  if (/Reddit\//i.test(ua)) return "reddit";
+  if (/Line\//i.test(ua)) return "line";
+  // Generic Android WebView (wv) without a named host app
+  if (/wv\)/i.test(ua) && /Android/i.test(ua)) return "android_wv";
+  // iOS WKWebView / UIWebView without Safari in UA
+  if (/(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(ua)) return "ios_wv";
+  return null;
+}

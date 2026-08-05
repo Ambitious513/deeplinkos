@@ -1,0 +1,146 @@
+/**
+ * dashboard-theme.css
+ *
+ * Dashboard-only CSS. Imported ONLY in app/(dashboard)/layout.tsx.
+ * Zero effect on the public website — public site CSS lives in app/(public)/public.css.
+ *
+ * Brand color: #ef7a22 (orange) — must match public site --accent.
+ */
+
+/* ─── Light-mode CSS tokens ───────────────────────────────────────────────── */
+
+.dlos-dashboard-theme {
+  --background: #f6f6f3;
+  --foreground: #14171d;
+  --card: #ffffff;
+  --card-foreground: #14171d;
+  --popover: #ffffff;
+  --popover-foreground: #14171d;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #efefec;
+  --secondary-foreground: #14171d;
+  --muted: #f0f0ed;
+  --muted-foreground: #6a7180;
+  --accent: #f1f1ee;
+  --accent-foreground: #14171d;
+  --destructive: #d8443b;
+  --border: #e6e6e2;
+  --input: #e6e6e2;
+  --ring: #2563eb;
+  --radius: 0.7rem;
+
+  --chart-1: #ef7a22;  /* keep orange for data viz variety */
+  --chart-2: #168558;
+  --chart-3: #2563eb;
+  --chart-4: #be7b00;
+  --chart-5: #8a5cf6;
+
+  /* ── Brand (blue) ── */
+  --brand:            #2563eb;
+  --brand-foreground: #ffffff;
+  --brand-soft:       #eff6ff;
+
+  /* ── Semantic colours ── */
+  --success:      #168558;
+  --success-soft: #e7f5ee;
+  --info:         #2563eb;
+  --info-soft:    #eaf1ff;
+  --warning:      #b87503;
+  --warning-soft: #fbf2da;
+  --danger:       #d8443b;
+  --danger-soft:  #fdeceb;
+
+  /* ── Sidebar (always dark even in light mode) ── */
+  --sidebar:                    #11151d;
+  --sidebar-foreground:         #e9ecf2;
+  --sidebar-primary:            #2563eb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent:             rgba(255, 255, 255, 0.08);
+  --sidebar-accent-foreground:  #ffffff;
+  --sidebar-border:             rgba(255, 255, 255, 0.10);
+  --sidebar-ring:               #2563eb;
+
+  /* ── Font stack ── */
+  --font-geist-sans: "Geist", "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-geist-mono: "Geist Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+/* ─── Dark-mode tokens ────────────────────────────────────────────────────── */
+
+.dark .dlos-dashboard-theme {
+  --background: #0a0d13;
+  --foreground: #eef1f6;
+  --card: #131922;
+  --card-foreground: #eef1f6;
+  --popover: #131922;
+  --popover-foreground: #eef1f6;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #1b222d;
+  --secondary-foreground: #eef1f6;
+  --muted: #1b222d;
+  --muted-foreground: #98a2b3;
+  --accent: #1b222d;
+  --accent-foreground: #eef1f6;
+  --destructive: #f0655b;
+  --border: rgba(255, 255, 255, 0.10);
+  --input: rgba(255, 255, 255, 0.14);
+  --ring: #3b82f6;
+
+  --chart-1: #3b82f6;
+  --chart-2: #2bb57d;
+  --chart-3: #5b8cf5;
+  --chart-4: #e0a32e;
+  --chart-5: #a884fb;
+
+  /* ── Brand (blue) ── */
+  --brand:            #3b82f6;
+  --brand-foreground: #ffffff;
+  --brand-soft:       rgba(59, 130, 246, 0.16);
+
+  /* ── Semantic colours ── */
+  --success:      #2bb57d;
+  --success-soft: rgba(43, 181, 125, 0.16);
+  --info:         #5b8cf5;
+  --info-soft:    rgba(91, 140, 245, 0.16);
+  --warning:      #e0a32e;
+  --warning-soft: rgba(224, 163, 46, 0.16);
+  --danger:       #f0655b;
+  --danger-soft:  rgba(240, 101, 91, 0.16);
+
+  /* ── Sidebar ── */
+  --sidebar:                    #070a0f;
+  --sidebar-foreground:         #e9ecf2;
+  --sidebar-primary:            #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent:             rgba(255, 255, 255, 0.07);
+  --sidebar-accent-foreground:  #ffffff;
+  --sidebar-border:             rgba(255, 255, 255, 0.09);
+  --sidebar-ring:               #3b82f6;
+}
+
+/* ─── Base resets ─────────────────────────────────────────────────────────── */
+
+/* Prevent any global SVG reset from shrinking Lucide icons */
+.dlos-dashboard-theme svg {
+  max-width: none;
+}
+
+/* Dashboard focus ring uses brand token */
+.dlos-dashboard-theme :focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Form elements inherit dashboard font */
+.dlos-dashboard-theme button,
+.dlos-dashboard-theme input,
+.dlos-dashboard-theme select,
+.dlos-dashboard-theme textarea {
+  font-family: inherit;
+}
+
+/* Scrollbar utility */
+.dlos-dashboard-theme .no-scrollbar::-webkit-scrollbar { display: none; }
+.dlos-dashboard-theme .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

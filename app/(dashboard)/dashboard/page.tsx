@@ -1,308 +1,399 @@
-import { PageFrame } from "@/components/dashboard/page-frame";
-import { listLinksForUser } from "@/lib/links";
-import { createClient } from "@/lib/supabase/server";
+'use client'
 
-function siteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/+$/, "");
+import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
+import {
+  AlertTriangle,
+  ArrowUpRight,
+  Info,
+  CheckCircle2,
+  Smartphone,
+  Monitor,
+  Tablet,
+} from 'lucide-react'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { KpiGrid } from '@/components/dashboard/kpi-grid'
+import { TrendChart } from '@/components/dashboard/trend-chart'
+import { DateRangeControl } from '@/components/dashboard/date-range'
+import {
+  Panel,
+  PanelHeader,
+  ProgressBar,
+  Badge,
+  IconTile,
+  type Tone,
+} from '@/components/dashboard/primitives'
+import { shortUrlForSlug } from '@/lib/dashboard-adapters'
+import type { DateRange, Kpi, SeriesPoint, DeviceSlice, ReferrerRow, DeepLink, AttentionItem } from '@/lib/dashboard-types'
+
+const deviceIcons = { Mobile: Smartphone, Desktop: Monitor, Tablet: Tablet } as const
+
+const severityTone: Record<string, Tone> = {
+  danger: 'danger',
+  warning: 'warning',
+  info: 'info',
 }
 
-function shortUrl(slug: string) {
-  return `${siteUrl()}/r/${slug}`;
+/** Normalise DB label ('mobile' / 'MOBILE') → 'Mobile' for icon lookup */
+function toTitleCase(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
 }
 
-function getInitials(name: string): string {
-  const parts = name.split(" ").filter(Boolean);
-  return parts.slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+/** Always returns a valid icon — falls back to Smartphone for unknown types */
+function getDeviceIcon(label: string) {
+  return deviceIcons[label as keyof typeof deviceIcons] ?? Smartphone
 }
 
-/* ── Inline mini sparkline SVG ─────────────────────────────────── */
-function SparklineSVG({ values }: { values: number[] }) {
-  if (values.length < 2) {
-    return (
-      <div style={{ width: "100%", height: 140, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-soft)", fontSize: "0.88rem" }}>
-        Click data will appear once traffic flows through your links.
-      </div>
-    );
+/** Derive attention items from real summary data */
+function buildAttentionItems(summary: {
+  paused_links?: number
+  active_links?: number
+  top_referrer?: string
+}): AttentionItem[] {
+  const items: AttentionItem[] = []
+
+  const paused = Number(summary.paused_links ?? 0)
+  if (paused > 0) {
+    items.push({
+      id: 'paused-links',
+      severity: 'warning',
+      title: `${paused} paused link${paused === 1 ? '' : 's'}`,
+      detail: 'These links are not receiving traffic. Resume them when ready.',
+    })
   }
-  const W = 640;
-  const H = 130;
-  const padX = 6;
-  const padY = 12;
-  const max = Math.max(...values) * 1.15 || 1;
-  const pts = values.map((v, i) => ({
-    x: padX + (i / (values.length - 1)) * (W - padX * 2),
-    y: padY + (1 - v / max) * (H - padY * 2),
-  }));
-  let d = `M ${pts[0].x} ${pts[0].y}`;
-  for (let i = 1; i < pts.length; i++) {
-    const cx = (pts[i - 1].x + pts[i].x) / 2;
-    d += ` C ${cx} ${pts[i - 1].y}, ${cx} ${pts[i].y}, ${pts[i].x} ${pts[i].y}`;
+
+  const active = Number(summary.active_links ?? 0)
+  if (active === 0 && paused === 0) {
+    items.push({
+      id: 'no-links',
+      severity: 'info',
+      title: 'No links yet',
+      detail: 'Create your first smart link to start tracking clicks and performance.',
+    })
   }
-  const area = `${d} L ${pts[pts.length - 1].x} ${H - padY} L ${pts[0].x} ${H - padY} Z`;
 
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="trend-sparkline" role="img" aria-label="Traffic trend">
-      <defs>
-        <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.2" />
-          <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      {[0.25, 0.5, 0.75].map((g) => (
-        <line
-          key={g}
-          x1={padX} x2={W - padX}
-          y1={padY + g * (H - padY * 2)} y2={padY + g * (H - padY * 2)}
-          stroke="var(--border)" strokeWidth="1" strokeDasharray="3 7"
-        />
-      ))}
-      <path d={area} fill="url(#sparkGrad)" />
-      <path d={d} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
-      {pts.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r="3" fill="var(--surface-strong)" stroke="var(--accent)" strokeWidth="2" />
-      ))}
-    </svg>
-  );
+  return items
 }
 
-/* ── Trend arrow SVGs ─────────────────────────────────────────── */
-function TrendUp() {
+export default function OverviewPage() {
+  const [range, setRange] = useState<DateRange>('7d')
+  const [loading, setLoading] = useState(true)   // true on first mount — prevents mock flash
+  const [live, setLive] = useState<{
+    kpis: Kpi[]
+    clicksByDay: SeriesPoint[]
+    devices: DeviceSlice[]
+    referrers: ReferrerRow[]
+    topLinks: DeepLink[]
+    attentionItems: AttentionItem[]
+    isLive: boolean
+  } | null>(null)
+
+  useEffect(() => {
+    setLoading(true)
+    fetch(`/api/dashboard/analytics?range=${range}`, { cache: 'no-store' })
+      .then((response) => {
+        if (!response.ok) throw new Error('Analytics unavailable')
+        return response.json()
+      })
+      .then((data) => {
+        // Only go demo-mode when the server explicitly says so (unauthenticated)
+        if (data.demo) {
+          setLive(null)
+          return
+        }
+
+        // summary may be null for a brand-new user with 0 clicks — treat as zeros
+        const summary = data.summary || {}
+        const global = data.global || {}
+        const totalClicks     = Number(summary.total_clicks    || 0)
+        const uniqueVisitors  = Number(summary.unique_visitors || 0)
+        const totalDeviceClicks = (global.devices || []).reduce(
+          (sum: number, row: { clicks: number }) => sum + Number(row.clicks || 0), 0
+        )
+        const totalRefClicks = (global.referrers || []).reduce(
+          (sum: number, row: { clicks: number }) => sum + Number(row.clicks || 0), 0
+        )
+        // Engagement rate = unique visitors / total clicks × 100
+        const engagementRate  = totalClicks > 0 ? Math.round((uniqueVisitors / totalClicks) * 1000) / 10 : 0
+
+        setLive({
+          isLive: true,
+          kpis: [
+            { id: 'clicks',   label: 'Total clicks',    value: totalClicks.toLocaleString(),                           delta: 'live',                                         trend: 'up', featured: true },
+            { id: 'visitors', label: 'Unique visitors', value: uniqueVisitors.toLocaleString(),                        delta: 'tracked',                                      trend: 'up' },
+            { id: 'active',   label: 'Active links',    value: Number(summary.active_links || 0).toLocaleString(),    delta: `${Number(summary.paused_links || 0)} paused`,   trend: 'up' },
+            { id: 'referrer', label: 'Top referrer',    value: summary.top_referrer || 'Direct',                      delta: 'source',                                       trend: 'up' },
+            { id: 'success',  label: 'Open success',    value: totalClicks > 0 ? `${engagementRate}%` : '—',          delta: 'engagement',                                   trend: 'up' },
+          ],
+          clicksByDay: (data.clicksByDay || []).map((row: { click_date: string; click_count: number; unique_visitors: number }) => ({
+            label:   new Date(row.click_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+            value:   Number(row.click_count    || 0),
+            compare: Number(row.unique_visitors || 0),
+          })),
+          devices: (global.devices || []).slice(0, 3).map((row: { label: string; clicks: number }, index: number) => ({
+            label:    toTitleCase(row.label || 'unknown'),
+            sessions: Number(row.clicks || 0),
+            share:    totalDeviceClicks ? Math.round((Number(row.clicks || 0) / totalDeviceClicks) * 1000) / 10 : 0,
+            tone:     index === 0 ? 'brand' : index === 1 ? 'info' : 'success',
+          })),
+          referrers: (global.referrers || []).slice(0, 5).map((row: { label: string; clicks: number }) => ({
+            source: row.label || 'Direct',
+            visits: Number(row.clicks || 0),
+            share:  totalRefClicks ? Math.round((Number(row.clicks || 0) / totalRefClicks) * 1000) / 10 : 0,
+          })),
+          topLinks: (global.top_links || []).slice(0, 5).map((row: { id: string; title: string; slug: string; clicks: number }) => ({
+            id:          row.id,
+            title:       row.title,
+            slug:        row.slug,
+            destination: '',
+            platform:    'Smart link',
+            status:      'active' as const,
+            clicks:      Number(row.clicks || 0),
+            openRate:    0,
+            createdAt:   '',
+          })),
+          attentionItems: buildAttentionItems(summary),
+        })
+      })
+      .catch(() => setLive(null))
+      .finally(() => setLoading(false))
+  }, [range])
+
+  const view = useMemo(
+    () => ({
+      // live !== null  → authenticated user (may have 0 data) → show real values
+      // live === null  → not authenticated / API error         → show empty states
+      kpis:           loading ? [] : (live?.kpis ?? []),
+      clicksByDay:    loading ? [] : (live?.clicksByDay ?? []),
+      devices:        loading ? [] : (live?.devices ?? []),
+      referrers:      loading ? [] : (live?.referrers ?? []),
+      topLinks:       loading ? [] : (live?.topLinks ?? []),
+      attentionItems: loading ? [] : (live?.attentionItems ?? []),
+      isLive:         live?.isLive ?? false,
+    }),
+    [live, loading],
+  )
+
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
-      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-      <polyline points="17 6 23 6 23 12" />
-    </svg>
-  );
-}
+    <div className="grid gap-6">
+      <PageHeader
+        eyebrow="Workspace"
+        title="Overview"
+        description="A real-time snapshot of clicks, audiences, and links that need your attention."
+        action={<DateRangeControl value={range} onChange={setRange} />}
+      />
 
-export default async function DashboardHomePage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const links = user ? await listLinksForUser(user.id) : [];
+      <KpiGrid items={view.kpis} loading={loading} />
 
-  const activeLinks = links.filter((l) => l.isActive);
-  const pausedLinks = links.filter((l) => !l.isActive);
-  const recentLinks = links.slice(0, 5);
-
-  // Created in last 7 days
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const recentCreated = links.filter((l) =>
-    l.createdAt ? new Date(l.createdAt) > sevenDaysAgo : false
-  ).length;
-
-  const topPlatform = activeLinks[0]?.preset
-    ? activeLinks[0].preset.split("-").map((p: string) => p[0].toUpperCase() + p.slice(1)).join(" ")
-    : "None yet";
-
-  // Sparkline mock — 7 data points proportional to link count
-  const total = links.length;
-  const mockSparkline = total > 0
-    ? [0, Math.floor(total * 0.3), Math.floor(total * 0.5), Math.floor(total * 0.4), Math.floor(total * 0.7), Math.floor(total * 0.9), total]
-    : [];
-
-  const kpiCards = [
-    {
-      label: "Total links",
-      value: String(links.length),
-      badge: "Owned",
-      delta: recentCreated > 0 ? `+${recentCreated} this week` : null,
-      up: true,
-      featured: false,
-    },
-    {
-      label: "Active links",
-      value: String(activeLinks.length),
-      badge: "Live",
-      delta: links.length > 0 ? `${Math.round((activeLinks.length / links.length) * 100)}% active` : null,
-      up: true,
-      featured: true,
-    },
-    {
-      label: "Paused links",
-      value: String(pausedLinks.length),
-      badge: "Review",
-      delta: pausedLinks.length > 0 ? "Needs attention" : "All clear",
-      up: pausedLinks.length === 0,
-      featured: false,
-    },
-    {
-      label: "Top platform",
-      value: topPlatform,
-      badge: "Detected",
-      delta: activeLinks.length > 0 ? "Auto-routed" : "Create a link",
-      up: true,
-      featured: false,
-    },
-    {
-      label: "Added this week",
-      value: String(recentCreated),
-      badge: "New",
-      delta: recentCreated > 0 ? "Since Monday" : "No new links",
-      up: recentCreated > 0,
-      featured: false,
-    },
-  ];
-
-  return (
-    <PageFrame
-      eyebrow="Dashboard"
-      title="Overview"
-      description="A faster read on link health, campaign traffic, and the work that needs attention."
-    >
-      {/* KPI grid */}
-      <div className="kpi-grid" style={{ marginBottom: 20 }}>
-        {kpiCards.map((card) => (
-          <div
-            key={card.label}
-            className={`card kpi-card${card.featured ? " kpi-card--featured" : ""}`}
-          >
-            <div className="kpi-card__label">{card.label}</div>
-            <div className="kpi-card__value">{card.value}</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <span className="metric-pill">{card.badge}</span>
-              {card.delta && (
-                <span className={`kpi-trend-delta${card.up ? " kpi-trend-delta--up" : " kpi-trend-delta--down"}`}>
-                  <TrendUp />
-                  {card.delta}
+      <div className="grid gap-4 xl:grid-cols-[1.7fr_1fr]">
+        {/* Trend chart */}
+        <Panel className="p-5">
+          <PanelHeader
+            title="Traffic trend"
+            subtitle="Clicks vs. previous period"
+            action={
+              <div className="hidden items-center gap-3 text-xs font-medium text-muted-foreground sm:flex">
+                <span className="flex items-center gap-1.5">
+                  <span className="size-2.5 rounded-full bg-brand" /> This period
                 </span>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="dashboard-grid">
-        {/* Left column */}
-        <div className="stack">
-          {/* Top links table */}
-          <div className="table-card">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Top links</th>
-                  <th>Short URL</th>
-                  <th>Platform</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentLinks.map((link) => {
-                  const platform = link.preset
-                    ? link.preset.split("-").map((p: string) => p[0].toUpperCase() + p.slice(1)).join(" ")
-                    : "Smart";
-                  return (
-                    <tr key={link.slug}>
-                      <td>
-                        <strong style={{ display: "block" }}>{link.title || link.slug}</strong>
-                      </td>
-                      <td>
-                        <span style={{ fontFamily: "monospace", fontSize: "0.82rem", color: "var(--text-soft)" }}>
-                          {shortUrl(link.slug)}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="platform-badge">{platform}</span>
-                      </td>
-                      <td>
-                        <span className={`badge${link.isActive ? " badge--active" : " badge--paused"}`}>
-                          <span className="badge-dot" />
-                          {link.isActive ? "Active" : "Paused"}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {!recentLinks.length && (
-                  <tr>
-                    <td colSpan={4}>
-                      <div className="empty-state" style={{ padding: "32px 16px" }}>
-                        <div className="empty-state__icon">
-                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                          </svg>
-                        </div>
-                        <p className="empty-state__title">No links yet</p>
-                        <p className="empty-state__desc">Create your first smart link to populate this table.</p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Attention panel */}
-          <div className="panel">
-            <div className="eyebrow" style={{ marginBottom: 12 }}>Attention</div>
-            {pausedLinks.length > 0 ? (
-              <div style={{ display: "grid", gap: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 14, background: "rgba(184,117,3,0.08)", border: "1px solid rgba(184,117,3,0.2)" }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b87503" strokeWidth="2" aria-hidden>
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                    <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
-                  </svg>
-                  <span style={{ fontSize: "0.88rem" }}>
-                    <strong>{pausedLinks.length}</strong> link{pausedLinks.length > 1 ? "s are" : " is"} paused — visit Links to resume.
-                  </span>
-                </div>
+                <span className="flex items-center gap-1.5">
+                  <span className="size-2.5 rounded-full bg-muted-foreground/50" /> Previous
+                </span>
               </div>
+            }
+          />
+          <div className="mt-4">
+            {loading ? (
+              <div className="h-40 animate-pulse rounded-xl bg-muted" />
             ) : (
-              <p style={{ color: "var(--text-soft)", fontSize: "0.88rem", margin: 0, lineHeight: 1.65 }}>
-                Pending DNS, weak fallbacks, or links needing review will appear here once connected. All looks good.
-              </p>
+              <TrendChart data={view.clicksByDay} />
             )}
           </div>
-        </div>
+        </Panel>
 
-        {/* Right column */}
-        <div className="stack">
-          {/* Traffic trend */}
-          <div className="panel">
-            <div className="eyebrow" style={{ marginBottom: 12 }}>Traffic Trend</div>
-            <SparklineSVG values={mockSparkline} />
-            <p style={{ fontSize: "0.78rem", color: "var(--text-soft)", marginTop: 8, marginBottom: 0 }}>
-              Trend based on active link count. Live click data appears once traffic flows.
-            </p>
-          </div>
-
-          {/* Next actions */}
-          <div className="panel">
-            <div className="eyebrow" style={{ marginBottom: 12 }}>Next Actions</div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {[
-                { text: "Create links for your top social and affiliate destinations", done: links.length > 0 },
-                { text: "Copy short URLs into campaigns, bios, and ad creatives", done: activeLinks.length > 0 },
-                { text: "Visit your links to validate redirect and click tracking", done: false },
-              ].map(({ text, done }) => (
-                <div
-                  key={text}
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: 10,
-                    padding: "10px 14px",
-                    borderRadius: 14,
-                    background: done ? "rgba(29,154,108,0.07)" : "color-mix(in srgb, var(--surface-strong) 78%, transparent)",
-                    border: `1px solid ${done ? "rgba(29,154,108,0.18)" : "var(--border)"}`,
-                  }}
-                >
-                  <span style={{ flexShrink: 0, marginTop: 1 }}>
-                    {done ? (
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2.5" aria-hidden>
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    ) : (
-                      <span style={{ width: 14, height: 14, borderRadius: "50%", border: "1.5px solid var(--border)", display: "inline-block" }} />
-                    )}
-                  </span>
-                  <span style={{ fontSize: "0.86rem", color: done ? "var(--text-soft)" : "var(--text)", lineHeight: 1.55 }}>{text}</span>
+        {/* Device breakdown */}
+        <Panel className="p-5">
+          <PanelHeader title="Device breakdown" subtitle="Sessions by device type" />
+          <div className="mt-4 grid gap-4">
+            {loading ? (
+              [1, 2, 3].map((i) => (
+                <div key={i} className="grid gap-2">
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 shrink-0 animate-pulse rounded-xl bg-muted" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="h-3 w-16 animate-pulse rounded-full bg-muted" />
+                      <div className="h-2.5 w-12 animate-pulse rounded-full bg-muted" />
+                    </div>
+                    <div className="h-4 w-8 animate-pulse rounded-full bg-muted" />
+                  </div>
+                  <div className="h-1.5 animate-pulse rounded-full bg-muted" />
                 </div>
-              ))}
+              ))
+            ) : (
+              view.devices.map((d) => {
+                const Icon = getDeviceIcon(d.label)
+                return (
+                  <div key={d.label} className="grid gap-2">
+                    <div className="flex items-center gap-3">
+                      <IconTile tone={d.tone}>
+                        <Icon className="size-[18px]" />
+                      </IconTile>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold">{d.label}</p>
+                        <p className="text-xs text-muted-foreground tabular-nums">
+                          {d.sessions.toLocaleString()} sessions
+                        </p>
+                      </div>
+                      <span className="text-sm font-bold tabular-nums">{d.share}%</span>
+                    </div>
+                    <ProgressBar value={d.share} tone={d.tone} />
+                  </div>
+                )
+              })
+            )}
+          </div>
+        </Panel>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-3">
+        {/* Top links */}
+        <Panel className="p-5 xl:col-span-2">
+          <PanelHeader
+            title="Top performing links"
+            subtitle="Highest click volume this period"
+          />
+          <ul className="mt-2">
+            {loading ? (
+              [1, 2, 3, 4, 5].map((i) => (
+                <li key={i} className="flex items-center gap-3 border-b border-border py-3 last:border-0">
+                  <div className="size-7 shrink-0 animate-pulse rounded-lg bg-muted" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3 w-32 animate-pulse rounded-full bg-muted" />
+                    <div className="h-2.5 w-24 animate-pulse rounded-full bg-muted" />
+                  </div>
+                  <div className="h-3 w-10 animate-pulse rounded-full bg-muted" />
+                </li>
+              ))
+            ) : (
+              view.topLinks.map((link, i) => (
+                <li
+                  key={link.id}
+                  className="flex items-center gap-3 border-b border-border py-3 last:border-0"
+                >
+                  <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-muted text-xs font-bold text-muted-foreground tabular-nums">
+                    {i + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold">{link.title}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {shortUrlForSlug(link.slug)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold tabular-nums">
+                      {link.clicks.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">clicks</p>
+                  </div>
+                </li>
+              ))
+            )}
+          </ul>
+        </Panel>
+
+        {/* Referrers */}
+        <Panel className="p-5">
+          <PanelHeader title="Top sources" subtitle="Where clicks come from" />
+          <ul className="mt-2">
+            {loading ? (
+              [1, 2, 3, 4].map((i) => (
+                <li key={i} className="grid gap-1.5 py-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="h-3 w-20 animate-pulse rounded-full bg-muted" />
+                    <div className="h-3 w-8 animate-pulse rounded-full bg-muted" />
+                  </div>
+                  <div className="h-1.5 animate-pulse rounded-full bg-muted" />
+                </li>
+              ))
+            ) : (
+              view.referrers.map((r) => (
+                <li key={r.source} className="grid gap-1.5 py-2.5">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-semibold">{r.source}</span>
+                    <span className="font-bold tabular-nums">{r.share}%</span>
+                  </div>
+                  <ProgressBar value={r.share} tone="brand" />
+                </li>
+              ))
+            )}
+          </ul>
+        </Panel>
+      </div>
+
+      {/* Attention items */}
+      <Panel className="p-5">
+        <PanelHeader
+          title="Needs attention"
+          subtitle="Links and domains flagged for review"
+          action={
+            <Link href="/dashboard/links" className="inline-flex items-center gap-1 text-sm font-semibold text-brand hover:underline">
+              View all <ArrowUpRight className="size-4" />
+            </Link>
+          }
+        />
+
+        {loading ? (
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex gap-3 rounded-2xl border border-border bg-background/60 p-4">
+                <div className="size-10 shrink-0 animate-pulse rounded-xl bg-muted" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 w-24 animate-pulse rounded-full bg-muted" />
+                  <div className="h-2.5 w-32 animate-pulse rounded-full bg-muted" />
+                  <div className="h-5 w-14 animate-pulse rounded-full bg-muted" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : view.isLive && view.attentionItems.length === 0 ? (
+          /* All-clear state when live and no issues */
+          <div className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-success-soft/40 p-4">
+            <IconTile tone="success">
+              <CheckCircle2 className="size-[18px]" />
+            </IconTile>
+            <div>
+              <p className="text-sm font-semibold">All links healthy</p>
+              <p className="text-xs text-muted-foreground">No issues detected across your workspace.</p>
             </div>
           </div>
-        </div>
-      </div>
-    </PageFrame>
-  );
+        ) : (
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            {view.attentionItems.map((item) => {
+              const tone = severityTone[item.severity]
+              const Icon = item.severity === 'info' ? Info : AlertTriangle
+              return (
+                <div
+                  key={item.id}
+                  className="flex gap-3 rounded-2xl border border-border bg-background/60 p-4"
+                >
+                  <IconTile tone={tone}>
+                    <Icon className="size-[18px]" />
+                  </IconTile>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold leading-tight">{item.title}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      {item.detail}
+                    </p>
+                    <div className="mt-2">
+                      <Badge tone={tone}>{item.severity}</Badge>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </Panel>
+    </div>
+  )
 }
