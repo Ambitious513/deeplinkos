@@ -13,7 +13,7 @@ seoDescription: "Step-by-step guide to creating Instagram deep links that open t
 searchTerms: ["instagram deep link", "instagram app link", "deep link instagram profile", "instagram uri scheme", "open instagram from link"]
 ---
 
-Instagram is the world's most-linked social platform — but most links to Instagram profiles and posts open a browser tab instead of the app. That friction kills conversions. Deep links fix it.
+Instagram is the world's most-linked social platform — but most links to Instagram profiles and posts open a sandboxed in-app browser instead of the app. That browser keeps users logged out, breaks Apple Pay, and reduces checkout completion rates by up to 35% compared to native app experiences. Deep links fix it.
 
 In this guide you'll learn exactly how Instagram deep links work, how to build them for both iOS and Android, and how to handle the case where a user doesn't have the app installed.
 
@@ -48,7 +48,7 @@ The modern approach uses **https** URLs that the OS intercepts and routes to the
 - **iOS:** `https://www.instagram.com/deeplinkos/`
 - **Android:** `https://www.instagram.com/deeplinkos/`
 
-When Instagram is installed, the OS intercepts the https URL and opens it in the app automatically. When it's not installed, the browser opens normally — a perfect fallback.
+When Instagram is installed, the OS intercepts the https URL and opens it in the app automatically. When it's not installed, the browser opens normally — a perfect fallback. This is the same mechanism as [iOS Universal Links](/blog/ios-universal-links-complete-guide) and [Android App Links](/blog/android-app-links-setup-guide) for your own apps.
 
 ## Building Instagram Deep Links Step by Step
 
@@ -132,7 +132,7 @@ If you send users directly to `instagram://user?username=deeplinkos`, users with
 
 ### ❌ Not Tracking the Source
 
-A raw Instagram URL tells you nothing. A DeepLinkOS smart link with UTM parameters tells you which campaign, post, or bio link sent the traffic — and whether they opened the app or fell back to web.
+A raw Instagram URL tells you nothing. A DeepLinkOS smart link with UTM parameters tells you which campaign, post, or bio link sent the traffic — and whether they opened the app or fell back to web. For the full picture of what UTM misses on mobile (and how to recover it), see [UTM vs Smart Attribution](/blog/utm-vs-smart-attribution).
 
 ### ❌ Ignoring In-App Browsers
 
@@ -146,6 +146,8 @@ For creators and brands:
 - **Merchandise stores:** Deep link to your product page in the native shopping app
 - **New followers:** Link to your Instagram profile from your bio — users follow faster inside the app
 - **Campaigns:** Track which post, story, or ad drove the most app opens
+
+If your goal is to route Instagram bio traffic to multiple destinations (shop, app, newsletter, YouTube), the [Link-in-Bio Conversion Strategy guide](/blog/link-in-bio-conversion-strategy) covers the full multi-destination routing approach.
 
 ## Frequently Asked Questions
 

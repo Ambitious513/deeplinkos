@@ -103,6 +103,26 @@ const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
 No extra configuration needed — WhatsApp's own Universal Link and App Link setup handles the routing. This makes `wa.me` one of the most reliable deep link formats available.
 
+### Handling Desktop Users Explicitly
+
+For campaigns where you control the routing (email, smart links, QR codes), detect desktop browsers and route them to WhatsApp Web directly:
+
+```javascript
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+const phone = '15551234567';
+const message = encodeURIComponent('Hi, I came from your campaign');
+
+if (isMobile) {
+  // Opens native WhatsApp app
+  window.location.href = `https://wa.me/${phone}?text=${message}`;
+} else {
+  // Opens WhatsApp Web directly — skips the "Download WhatsApp" interstitial
+  window.location.href = `https://web.whatsapp.com/send?phone=${phone}&text=${message}`;
+}
+```
+
+> **Why use `web.whatsapp.com` for desktop?** The standard `wa.me` URL on desktop opens an intermediate page asking users to download WhatsApp or continue to web. Routing desktop users directly to `web.whatsapp.com/send` eliminates that friction step for users who already have WhatsApp Web set up.
+
 ## Four Types of WhatsApp Deep Links
 
 ### 1. Click-to-Chat (Most Common)
@@ -145,7 +165,7 @@ Opens the business catalog directly, bypassing the chat screen.
 
 ### In a QR Code
 
-Encode the full `wa.me` URL as a QR code. Users scanning with iOS Camera or Android Camera launch WhatsApp directly. Use a **dynamic QR code** (via DeepLinkOS) so you can update the phone number or message without reprinting.
+Encode the full `wa.me` URL as a QR code. Users scanning with iOS Camera or Android Camera launch WhatsApp directly. Use a **dynamic QR code** (via DeepLinkOS) so you can update the phone number or message without reprinting. For a full walkthrough of QR code + deep link campaigns, see the [QR Codes + Shopify Deep Links guide](/blog/qr-codes-shopify-deep-links) — the same principles apply for any wa.me destination.
 
 ### In Email Campaigns
 
@@ -163,6 +183,8 @@ Use a smart link router (like DeepLinkOS) to wrap the `wa.me` URL. This lets you
 - Track clicks by platform
 - A/B test different pre-filled messages
 - Route desktop users to WhatsApp Web instead of failing
+
+For a complete strategy on structuring multi-destination bio pages that include a WhatsApp CTA alongside app links and product pages, see the [Link-in-Bio Conversion Strategy guide](/blog/link-in-bio-conversion-strategy).
 
 ### In SMS
 
@@ -223,7 +245,7 @@ Yes, with a caveat. The `wa.me` Universal Link is generally respected even insid
 
 ### Can I track clicks on WhatsApp deep links?
 
-Not directly inside WhatsApp (no pixel, no referrer). Wrap your `wa.me` URL in a tracked smart link — DeepLinkOS captures the click, device type, and source before forwarding to WhatsApp.
+Not directly inside WhatsApp (no pixel, no referrer). Wrap your `wa.me` URL in a tracked smart link — DeepLinkOS captures the click, device type, and source before forwarding to WhatsApp. For app campaigns, UTM parameters are captured at click time and delivered via deferred deep linking — see [UTM vs Smart Attribution](/blog/utm-vs-smart-attribution) for how this works.
 
 ## Next Steps
 

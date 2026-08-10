@@ -41,7 +41,7 @@ When a user leaves your web URL and enters the App Store, the HTTP referrer chai
 
 ### Layer 1: Web → App Store → App (60–80% loss)
 
-Standard UTM parameters die at the App Store handoff. This is the primary cause of attribution loss for app install campaigns.
+Standard UTM parameters die at the App Store handoff. This is the primary cause of attribution loss for app install campaigns. The fix is configuring [iOS Universal Links](/blog/ios-universal-links-complete-guide) and [Android App Links](/blog/android-app-links-setup-guide) so your routing chain never breaks before the handoff.
 
 ### Layer 2: Social In-App Browsers (15–20% additional loss)
 
@@ -50,7 +50,7 @@ Social platforms (Instagram, TikTok, Facebook) use sandboxed in-app browsers. Th
 - Strip `Referer` headers for privacy
 - Don't share cookie state with Safari/Chrome
 
-Even if a user doesn't install the app, their web session may be unattributable.
+Even if a user doesn't install the app, their web session may be unattributable. This is why [Instagram deep links](/blog/how-to-create-instagram-deep-links) and [TikTok deep links](/blog/how-to-create-tiktok-deep-links) require special routing to break out of sandboxed browsers before attribution can be captured.
 
 ### Layer 3: Apple's ATT (iOS 14+, 20–40% additional loss)
 
@@ -203,7 +203,7 @@ Track:
 Instagram ad → Web landing page → Manual App Store search
 ```
 
-✅ **Fix:** Use smart links that route directly to App Store / Play Store with attribution.
+✅ **Fix:** Use smart links that route directly to App Store / Play Store with attribution. For creators routing social traffic (Instagram bio, TikTok bio, YouTube), see the [Link-in-Bio Conversion Strategy guide](/blog/link-in-bio-conversion-strategy) for the full deferred attribution setup.
 
 ### ❌ Mistake 2: Relying on UTM in app install campaigns
 

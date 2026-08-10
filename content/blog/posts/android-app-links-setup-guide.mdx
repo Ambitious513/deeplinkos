@@ -37,6 +37,8 @@ App Links eliminate that dialog entirely. When a verified App Link is tapped, An
 2. **`AndroidManifest.xml` intent filter** — with `autoVerify="true"`
 3. **Kotlin/Java deep link handler** — in your Activity or NavGraph
 
+> **Building for both platforms?** The iOS equivalent of this guide is [iOS Universal Links: Complete Setup Guide](/blog/ios-universal-links-complete-guide). The architecture is parallel — AASA file instead of `assetlinks.json`, Associated Domains entitlement instead of `autoVerify`, Swift instead of Kotlin.
+
 ## Step 1 — Create assetlinks.json
 
 Host this file at:
@@ -265,6 +267,21 @@ GET /.well-known/assetlinks.json → 301 → https://www.example.com/.well-known
 ```
 
 Package names are case-sensitive.
+
+### ❌ Failure 5: Android 12 (API 31) strict verification mode
+
+Android 12 introduced a **breaking change** in App Links verification. Apps targeting `targetSdkVersion 31+` that fail domain verification are now fully downgraded to intent filters — showing the "Open with" dialog on every tap. In earlier Android versions, partial failures were silently ignored.
+
+What changed:
+- Android 12 requires **all** domains in your intent filter to verify successfully
+- A single domain failure (e.g., `www.example.com` verifies but `example.com` doesn't) disables App Links for all domains in that filter
+- The ADB verification output will show `1002` (failed) instead of `1024` (verified)
+
+✅ **Fix:** Run the ADB verification command before releasing to production targeting API 31+:
+```bash
+adb shell pm get-app-links --user cur com.yourcompany.yourapp
+```
+Every domain must show `verified`. Fix any `none` or `legacy_failure` entries before shipping.
 
 ## Frequently Asked Questions
 

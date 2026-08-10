@@ -40,7 +40,7 @@ const isIOS = /iPhone|iPad/i.test(navigator.userAgent);
 const isAndroid = /Android/i.test(navigator.userAgent);
 ```
 
-Once detected, routing follows the same Platform-Detect-Route-Fallback approach as [TikTok](/blog/how-to-create-tiktok-deep-links) and [Instagram](#) links.
+Once detected, routing follows the same Platform-Detect-Route-Fallback approach as [TikTok](/blog/how-to-create-tiktok-deep-links) and [Instagram](/blog/how-to-create-instagram-deep-links) links.
 
 ### iOS Routing from YouTube
 
@@ -254,7 +254,18 @@ Yes — create a unique smart link per video with `?utm_content=video-title` or 
 
 ### Do YouTube Shorts support description links?
 
-YouTube Shorts have limited description visibility on mobile. The channel link and pinned comment are more reliable placements for Shorts content.
+YouTube Shorts have significantly different UI constraints on mobile:
+
+- **Descriptions are hidden** behind the 3-dot menu (not visible by default)
+- **No pinned comment** is visible in the Shorts feed scroll UI on mobile
+- **Channel profile link** (in the About tab) is accessible from the creator's Shorts profile
+
+**Recommended Shorts strategy:**
+1. Add your smart link to your **channel profile bio** — visible when users tap your channel name from any Short
+2. Include a verbal CTA in the Shorts video itself ("Link in bio / channel profile")
+3. For Shorts with high virality potential, create a **short.link** with `utm_content=shorts-[title]` to track Shorts-specific traffic separately from long-form video traffic
+
+Shorts-driven channel visits convert at a higher rate than description clicks — the channel profile link is where Shorts traffic actually converts.
 
 ## Next Steps
 

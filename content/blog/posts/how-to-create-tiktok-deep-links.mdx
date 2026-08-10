@@ -72,7 +72,7 @@ iOS WebKit blocks automatic URI scheme launches. The only reliable method is pai
 </a>
 ```
 
-When the user taps this button, iOS intercepts the `https://yourapp.com` domain (because your AASA file is configured — see the iOS Universal Links guide) and opens your app directly.
+When the user taps this button, iOS intercepts the `https://yourapp.com` domain (because your AASA file is configured — see the [iOS Universal Links guide](/blog/ios-universal-links-complete-guide)) and opens your app directly.
 
 ### Step 3 — Android Routing: Intent URI
 
@@ -112,6 +112,8 @@ Desktop fallback: https://yourapp.com (web version)
 | Video description link | Full control | UTM | Requires user gesture |
 
 For TikTok Ads, use the **Measurement URL** field in TikTok Ads Manager to pass a separate smart link URL for attribution — independent of the creative link destination.
+
+For a deeper look at attribution loss across mobile campaigns, see [UTM vs Smart Attribution](/blog/utm-vs-smart-attribution).
 
 ## TikTok URI Schemes (Linking Into TikTok)
 
@@ -157,7 +159,9 @@ myapp://product/123
 
 ### ❌ Mistake 4: No attribution on deep link traffic
 
-✅ **Fix:** Append UTM parameters to every TikTok smart link: `?utm_source=tiktok&utm_medium=bio&utm_campaign=summer26`
+✅ **Fix:** Append UTM parameters to every TikTok smart link: `?utm_source=tiktok&utm_medium=bio&utm_campaign=summer26`. For a full breakdown of how to recover attribution data lost at the App Store, see [UTM vs Smart Attribution](/blog/utm-vs-smart-attribution).
+
+If you're managing a TikTok link-in-bio page with multiple destinations, the [Link-in-Bio Conversion Strategy guide](/blog/link-in-bio-conversion-strategy) covers the full multi-platform routing approach.
 
 ## Testing Your TikTok Deep Links
 

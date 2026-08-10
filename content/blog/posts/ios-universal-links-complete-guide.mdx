@@ -180,13 +180,21 @@ struct MyApp: App {
   var body: some Scene {
     WindowGroup {
       ContentView()
+        // Handles Universal Links when app is already running
         .onOpenURL { url in
+          handleDeepLink(url)
+        }
+        // Handles Universal Links when app launches from background via NSUserActivity
+        .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
+          guard let url = userActivity.webpageURL else { return }
           handleDeepLink(url)
         }
     }
   }
 }
 ```
+
+> **Why both handlers?** `.onOpenURL` handles links when the app is already in memory. `.onContinueUserActivity` handles the case where the app is launched fresh via a Universal Link tap — omitting it causes missed deep link events on cold launches.
 
 ## Step 4 — How Apple's CDN Verification Works
 
@@ -207,6 +215,18 @@ Use Apple's official validation tool:
 ```
 https://app-site-association.cdn-apple.com/a/v1/example.com
 ```
+
+### Smart App Banner: A web fallback that drives installs
+
+For users who open your Universal Link on the web (app not installed), add a **Smart App Banner** to your HTML `<head>`. iOS renders a native install prompt at the top of Safari:
+
+```html
+<meta name="apple-itunes-app"
+      content="app-id=YOUR_APP_STORE_ID,
+               app-argument=https://example.com/products/123">
+```
+
+The `app-argument` pre-fills the deep link destination so users land on the correct screen immediately after installing — effectively a built-in deferred deep link for Safari users.
 
 This shows what Apple's CDN has cached for your domain. If it doesn't match your file, the CDN hasn't picked up your changes yet.
 
