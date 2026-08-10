@@ -39,24 +39,29 @@ export function getServiceSupabaseEnv() {
 }
 
 // ── Full server-side env validation ─────────────────────────────────────────
-// Called in app/layout.tsx — throws on cold start if anything is misconfigured.
+// Helper: treat empty / placeholder / short strings as "not provided"
+const optionalStr = (minLen = 1) =>
+  z.preprocess(
+    (v) => (typeof v === "string" && v.trim().length >= minLen ? v.trim() : undefined),
+    z.string().optional()
+  );
 
 const serverEnvSchema = z.object({
   // Supabase — always required
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url("NEXT_PUBLIC_SUPABASE_URL must be a valid URL"),
+  NEXT_PUBLIC_SUPABASE_URL:      z.string().url("NEXT_PUBLIC_SUPABASE_URL must be a valid URL"),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(10, "NEXT_PUBLIC_SUPABASE_ANON_KEY looks invalid"),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(10, "SUPABASE_SERVICE_ROLE_KEY looks invalid"),
+  SUPABASE_SERVICE_ROLE_KEY:     z.string().min(10, "SUPABASE_SERVICE_ROLE_KEY looks invalid"),
   // App — always required
   NEXT_PUBLIC_SITE_URL: z.string().url("NEXT_PUBLIC_SITE_URL must be a valid URL (e.g. https://deeplinkos.com)"),
   // Security — always required
   IP_HASH_SALT: z.string().min(32, "IP_HASH_SALT must be at least 32 chars — run: openssl rand -hex 32"),
   // Polar billing — optional until account is approved
   // TODO: change to z.string().min(10) after Polar approval
-  POLAR_WEBHOOK_SECRET:         z.string().min(10).optional(),
-  POLAR_CHECKOUT_URL_CREATOR:   z.string().url().optional(),
-  POLAR_CHECKOUT_URL_SCALE:     z.string().url().optional(),
-  POLAR_CHECKOUT_URL_ENTERPRISE: z.string().url().optional(),
-  POLAR_CHECKOUT_URL_LIFETIME:  z.string().url().optional(),
+  POLAR_WEBHOOK_SECRET:          optionalStr(10),
+  POLAR_CHECKOUT_URL_CREATOR:    optionalStr(10),
+  POLAR_CHECKOUT_URL_SCALE:      optionalStr(10),
+  POLAR_CHECKOUT_URL_ENTERPRISE: optionalStr(10),
+  POLAR_CHECKOUT_URL_LIFETIME:   optionalStr(10),
 });
 
 let _validated = false;
