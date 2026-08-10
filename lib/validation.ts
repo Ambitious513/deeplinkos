@@ -1,13 +1,19 @@
 import { z } from "zod";
 
+const BLOCKED_SCHEMES = /^(javascript|data|vbscript):/i;
+
 const optionalUrl = z
   .string()
   .trim()
   .optional()
   .transform((value) => (value ? value : undefined))
+  .refine((value) => !value || !BLOCKED_SCHEMES.test(value), {
+    message: "URL scheme not allowed.",
+  })
   .refine((value) => !value || /^(https?:\/\/|[a-z][a-z0-9+.-]*:\/\/)/i.test(value), {
     message: "Use a valid URL or app URI scheme.",
   });
+
 
 const optionalString = (max = 200) =>
   z

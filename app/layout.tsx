@@ -3,6 +3,10 @@ import type { ReactNode } from "react";
 import NextTopLoader from "nextjs-toploader";
 
 import { ThemeProvider } from "@/components/theme-provider";
+import { validateServerEnv } from "@/lib/env";
+
+// Validate all required env vars on cold start — throws clearly if anything is missing
+validateServerEnv();
 
 import "./globals.css";
 

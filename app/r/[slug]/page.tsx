@@ -18,6 +18,66 @@ import {
 
 export const dynamic = "force-dynamic";
 
+// ── Password brute-force rate limiter (2.1) ────────────────────────────────────
+// Module-level Map persists across requests within the same Node.js process.
+// Works correctly on a single-instance VPS. Replace with Redis for multi-instance.
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+
+type RateBucket = { count: number; firstAttempt: number };
+const _rateBuckets = new Map<string, RateBucket>();
+
+function isRateLimited(ip: string, slug: string): boolean {
+  const key = `${ip}:${slug}`;
+  const bucket = _rateBuckets.get(key);
+  if (!bucket) return false;
+  if (Date.now() - bucket.firstAttempt > RATE_LIMIT_WINDOW_MS) {
+    _rateBuckets.delete(key);
+    return false;
+  }
+  return bucket.count >= RATE_LIMIT_MAX;
+}
+
+function recordFailedAttempt(ip: string, slug: string): void {
+  const key = `${ip}:${slug}`;
+  const existing = _rateBuckets.get(key);
+  const now = Date.now();
+  if (!existing || now - existing.firstAttempt > RATE_LIMIT_WINDOW_MS) {
+    _rateBuckets.set(key, { count: 1, firstAttempt: now });
+  } else {
+    existing.count += 1;
+  }
+  // Purge expired buckets periodically to prevent unbounded memory growth
+  if (_rateBuckets.size > 5000) {
+    for (const [k, b] of _rateBuckets) {
+      if (now - b.firstAttempt > RATE_LIMIT_WINDOW_MS) _rateBuckets.delete(k);
+    }
+  }
+}
+
+// ── URL scheme allowlist (2.2) ─────────────────────────────────────────────────
+// Only allow known-safe schemes as redirect destinations.
+// Blocks javascript:, data:, vbscript:, and any other unexpected scheme.
+const SAFE_PROTOCOLS = new Set(["https:", "http:", "intent:", "x-safari-https:", "x-safari-http:"]);
+
+function isSafeDestination(url: string): boolean {
+  // intent:// URIs are not parseable by URL() — allow them explicitly
+  if (url.startsWith("intent://")) return true;
+  try {
+    const { protocol } = new URL(url);
+    // Allow known-safe protocols
+    if (SAFE_PROTOCOLS.has(protocol)) return true;
+    // Allow any custom app URI scheme (e.g. spotify://, youtube://)
+    // These are set by authenticated users at link-creation time
+    if (/^[a-z][a-z0-9+\-.]+:\/\//i.test(url)) return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+// ── Types ─────────────────────────────────────────────────────────────────────
+
 type RedirectSearchParams = {
   pw?: string;
   utm_source?: string;
@@ -27,6 +87,8 @@ type RedirectSearchParams = {
   utm_content?: string;
   [key: string]: string | string[] | undefined;
 };
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -44,12 +106,9 @@ function utmEntries(searchParams: RedirectSearchParams) {
 function appendUtm(rawUrl: string, stored: Record<string, string | null>, incoming: Record<string, string>) {
   const merged: Record<string, string> = {};
   for (const [key, value] of Object.entries({ ...stored, ...incoming })) {
-    if (value) {
-      merged[key] = value;
-    }
+    if (value) merged[key] = value;
   }
   if (!Object.keys(merged).length) return rawUrl;
-
   try {
     const url = new URL(rawUrl);
     for (const [key, value] of Object.entries(merged)) {
@@ -83,6 +142,8 @@ function toSafariEscape(url: string): string | null {
     return null;
   }
 }
+
+// ── Password gate UI ──────────────────────────────────────────────────────────
 
 function PasswordGate({
   slug,
@@ -132,6 +193,26 @@ function PasswordGate({
   );
 }
 
+// ── Rate-limited lockout UI ───────────────────────────────────────────────────
+
+function RateLimitGate() {
+  return (
+    <main className="section">
+      <div className="card" style={{ maxWidth: 420, margin: "12vh auto 0", textAlign: "center", display: "grid", gap: 12 }}>
+        <div className="eyebrow">Too many attempts</div>
+        <h1 className="dashboard-page__title" style={{ fontSize: "clamp(1.5rem, 5vw, 2.25rem)" }}>
+          Link locked
+        </h1>
+        <p className="dashboard-page__summary">
+          Too many incorrect password attempts. Please try again in 10 minutes.
+        </p>
+      </div>
+    </main>
+  );
+}
+
+// ── Main redirect page ────────────────────────────────────────────────────────
+
 export default async function DeepLinkRedirectPage({
   params,
   searchParams,
@@ -148,23 +229,48 @@ export default async function DeepLinkRedirectPage({
   if (!record) redirect("/missing");
   if (record.expiresAt && new Date(record.expiresAt) < new Date()) redirect("/missing");
 
-  const incomingUtm = utmEntries(query);
-  const providedPassword = firstParam(query.pw);
-  if (record.passwordHash) {
-    if (!providedPassword || !(await verifyPassword(providedPassword, record.passwordHash))) {
-      return <PasswordGate slug={record.slug} title={record.title} wrongPassword={Boolean(providedPassword)} incomingUtm={incomingUtm} />;
-    }
-  }
-
   const userAgent = headersList.get("user-agent") ?? "";
   const platform = detectPlatform(userAgent);
   const referer = headersList.get("referer");
   const xRequestedWith = headersList.get("x-requested-with");
-  const ip = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() || headersList.get("x-real-ip") || "unknown";
+  const ip =
+    headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    headersList.get("x-real-ip") ||
+    "unknown";
+  const incomingUtm = utmEntries(query);
+  const providedPassword = firstParam(query.pw);
+
+  // ── Password gate with rate limiting ─────────────────────────────────────
+  if (record.passwordHash) {
+    if (isRateLimited(ip, record.slug)) {
+      return <RateLimitGate />;
+    }
+    if (!providedPassword || !(await verifyPassword(providedPassword, record.passwordHash))) {
+      if (providedPassword) recordFailedAttempt(ip, record.slug);
+      return (
+        <PasswordGate
+          slug={record.slug}
+          title={record.title}
+          wrongPassword={Boolean(providedPassword)}
+          incomingUtm={incomingUtm}
+        />
+      );
+    }
+  }
+
   const { variant, variantUrl } = pickVariant(record.abTestUrl, record.abTestWeight);
   const destination = resolveDestination(record, userAgent, variantUrl);
 
   if (!destination) redirect("/missing");
+
+  // ── URL scheme allowlist ──────────────────────────────────────────────────
+  if (!isSafeDestination(destination.destination)) {
+    console.error(
+      `[redirect] Blocked unsafe destination scheme for slug=${record.slug}: ` +
+        destination.destination.slice(0, 60)
+    );
+    redirect("/missing");
+  }
 
   const storedUtm = {
     utm_source: record.utmSource,
@@ -177,13 +283,13 @@ export default async function DeepLinkRedirectPage({
   const prefetch = isPrefetch(headersList);
   const bot = isBot(userAgent);
 
-  // ── IAB detection ──────────────────────────────────────────────────────────
+  // ── IAB detection ─────────────────────────────────────────────────────────
   const iabSource = detectIABSource(userAgent);
   const isIAB = iabSource !== null || isInAppWebView(userAgent, xRequestedWith, referer);
   const isDeepLink = destination.reason === "deep-link";
   const isIntentUri = finalDestination.startsWith("intent://");
 
-  // ── Click analytics (non-blocking via after()) ─────────────────────────────
+  // ── Click analytics (non-blocking via after()) ────────────────────────────
   if (!bot && !prefetch) {
     after(async () => {
       try {
@@ -194,8 +300,6 @@ export default async function DeepLinkRedirectPage({
           variant,
           device: deviceLabel(platform),
           os: detectOS(userAgent),
-          // When in IAB, label the browser as "Instagram IAB", "TikTok IAB" etc.
-          // so the analytics page shows social IAB traffic accurately.
           browser: iabSource ? `${iabSource} IAB` : detectBrowser(userAgent),
           referrer: detectReferrer(userAgent, referer),
           country: headersList.get("cf-ipcountry"),
@@ -208,7 +312,6 @@ export default async function DeepLinkRedirectPage({
           utm_term: incomingUtm.utm_term ?? record.utmTerm,
           utm_content: incomingUtm.utm_content ?? record.utmContent,
         });
-
         if (error && error.code !== "23505") {
           console.error("[click-tracking]", error.message);
         }
@@ -218,41 +321,31 @@ export default async function DeepLinkRedirectPage({
     });
   }
 
-  // ── Routing decision tree ──────────────────────────────────────────────────
-  //
-  //  Case 1: Not in an IAB, or not a deep-link → plain redirect (existing behaviour)
-  //  Case 2: Android IAB + intent:// URI      → direct 302, Android OS handles it → ZERO page shown
-  //  Case 3: iOS IAB (or Android without intent://) → serve interstitial with JS escape sequence
-  //
-  // Case 1 — plain redirect
+  // ── Routing decision tree ─────────────────────────────────────────────────
+  // Case 1 — Not in an IAB, or not a deep-link → plain redirect
   if (!isIAB || !isDeepLink) {
     redirect(finalDestination);
   }
 
-  // Case 2 — Android + intent URI: pure OS-level redirect, no page rendered at all
-  // The Android OS intercepts intent:// before the browser can display anything.
-  // S.browser_fallback_url in the intent string handles the "app not installed" case.
+  // Case 2 — Android + intent URI → OS-level redirect (zero page rendered)
   if (platform === "android" && isIntentUri) {
     redirect(finalDestination);
   }
 
   // Case 3 — interstitial for iOS IABs (and Android with custom scheme deep links)
   const fallback = appendUtm(
-    record.iosStoreUrl || record.androidStoreUrl || record.fallbackUrl || record.desktopUrl || record.destinationUrl || finalDestination,
+    record.iosStoreUrl ||
+      record.androidStoreUrl ||
+      record.fallbackUrl ||
+      record.desktopUrl ||
+      record.destinationUrl ||
+      finalDestination,
     storedUtm,
-    incomingUtm,
+    incomingUtm
   );
 
-  // For iOS: after failing to open the app, try escaping the WebView into Safari
-  // using the x-safari-https:// scheme. Safari processes Universal Links, so the
-  // app can still open from there. URLgenius uses this same technique.
   const safariEscape = platform === "ios" ? toSafariEscape(fallback) : null;
 
-  // Inline script fires synchronously before any pixels render.
-  // Timeline: script executes → tries deep link → 1200ms timeout:
-  //   • if document.hidden → app opened, stop (user is in the app)
-  //   • iOS: try Safari escape first (Universal Links), then web fallback
-  //   • Android: go straight to web fallback
   const inlineScript = `(function(){
   var target=${JSON.stringify(finalDestination)};
   var fallback=${JSON.stringify(fallback)};
@@ -277,7 +370,6 @@ export default async function DeepLinkRedirectPage({
 
   return (
     <>
-      {/* Script runs before body renders — effectively invisible when app opens */}
       <script dangerouslySetInnerHTML={{ __html: inlineScript }} />
       <main className="section">
         <div
@@ -290,7 +382,6 @@ export default async function DeepLinkRedirectPage({
             gap: 16,
           }}
         >
-          {/* Pulsing brand indicator */}
           <span
             aria-hidden="true"
             style={{
@@ -298,7 +389,7 @@ export default async function DeepLinkRedirectPage({
               width: 48,
               height: 48,
               borderRadius: "50%",
-              background: "var(--accent, #ea6a1c)",
+              background: "var(--accent, #2563eb)",
               margin: "0 auto",
               animation: "pulse 1.4s ease-in-out infinite",
             }}
