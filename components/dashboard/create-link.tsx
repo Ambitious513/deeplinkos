@@ -2,7 +2,7 @@
 
 import { createContext, type FormEvent, useContext, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, ChevronDown, Link2, Sparkles, X } from 'lucide-react'
+import { Check, ChevronDown, Link2, Sparkles, X, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/dashboard/modal'
 import { Field, TextInput, SelectInput } from '@/components/dashboard/form'
@@ -13,6 +13,25 @@ type CreateLinkContextValue = { open: () => void }
 const CreateLinkContext = createContext<CreateLinkContextValue | undefined>(undefined)
 
 const DEFAULT_DOMAIN_LABEL = 'deeplinkos.com (default)'
+
+// ─── Platform preset options ──────────────────────────────────────────────────
+
+const PRESET_OPTIONS = [
+  { value: 'custom',    label: 'Custom / No preset' },
+  { value: 'instagram', label: 'Instagram' },
+  { value: 'tiktok',    label: 'TikTok' },
+  { value: 'youtube',   label: 'YouTube' },
+  { value: 'facebook',  label: 'Facebook' },
+  { value: 'twitter',   label: 'X / Twitter' },
+  { value: 'spotify',   label: 'Spotify' },
+  { value: 'amazon',    label: 'Amazon' },
+  { value: 'snapchat',  label: 'Snapchat' },
+  { value: 'pinterest', label: 'Pinterest' },
+  { value: 'linkedin',  label: 'LinkedIn' },
+  { value: 'reddit',    label: 'Reddit' },
+  { value: 'whatsapp',  label: 'WhatsApp' },
+  { value: 'telegram',  label: 'Telegram' },
+]
 
 // ─── UTM field definitions ────────────────────────────────────────────────────
 
@@ -85,6 +104,7 @@ export function CreateLinkProvider({ children }: { children: React.ReactNode }) 
   // Form fields
   const [slug, setSlug]               = useState('')
   const [destUrl, setDestUrl]         = useState('')
+  const [preset, setPreset]           = useState('custom')
   const [utm, setUtmState]            = useState<UtmValues>(EMPTY_UTM)
   const [utmOpen, setUtmOpen]         = useState(false)
   const [detectedUtm, setDetectedUtm] = useState<Partial<UtmValues> | null>(null)
@@ -112,7 +132,7 @@ export function CreateLinkProvider({ children }: { children: React.ReactNode }) 
 
   const open = useCallback(() => {
     setCreated(false); setError(null); setCreatedUrl(null)
-    setSlug(''); setDestUrl(''); setUtmState(EMPTY_UTM)
+    setSlug(''); setDestUrl(''); setUtmState(EMPTY_UTM); setPreset('custom')
     setUtmOpen(false); setDetectedUtm(null); setSelectedDomainId('')
     setIsOpen(true)
     void loadDomains()
@@ -147,6 +167,7 @@ export function CreateLinkProvider({ children }: { children: React.ReactNode }) 
       slug:        slug.trim(),
       destinationUrl: destUrl.trim(),
       domainId:    selectedDomainId || '',
+      preset:      preset !== 'custom' ? preset : undefined,
       utmSource:   utm.utmSource.trim()   || undefined,
       utmMedium:   utm.utmMedium.trim()   || undefined,
       utmCampaign: utm.utmCampaign.trim() || undefined,
@@ -221,9 +242,28 @@ export function CreateLinkProvider({ children }: { children: React.ReactNode }) 
           /* ── Form ── */
           <form id="dashboard-create-link-form" onSubmit={submit} className="grid gap-4">
             {error && (
-              <p className="rounded-xl border border-danger/30 bg-danger-soft px-3 py-2 text-sm font-medium text-danger">
-                {error}
-              </p>
+              /limit|upgrade|plan/i.test(error) ? (
+                /* ── Plan limit upgrade card ── */
+                <div className="flex items-start gap-3 rounded-xl border border-amber-400/40 bg-amber-50 px-4 py-3 dark:bg-amber-950/30">
+                  <Zap className="mt-px size-4 shrink-0 text-amber-500" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">Link limit reached</p>
+                    <p className="mt-0.5 text-xs text-amber-600 dark:text-amber-400">{error}</p>
+                    <a
+                      href="/pricing"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center gap-1 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-bold text-white transition-opacity hover:opacity-85"
+                    >
+                      <Zap className="size-3" /> Upgrade plan
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                <p className="rounded-xl border border-danger/30 bg-danger-soft px-3 py-2 text-sm font-medium text-danger">
+                  {error}
+                </p>
+              )
             )}
 
             {/* Title */}
@@ -279,6 +319,18 @@ export function CreateLinkProvider({ children }: { children: React.ReactNode }) 
                 onChange={(e) => handleDestChange(e.target.value)}
                 required
               />
+            </Field>
+
+            {/* Platform preset */}
+            <Field label="Platform preset" hint="Enables smart deep-link routing for the selected app">
+              <SelectInput
+                value={preset}
+                onChange={(e) => setPreset(e.target.value)}
+              >
+                {PRESET_OPTIONS.map((p) => (
+                  <option key={p.value} value={p.value}>{p.label}</option>
+                ))}
+              </SelectInput>
             </Field>
 
             {/* UTM detection banner */}

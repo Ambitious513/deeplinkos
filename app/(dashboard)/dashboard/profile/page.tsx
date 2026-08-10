@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Copy, Check, KeyRound, LogOut, Monitor } from 'lucide-react'
+import { Check, Monitor, Save } from 'lucide-react'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel, PanelHeader, Badge } from '@/components/dashboard/primitives'
 import { Field, TextInput, Toggle } from '@/components/dashboard/form'
@@ -10,11 +10,21 @@ import type { AuthProfile } from '@/lib/auth/session'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+const NOTIF_STORAGE_KEY = 'dlos:notif_prefs'
+
+function defaultNotif() {
+  if (typeof window === 'undefined') return { weekly: true, alerts: true, product: false }
+  try {
+    const stored = localStorage.getItem(NOTIF_STORAGE_KEY)
+    if (stored) return JSON.parse(stored) as { weekly: boolean; alerts: boolean; product: boolean }
+  } catch { /* ignore */ }
+  return { weekly: true, alerts: true, product: false }
+}
+
 function initialsFor(name: string, email?: string) {
   const words = name.split(/\s+/).filter(Boolean)
   if (words.length >= 2) return (words[0][0] + words[words.length - 1][0]).toUpperCase()
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
-  // Fallback to email prefix
   return (email ?? '?').slice(0, 2).toUpperCase()
 }
 
@@ -28,10 +38,8 @@ export default function ProfilePage() {
   const [loading, setLoading]   = useState(true)
   const [profile, setProfile]   = useState<AuthProfile | null>(null)
   const [email, setEmail]       = useState<string>('')
-  const [copied, setCopied]     = useState(false)
-  const [notif, setNotif]       = useState({ weekly: true, alerts: true, product: false })
-
-  const apiKey = 'dlos_live_8f3a················2b71'
+  const [notif, setNotif]       = useState(defaultNotif)
+  const [notifSaved, setNotifSaved] = useState(false)
 
   // ── Fetch real profile ──────────────────────────────────────────────────
   useEffect(() => {
@@ -64,10 +72,11 @@ export default function ProfilePage() {
     }
   }, [profile, email])
 
-  const copyKey = () => {
-    void navigator.clipboard.writeText(apiKey).catch(() => {})
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1400)
+  // ── Notification save ───────────────────────────────────────────────────
+  const saveNotif = () => {
+    try { localStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(notif)) } catch { /* ignore */ }
+    setNotifSaved(true)
+    setTimeout(() => setNotifSaved(false), 2000)
   }
 
   return (
@@ -139,7 +148,17 @@ export default function ProfilePage() {
         <div className="grid gap-4 lg:col-span-2">
           {/* ── Notification prefs ───────────────────────────────────── */}
           <Panel className="p-6">
-            <PanelHeader title="Notification preferences" subtitle="Choose what lands in your inbox" />
+            <PanelHeader
+              title="Notification preferences"
+              subtitle="Choose what lands in your inbox"
+              action={
+                <Button variant="outline" size="sm" onClick={saveNotif}>
+                  {notifSaved
+                    ? <><Check className="size-4" /> Saved</>
+                    : <><Save className="size-4" /> Save</>}
+                </Button>
+              }
+            />
             <div className="mt-4 grid gap-1">
               {[
                 { key: 'weekly',  label: 'Weekly performance summary', desc: 'A digest of clicks and top links every Monday.' },
@@ -164,27 +183,24 @@ export default function ProfilePage() {
             </div>
           </Panel>
 
-          {/* ── API key ──────────────────────────────────────────────── */}
+          {/* ── API access — coming soon ──────────────────────────── */}
           <Panel className="p-6">
             <PanelHeader
               title="API access"
-              subtitle="Use this key to manage links programmatically"
-              action={
-                <Button variant="outline" size="sm">
-                  <KeyRound className="size-4" /> Rotate
-                </Button>
-              }
+              subtitle="Programmatic link management via REST API"
             />
-            <div className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-3 py-2.5">
-              <code className="flex-1 truncate font-mono text-sm">{apiKey}</code>
-              <button
-                type="button"
-                onClick={copyKey}
-                aria-label="Copy API key"
-                className="grid size-8 place-items-center rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground"
-              >
-                {copied ? <Check className="size-4 text-success" /> : <Copy className="size-4" />}
-              </button>
+            <div className="mt-4 flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-muted/30 px-6 py-8 text-center">
+              <span className="inline-flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+              </span>
+              <div>
+                <p className="text-sm font-semibold">API keys — coming soon</p>
+                <p className="mt-1 max-w-xs text-xs text-muted-foreground">
+                  REST API access is on our roadmap. You&apos;ll be able to create, update, and delete links programmatically. Stay tuned.
+                </p>
+              </div>
             </div>
           </Panel>
 

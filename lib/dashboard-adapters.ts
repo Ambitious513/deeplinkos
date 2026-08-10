@@ -8,9 +8,13 @@ export function dashboardStatusFor(link: LinkRecord): DashboardLinkStatus {
   return "active";
 }
 
-export function shortUrlForSlug(slug: string) {
-  if (typeof window === "undefined") return `/r/${slug}`;
-  return `${window.location.origin}/r/${slug}`;
+export function shortUrlForSlug(slug: string, customDomain?: string | null) {
+  // Prefer explicit custom domain, then env var, then current origin as last resort
+  const base = customDomain
+    ? `https://${customDomain}`
+    : (process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+        (typeof window !== "undefined" ? window.location.origin : ""));
+  return `${base}/r/${slug}`;
 }
 
 export function mapLinkRecordToDashboardLink(link: LinkRecord, clickCount = 0): DeepLink {

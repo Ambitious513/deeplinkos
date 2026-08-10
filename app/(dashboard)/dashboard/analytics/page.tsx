@@ -193,6 +193,11 @@ export default function AnalyticsPage() {
                   <SkeletonLine h="h-1.5" />
                 </div>
               ))
+            ) : view.devices.length === 0 ? (
+              <div className="flex flex-col items-center gap-2 py-10 text-center">
+                <Smartphone className="size-8 text-muted-foreground/40" />
+                <p className="text-sm text-muted-foreground">No device data yet — clicks will appear here as traffic comes in.</p>
+              </div>
             ) : (
               view.devices.map((d) => {
                 const Icon = getDeviceIcon(d.label)
@@ -232,6 +237,10 @@ export default function AnalyticsPage() {
                   <SkeletonLine h="h-1.5" />
                 </li>
               ))
+            ) : view.referrers.length === 0 ? (
+              <li className="py-10 text-center text-sm text-muted-foreground">
+                No referrer data yet — clicks will appear here as traffic comes in.
+              </li>
             ) : (
               view.referrers.map((r) => (
                 <li key={r.source} className="flex items-center gap-3 border-b border-border py-3 last:border-0">
