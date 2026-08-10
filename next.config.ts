@@ -42,6 +42,17 @@ const nextConfig: NextConfig = {
 
   outputFileTracingRoot: process.cwd(),
 
+  // Allow next/image to optimise images hosted on Cloudinary
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/bylks678/**",
+      },
+    ],
+  },
+
   // Apply security headers to all routes
   async headers() {
     return [
