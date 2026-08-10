@@ -1,0 +1,23 @@
+User-agent: *
+
+# Block bots from redirect routes — prevents click count inflation and indexing of short links
+Disallow: /r/
+
+# Block API routes — no reason for bots to hit these
+Disallow: /api/
+
+# Block dashboard — private, auth-protected area
+Disallow: /dashboard/
+
+# Allow all public marketing pages
+Allow: /
+Allow: /pricing
+Allow: /blog
+Allow: /contact
+Allow: /tools
+Allow: /privacy
+Allow: /terms
+Allow: /disclaimer
+
+# Sitemap location
+Sitemap: https://deeplinkos.com/sitemap.xml

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { deleteLinkForUser, toggleLinkForUser, updateLinkForUser } from "@/lib/links";
 import { createClient } from "@/lib/supabase/server";
-import { toggleLinkSchema } from "@/lib/validation";
+import { toggleLinkSchema, updateLinkSchema } from "@/lib/validation";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -45,8 +45,17 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
 
   const { slug } = await params;
 
+  // Validate the request body before touching the database
+  const parsed = updateLinkSchema.safeParse(await request.json());
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message || "Invalid request body." },
+      { status: 400 }
+    );
+  }
+
   try {
-    const link = await updateLinkForUser(slug, await request.json(), user.id);
+    const link = await updateLinkForUser(slug, parsed.data, user.id);
     if (!link) {
       return NextResponse.json({ error: "Link not found" }, { status: 404 });
     }
