@@ -4251,6 +4251,7 @@ html[data-theme="light"] .reason-options {
   outline: none;
 }
 
+
 .blog-search input:focus {
   border-color: var(--blue);
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
@@ -4625,7 +4626,7 @@ html[data-theme="light"] .reason-options {
 
 .blog-read-cta::after {
   margin-left: 6px;
-  content: "ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢";
+  content: "\2192";
   transition: transform 160ms ease;
 }
 
@@ -8609,26 +8610,35 @@ html[data-theme="light"] .faq-grid details {
   }
 }
 
-/* -- Blog article card: photo variant ---------------------------------------- */
+/* ── Blog article card: photo variant ─────────────────────────────────────── */
 
 .blog-article-visual--photo {
+  /* position: relative is needed so the absolute img fills this box */
   position: relative;
   overflow: hidden;
-  aspect-ratio: 16 / 9;
+  /* No aspect-ratio — desktop grid column (170-230px) determines width;
+     min-height from .blog-article-visual handles height on mobile & desktop */
   background: var(--bg-soft, #ede8df);
-  border-radius: 12px 12px 0 0;
+  /* No custom border-radius — parent .blog-article-card has overflow:hidden */
+  /* Override the default padding & grid that the base .blog-article-visual sets */
+  padding: 0;
+  display: block;
+  min-height: 200px;
 }
 
 .blog-article-visual--photo img {
+  /* Fill the positioned parent completely */
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.4s ease;
+  transition: transform 0.45s ease;
 }
 
 .blog-article-card:hover .blog-article-visual--photo img {
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
 /* Live badge on MDX cards */
