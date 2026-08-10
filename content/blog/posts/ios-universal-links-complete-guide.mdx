@@ -1,0 +1,295 @@
+---
+title: "iOS Universal Links: Complete Setup Guide for Developers (2025)"
+description: "Step-by-step guide to implementing iOS Universal Links — AASA file setup, Xcode entitlements, Apple CDN caching, common failures, and testing. Works without alert dialogs."
+publishedAt: "2026-08-10"
+author: "DeepLinkOS Team"
+category: "engineering"
+categoryLabel: "Engineering"
+tags: ["ios", "universal links", "aasa", "apple", "deep links", "xcode", "swift"]
+image: "https://res.cloudinary.com/bylks678/image/upload/v1786383259/blog/ios-universal-links.jpg"
+readTime: "11 min read"
+seoTitle: "iOS Universal Links Complete Setup Guide (2025) | DeepLinkOS"
+seoDescription: "Complete iOS Universal Links setup: AASA file format, Xcode entitlements, Apple CDN verification, SwiftUI handling, and debugging checklist. No alert dialogs."
+searchTerms: ["ios universal links", "apple app site association", "aasa file setup", "universal links not working", "xcode associated domains", "swift universal link handler", "ios deep link setup"]
+---
+
+iOS Universal Links are the most reliable way to route web traffic into your iOS app — no alert dialogs, no custom scheme conflicts, no broken experiences when the app isn't installed. But the setup has more failure points than most developers expect, and Apple's CDN caching makes debugging non-obvious.
+
+This guide walks through the complete implementation: AASA file structure, Xcode configuration, Swift/SwiftUI handling, Apple CDN validation, and a debugging checklist that covers the 18% of apps that get it wrong.
+
+## What Are iOS Universal Links?
+
+**iOS Universal Links** are standard `https://` URLs that iOS intercepts and routes to your native app — instantly, without an alert dialog — when your app is installed. If the app isn't installed, the URL opens in Safari normally.
+
+This makes Universal Links the only deep linking approach that:
+- Works without a browser popup
+- Provides a graceful web fallback
+- Cannot be hijacked by other apps (cryptographically verified)
+- Works inside most in-app browsers (with caveats)
+
+### Universal Links vs Custom URI Schemes
+
+| Feature | Universal Links (`https://`) | Custom URI Scheme (`myapp://`) |
+|---|---|---|
+| Alert dialog | None | "Open in myapp?" every time |
+| App not installed | Falls back to Safari | Shows error or does nothing |
+| Can be hijacked | No (domain verified) | Yes (any app can claim scheme) |
+| Works in email | Yes | Sometimes |
+| Works in Safari address bar | No | No |
+| iOS version required | iOS 9+ | iOS 3+ |
+
+## The Three Components of Universal Links
+
+Universal Links require three things to work together:
+
+1. **`apple-app-site-association` (AASA) file** — hosted on your domain
+2. **Associated Domains entitlement** — in your Xcode project
+3. **App delegate / scene delegate handler** — in your Swift/SwiftUI code
+
+All three must be correct. One wrong detail breaks the entire chain.
+
+## Step 1 — Create the AASA File
+
+The AASA file tells Apple which URL paths should open your app.
+
+### File location
+
+Host the file at **both** of these paths (Apple checks both):
+```
+https://example.com/apple-app-site-association
+https://example.com/.well-known/apple-app-site-association
+```
+
+> **Critical:** The filename must have **no `.json` extension**. `apple-app-site-association.json` will be ignored by Apple.
+
+### File format (iOS 13+)
+
+```json
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["TEAMID.com.yourcompany.yourapp"],
+        "components": [
+          {
+            "/": "/products/*",
+            "comment": "Open all product pages in the app"
+          },
+          {
+            "/": "/blog/*",
+            "comment": "Open blog posts in the app"
+          },
+          {
+            "/": "/user/*",
+            "comment": "Open user profiles in the app"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Finding your App ID prefix (Team ID)
+
+Your `appIDs` value combines:
+- **Team ID**: Found in Apple Developer Portal → Membership → Team ID
+- **Bundle ID**: Your app's bundle identifier (e.g., `com.yourcompany.yourapp`)
+
+Format: `TEAMID.bundleidentifier`
+
+### HTTP response headers
+
+The file must be served with:
+```
+Content-Type: application/json
+```
+
+And must **not** be behind an HTTP redirect (301/302). Apple's CDN fetches the file directly and does not follow redirects.
+
+## Step 2 — Configure Xcode
+
+### Add the Associated Domains entitlement
+
+1. Open your Xcode project
+2. Select your app target → **Signing & Capabilities**
+3. Click **+ Capability** → search for **Associated Domains**
+4. Add your domains:
+
+```
+applinks:example.com
+applinks:www.example.com
+```
+
+> **Development mode:** Add `applinks:example.com?mode=developer` to bypass Apple's CDN cache during development and fetch directly from your server.
+
+### Verify your entitlements file
+
+Check your `.entitlements` file contains:
+
+```xml
+<key>com.apple.developer.associated-domains</key>
+<array>
+  <string>applinks:example.com</string>
+  <string>applinks:www.example.com</string>
+</array>
+```
+
+## Step 3 — Handle the Universal Link in Swift
+
+### UIKit (AppDelegate)
+
+```swift
+func application(
+  _ application: UIApplication,
+  continue userActivity: NSUserActivity,
+  restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
+) -> Bool {
+  guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+        let url = userActivity.webpageURL else {
+    return false
+  }
+  return handleDeepLink(url)
+}
+
+private func handleDeepLink(_ url: URL) -> Bool {
+  guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+    return false
+  }
+  let path = components.path
+  switch path {
+  case _ where path.hasPrefix("/products/"):
+    let productId = String(path.dropFirst("/products/".count))
+    navigateToProduct(productId)
+    return true
+  case _ where path.hasPrefix("/user/"):
+    let userId = String(path.dropFirst("/user/".count))
+    navigateToProfile(userId)
+    return true
+  default:
+    return false
+  }
+}
+```
+
+### SwiftUI (Scene-based)
+
+```swift
+@main
+struct MyApp: App {
+  var body: some Scene {
+    WindowGroup {
+      ContentView()
+        .onOpenURL { url in
+          handleDeepLink(url)
+        }
+    }
+  }
+}
+```
+
+## Step 4 — How Apple's CDN Verification Works
+
+Since **iOS 14**, Apple no longer fetches your AASA file directly from your server. Instead:
+
+1. Apple's CDN (`app-site-association.cdn-apple.com`) scrapes your AASA file
+2. The CDN caches and distributes the file globally
+3. iOS devices download the AASA from Apple's CDN during app install or update
+
+**What this means for debugging:**
+- Changes to your AASA file don't take effect immediately
+- CDN cache TTL is unpredictable (hours to days)
+- You cannot bypass CDN caching in production (only in developer mode)
+
+### Validate your AASA immediately
+
+Use Apple's official validation tool:
+```
+https://app-site-association.cdn-apple.com/a/v1/example.com
+```
+
+This shows what Apple's CDN has cached for your domain. If it doesn't match your file, the CDN hasn't picked up your changes yet.
+
+## Common Failures and Fixes
+
+### ❌ Failure 1: AASA file has `.json` extension
+
+```
+Wrong: apple-app-site-association.json
+Right: apple-app-site-association (no extension)
+```
+
+### ❌ Failure 2: AASA served behind a redirect
+
+```
+HTTP/1.1 301 Moved Permanently
+Location: https://www.example.com/.well-known/apple-app-site-association
+```
+
+Apple's CDN does not follow redirects. Host the file directly at both paths.
+
+### ❌ Failure 3: Testing by typing the URL into Safari
+
+Entering a Universal Link directly in Safari's address bar explicitly tells iOS the user wants the website, not the app. This bypasses Universal Link routing — always test by tapping a link in Notes, Mail, or Messages.
+
+### ❌ Failure 4: Using the Debug keystore fingerprint (Android crossover error)
+
+Universal Links don't use fingerprints — that's Android. If this is confusing you, check the [Android App Links guide](/blog/android-app-links-setup-guide).
+
+### ❌ Failure 5: App ID prefix mismatch
+
+```json
+// Wrong — missing Team ID prefix
+"appIDs": ["com.yourcompany.yourapp"]
+
+// Correct
+"appIDs": ["ABCDE12345.com.yourcompany.yourapp"]
+```
+
+## Debugging Checklist
+
+```
+Pre-launch verification:
+☐ AASA file hosted without .json extension
+☐ AASA served with Content-Type: application/json
+☐ No 301/302 redirect on AASA file path
+☐ Apple CDN validation returns correct content
+☐ Team ID prefix correct in appIDs
+☐ Associated Domains added in Xcode Signing & Capabilities
+☐ Entitlements file contains applinks:yourdomain.com
+☐ App handles NSUserActivityTypeBrowsingWeb in AppDelegate
+☐ Tested on real device (not simulator)
+☐ Tested by tapping link (not typing in Safari address bar)
+```
+
+## Frequently Asked Questions
+
+### Why do Universal Links open Safari instead of my app?
+
+Three most likely causes: (1) AASA file isn't being found by Apple CDN, (2) the URL path isn't covered by your `components` array, or (3) the user previously tapped the domain name pill in Safari's top-right corner, which disables Universal Links for that domain for that session.
+
+### How long does AASA caching take?
+
+Apple's CDN can take anywhere from a few hours to several days to pick up AASA file changes. During development, use `?mode=developer` in your entitlement to bypass CDN caching.
+
+### Do Universal Links work inside WKWebView?
+
+No — Universal Links inside your own app's WKWebView don't trigger. This is a WebKit security restriction. Use `SFSafariViewController` for web content where you want Universal Links to work.
+
+### Do Universal Links work inside TikTok and Instagram?
+
+Sometimes — with caveats. Social in-app browsers are sandboxed WKWebViews. Universal Links triggered by a user gesture (button tap) generally work. Auto-redirects do not. See the [TikTok deep links guide](/blog/how-to-create-tiktok-deep-links) for the full routing approach.
+
+### Can one app handle Universal Links from multiple domains?
+
+Yes. Add multiple `applinks:` entries to your Associated Domains entitlement and list all domains in your AASA's `appIDs` array.
+
+## Next Steps
+
+1. Create your AASA file with the correct Team ID prefix and path patterns
+2. Add the Associated Domains entitlement in Xcode
+3. Implement the `onOpenURL` or `application(_:continue:)` handler
+4. Validate via Apple's CDN endpoint before shipping
+5. Use DeepLinkOS smart links to wrap your Universal Links with click analytics, campaign attribution, and fallback control
+
+Once configured, every `https://example.com/products/123` tap in Safari, Mail, Notes, and most in-app browsers routes directly into your app — instantly, silently, with no alert dialogs.

@@ -1,0 +1,300 @@
+---
+title: "Android App Links Setup Guide: Eliminate the 'Open With' Dialog (2025)"
+description: "Step-by-step guide to implementing Android App Links using Digital Asset Links (assetlinks.json) — eliminating the app picker, fixing certificate fingerprint errors, and verifying domain ownership."
+publishedAt: "2026-08-10"
+author: "DeepLinkOS Team"
+category: "engineering"
+categoryLabel: "Engineering"
+tags: ["android", "app links", "assetlinks.json", "digital asset links", "deep links", "kotlin"]
+image: "https://res.cloudinary.com/bylks678/image/upload/v1786383271/blog/android-app-links.jpg"
+readTime: "10 min read"
+seoTitle: "Android App Links Setup Guide: Eliminate the 'Open With' Dialog (2025) | DeepLinkOS"
+seoDescription: "Complete Android App Links setup with assetlinks.json, SHA-256 fingerprints, AndroidManifest.xml config, Kotlin deep link handler, and verification steps."
+searchTerms: ["android app links", "assetlinks.json setup", "digital asset links android", "android deep link no dialog", "android autoVerify", "android app link not working", "SHA-256 fingerprint app links"]
+---
+
+Android App Links are the difference between a deep link that just works — and one that shows an "Open with Chrome / Open with your app" dialog every single time. 30–45% of users will choose Chrome. Your app never opens.
+
+App Links eliminate that dialog entirely. When a verified App Link is tapped, Android opens your app directly — no popup, no choice. This guide shows you the exact setup, the most common certificate fingerprint error (affecting 18% of published apps), and how to verify your configuration before shipping.
+
+## What Are Android App Links?
+
+**Android App Links** are HTTPS URLs that Android verifies your app owns — via a `assetlinks.json` file on your domain — and then routes directly to your app without showing the system app picker dialog.
+
+### App Links vs Intent Filters vs Custom Schemes
+
+| Feature | App Links (`https://`) | Intent Filter (unverified) | Custom Scheme (`myapp://`) |
+|---|---|---|---|
+| App picker dialog | Never | Always | Rarely (if only one handler) |
+| App not installed | Opens Chrome | Opens Chrome | Nothing / error |
+| Domain verified | Yes (cryptographic) | No | No |
+| Android version | 6.0+ (API 23+) | All | All |
+| Works in email | Yes | Yes | Sometimes |
+
+## The Three Components of Android App Links
+
+1. **`assetlinks.json`** — hosted on your domain at `/.well-known/assetlinks.json`
+2. **`AndroidManifest.xml` intent filter** — with `autoVerify="true"`
+3. **Kotlin/Java deep link handler** — in your Activity or NavGraph
+
+## Step 1 — Create assetlinks.json
+
+Host this file at:
+```
+https://example.com/.well-known/assetlinks.json
+```
+
+### File format
+
+```json
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.yourcompany.yourapp",
+      "sha256_cert_fingerprints": [
+        "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C"
+      ]
+    }
+  }
+]
+```
+
+### Getting the correct SHA-256 fingerprint
+
+This is where **18% of Android developers get it wrong** — they use the debug keystore fingerprint instead of the production Play Signing key.
+
+**Option A — Google Play App Signing (recommended)**
+
+If you use Google Play App Signing (you almost certainly do for new apps):
+
+1. Go to Google Play Console → your app → **Release → Setup → App Integrity**
+2. Click the **App signing** tab
+3. Copy the **SHA-256 certificate fingerprint** listed under "App signing key certificate"
+
+> This is the key Google uses to sign your app. It's different from your local keystore.
+
+**Option B — Self-managed keystore**
+
+```bash
+# Get fingerprint from your keystore file
+keytool -list -v \
+  -keystore /path/to/your.keystore \
+  -alias your-key-alias \
+  -storepass your-password
+```
+
+Look for `SHA256:` in the output.
+
+**Option C — From an installed APK**
+
+```bash
+apksigner verify --print-certs your-app.apk | grep SHA-256
+```
+
+### HTTP headers required
+
+Serve the file with:
+```
+Content-Type: application/json
+```
+
+No 301/302 redirects. Android OS fetches directly from origin — it does not follow redirects.
+
+## Step 2 — Configure AndroidManifest.xml
+
+Add an intent filter with `android:autoVerify="true"` to your target Activity:
+
+```xml
+<activity
+    android:name=".MainActivity"
+    android:exported="true">
+
+    <!-- Regular launcher intent -->
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+
+    <!-- App Links intent filter — autoVerify is critical -->
+    <intent-filter android:autoVerify="true">
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <!-- Your verified domain -->
+        <data
+            android:scheme="https"
+            android:host="example.com" />
+        <data
+            android:scheme="https"
+            android:host="www.example.com" />
+    </intent-filter>
+
+</activity>
+```
+
+> **Critical:** `android:autoVerify="true"` must be present. Without it, the intent filter behaves like a standard unverified intent — showing the app picker dialog.
+
+## Step 3 — Handle the Deep Link in Kotlin
+
+### In your Activity
+
+```kotlin
+class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        handleDeepLink(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleDeepLink(intent)
+    }
+
+    private fun handleDeepLink(intent: Intent) {
+        if (intent.action != Intent.ACTION_VIEW) return
+        val uri = intent.data ?: return
+
+        when {
+            uri.pathSegments.firstOrNull() == "products" -> {
+                val productId = uri.pathSegments.getOrNull(1)
+                navigateToProduct(productId)
+            }
+            uri.pathSegments.firstOrNull() == "user" -> {
+                val userId = uri.pathSegments.getOrNull(1)
+                navigateToProfile(userId)
+            }
+            else -> {
+                // Fallback — open home screen
+                navigateToHome()
+            }
+        }
+    }
+}
+```
+
+### With Jetpack Navigation and NavDeepLink
+
+```kotlin
+// In your nav graph XML
+<fragment android:id="@+id/productFragment">
+    <deepLink
+        android:id="@+id/productDeepLink"
+        app:uri="https://example.com/products/{productId}" />
+</fragment>
+```
+
+```kotlin
+// In NavHostFragment setup
+findNavController().handleDeepLink(intent)
+```
+
+## Step 4 — Verify Your App Links
+
+### Google's Statement List Checker
+
+```
+https://digitalassetlinks.googleapis.com/v1/statements:list?source.web.site=https://example.com&relation=delegate_permission/common.handle_all_urls
+```
+
+Look for `"matched": true` in the response. If the response is empty or shows an error, your `assetlinks.json` has a problem.
+
+### ADB verification on device
+
+```bash
+# After installing the app, trigger verification
+adb shell pm set-app-links --package com.yourcompany.yourapp 2 example.com
+
+# Check verification status
+adb shell pm get-app-links com.yourcompany.yourapp
+```
+
+Expected output:
+```
+com.yourcompany.yourapp:
+    ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    Signatures: [<your SHA-256>]
+    Domain verification state:
+      example.com: verified
+```
+
+If you see `none` or `legacy_failure` instead of `verified`, your setup is incorrect.
+
+### Testing deep links via ADB
+
+```bash
+adb shell am start \
+  -W -a android.intent.action.VIEW \
+  -d "https://example.com/products/123" \
+  com.yourcompany.yourapp
+```
+
+## Common Failures and Fixes
+
+### ❌ Failure 1: Wrong SHA-256 fingerprint (most common — 18% of apps)
+
+Using the debug keystore fingerprint instead of the Google Play production signing key.
+
+✅ **Fix:** Get the fingerprint from Google Play Console → Release → Setup → App Integrity → App signing key certificate.
+
+### ❌ Failure 2: Missing autoVerify="true"
+
+```xml
+<!-- Missing autoVerify — behaves like a regular intent filter -->
+<intent-filter>
+```
+
+✅ **Fix:** Add `android:autoVerify="true"` to every intent filter that handles HTTPS scheme.
+
+### ❌ Failure 3: assetlinks.json behind a redirect
+
+```
+GET /.well-known/assetlinks.json → 301 → https://www.example.com/.well-known/assetlinks.json
+```
+
+✅ **Fix:** Host the file directly on both `example.com` and `www.example.com` without redirects.
+
+### ❌ Failure 4: Package name mismatch
+
+```json
+"package_name": "com.yourcompany.YourApp"  ← wrong case
+"package_name": "com.yourcompany.yourapp"  ← correct
+```
+
+Package names are case-sensitive.
+
+## Frequently Asked Questions
+
+### Do Android App Links work in TikTok and Instagram?
+
+TikTok's WebView supports `intent://` URIs which can be used to break out into your app. Standard App Links (HTTPS scheme) may not trigger inside third-party WebViews. See the [TikTok deep links guide](/blog/how-to-create-tiktok-deep-links) for the full approach.
+
+### Does App Links verification happen at install time or runtime?
+
+Primarily at install time (and during updates). Android OS verifies `assetlinks.json` when the app is installed from Google Play. The verification result is cached — you don't need a network connection for App Links to work after installation.
+
+### Can I have multiple apps handle the same domain?
+
+Yes — add multiple entries to your `assetlinks.json` array, one per app. Both apps will be verified. Android will open whichever app the user has installed (or ask if both are installed).
+
+### What happens if assetlinks.json changes after the app is installed?
+
+Android periodically re-verifies App Links. Re-verification can also be triggered by app updates. For immediate re-verification during testing, use the `adb shell pm set-app-links` command.
+
+### Are App Links required for deep linking to work?
+
+No. You can deep link without App Links using intent filters — but users will see the "Open with" dialog every time. App Links make the experience seamless and are essential for production apps.
+
+## Next Steps
+
+1. Get your production SHA-256 fingerprint from Google Play Console (not your local keystore)
+2. Create `assetlinks.json` and host at `/.well-known/assetlinks.json` on your domain
+3. Add the `autoVerify="true"` intent filter to `AndroidManifest.xml`
+4. Implement the Kotlin deep link handler in your Activity
+5. Verify using Google's Statement List Checker and ADB
+6. Wrap your App Links in DeepLinkOS smart links for click analytics and cross-platform attribution
+
+With App Links configured, every `https://example.com/products/123` tap opens your app instantly — no dialog, no friction.

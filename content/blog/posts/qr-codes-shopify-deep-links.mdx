@@ -1,0 +1,225 @@
+---
+title: "QR Codes + Shopify Deep Links: Drive 40% Higher App Conversions"
+description: "Learn how to combine QR codes with Shopify deep links to route offline and print traffic directly into native app checkouts — achieving 40-50% higher conversion rates than standard mobile web."
+publishedAt: "2026-08-10"
+author: "DeepLinkOS Team"
+category: "tutorials"
+categoryLabel: "Playbook"
+tags: ["qr codes", "shopify", "deep links", "ecommerce", "shop app", "mobile commerce"]
+image: "https://res.cloudinary.com/bylks678/image/upload/v1786383275/blog/shopify-qr-deep-links.jpg"
+readTime: "8 min read"
+seoTitle: "QR Codes + Shopify Deep Links: Drive 40% Higher Conversions | DeepLinkOS"
+seoDescription: "Combine QR codes with Shopify deep links to open native app checkout directly. Pre-fill carts, auto-apply discounts, track scans, and boost conversion 40-50%."
+searchTerms: ["shopify deep link", "qr code shopify", "shopify app link", "shopify qr code", "shop app deep link", "shopify cart deep link", "qr code ecommerce"]
+---
+
+A customer scans your product QR code. They land on your mobile website. They have to log in. They can't find Apple Pay. They leave. That sale is gone.
+
+The same QR code, built correctly, opens your Shopify app or native store app directly — with the product in the cart, the discount applied, and Shop Pay one tap away. Scan-to-purchase conversion is 3.5× higher. Here's how to build it.
+
+## What Are Shopify Deep Links?
+
+**Shopify deep links** are URLs that route users directly to specific screens inside a native Shopify-powered app experience — a product page, pre-filled cart, collection, or checkout — rather than landing on a generic mobile website.
+
+There are three types of Shopify deep link targets:
+
+| Target | Description | Best for |
+|---|---|---|
+| **Shop App** (`shop.app`) | Universal Link to Shopify's native consumer app | Merchants without a custom app |
+| **Custom brand app** | Your brand's own iOS/Android app via Universal/App Links | Brands with dedicated apps |
+| **Web cart with params** | Pre-filled mobile web cart with discount codes | All merchants (no app required) |
+
+## Why QR Code + Deep Link Outperforms QR Code + Web
+
+| Metric | QR → Mobile Web | QR → Native App |
+|---|---|---|
+| Checkout completion rate | ~2.1% | ~3.8–5.4% |
+| Payment method availability | Credit card only | Apple Pay, Google Pay, Shop Pay |
+| Login required | Yes (usually) | No (already logged in) |
+| Cart persistence | Session-based | Account-based |
+| Conversion lift vs web | Baseline | **40–50% higher** |
+| Shop Pay conversion advantage | — | **1.91× higher than guest web** |
+
+The difference is entirely about friction. A native app user is logged in, their payment is saved, and Shop Pay completes checkout in 2 taps.
+
+## Building Shopify Deep Link URLs
+
+### 1. Product Page Deep Link
+
+```
+https://shop.app/p/[product-handle]
+
+# Example
+https://shop.app/p/your-product-name
+```
+
+The `shop.app` Universal Link routes iOS users to the Shop App if installed, or to the Shop App download page.
+
+For your custom brand app:
+```
+https://yourstore.com/products/your-product-name
+```
+
+This URL works as a Universal Link (iOS) or App Link (Android) once configured — see the [iOS Universal Links guide](/blog/ios-universal-links-complete-guide) and [Android App Links guide](/blog/android-app-links-setup-guide).
+
+### 2. Pre-Filled Cart Deep Link
+
+Shopify supports pre-filling carts via URL:
+
+```
+https://yourstore.com/cart/[variant-id]:[quantity]?discount=[CODE]
+
+# Single product
+https://yourstore.com/cart/41234567890:1?discount=SUMMER26
+
+# Multiple products
+https://yourstore.com/cart/41234567890:1,41234567891:2?discount=SUMMER26
+```
+
+To get the variant ID:
+1. Go to Shopify Admin → Products → your product
+2. Click a variant
+3. The variant ID is in the URL: `https://admin.shopify.com/store/[handle]/variants/[ID]`
+
+### 3. Pre-Filled Cart with Checkout Bypass
+
+```
+https://yourstore.com/cart/[variant-id]:[quantity]?checkout[email]=user@email.com&checkout[shipping_address][zip]=90210
+```
+
+This pre-fills checkout fields — useful for QR codes in physical retail where you have member data.
+
+### 4. Collection Deep Link
+
+```
+https://yourstore.com/collections/[collection-handle]
+
+# Example
+https://yourstore.com/collections/summer-sale
+```
+
+## Building QR Codes That Deep Link Correctly
+
+### ❌ The Wrong Way: Encode a URI Scheme
+
+```
+# This breaks on camera apps and desktop scanners
+myshopifyapp://product/123
+```
+
+Custom URI schemes embedded in QR codes fail when:
+- Scanned with iOS Camera (which doesn't launch URI schemes)
+- Scanned with Google Lens
+- Scanned on desktop
+
+### ✅ The Right Way: Encode a Smart HTTP URL
+
+Always encode an `https://` URL in your QR code — never a URI scheme. The smart link handles routing:
+
+```
+https://dlnk.co/your-store/product-name
+```
+
+This URL:
+1. Detects the device (iOS / Android / desktop)
+2. Checks for your app (Universal Link test)
+3. Routes to native app if installed
+4. Routes to App Store / Play Store if not installed
+5. Routes to mobile web if on desktop
+
+### Dynamic vs Static QR Codes
+
+| Feature | Static QR | Dynamic QR |
+|---|---|---|
+| URL encoded directly | Yes | No — encoded URL is a redirect |
+| Can update destination | Never | Any time |
+| Track scan analytics | No | Yes |
+| Reprint required on change | Yes | No |
+| Best for | Never | Always |
+
+**Always use dynamic QR codes** — they encode a redirect URL (like a DeepLinkOS smart link) that you can update any time. Static QR codes encode the destination URL directly, which you cannot change once printed.
+
+## Step-by-Step: QR Code Campaign for a Product Launch
+
+### Step 1 — Create your Shopify cart deep link
+
+```
+https://yourstore.com/cart/41234567890:1?discount=LAUNCH26
+```
+
+This opens the native app with the product in the cart and the launch discount applied.
+
+### Step 2 — Wrap it in a DeepLinkOS smart link
+
+Create a smart link with:
+- **iOS destination:** Universal Link to your brand app or `shop.app`
+- **Android destination:** Android App Link to your brand app
+- **iOS fallback (no app):** App Store listing
+- **Android fallback (no app):** Play Store listing
+- **Desktop fallback:** Product web page
+
+### Step 3 — Generate a dynamic QR code from the smart link
+
+Encode the short smart link URL (e.g., `https://dlnk.co/launch-sale`) in a QR code. This QR code never changes — you can update the destination URL anytime without reprinting.
+
+### Step 4 — Add UTM parameters for scan attribution
+
+```
+https://dlnk.co/launch-sale?utm_source=print&utm_medium=flyer&utm_campaign=aug-launch
+```
+
+Track scan-to-purchase conversion in your analytics platform.
+
+### Step 5 — Print and place QR codes
+
+High-converting QR code placements for Shopify merchants:
+- Product packaging (post-purchase upsell QR)
+- In-store shelf talkers (drive to app for loyalty pricing)
+- Event banners (collect emails or drive app install)
+- Delivery inserts (re-engagement + loyalty)
+- Outdoor ads (OOH attribution via UTM)
+
+## Tracking QR Scan Attribution
+
+### What to track per QR code
+
+| Metric | Why it matters |
+|---|---|
+| Scan volume | Which placements get most traffic |
+| Device split (iOS / Android / desktop) | Tells you which app to prioritise |
+| App install rate | Did the QR scan drive an app install? |
+| Scan → cart add rate | Is the deep link pre-fill working? |
+| Scan → purchase rate | Final conversion metric |
+| Time of scan | Identifies peak physical traffic windows |
+
+## Frequently Asked Questions
+
+### Do Shopify cart deep links work on mobile web too?
+
+Yes. If the user doesn't have your app, the smart link falls back to the mobile web cart URL — which still has the product pre-filled and discount applied. Native app is the premium experience, web is the reliable fallback.
+
+### Can I use QR codes in TikTok and Instagram videos?
+
+QR codes displayed in videos can be scanned with iOS Camera or Google Lens if visible long enough (~2 seconds minimum at reasonable size). This is becoming more common in creator product placements.
+
+### How do I get the variant ID for a Shopify product?
+
+Go to Shopify Admin → Products → select your product → click a variant → the variant ID is in the URL. You can also retrieve variant IDs via the Shopify Admin API: `GET /admin/api/2024-01/products/{product_id}/variants.json`.
+
+### Does the Shop App Universal Link work for all Shopify stores?
+
+Yes — any Shopify merchant is automatically supported by the Shop App. The `shop.app/p/[handle]` Universal Link works out of the box. You don't need to build your own iOS app to get native app conversions.
+
+### What QR code size is needed for reliable scanning?
+
+Minimum 2cm × 2cm for print items held at arm's length. For outdoor/billboard use, scale proportionally: 1cm of QR size per metre of viewing distance. Use QR code generators with high error correction (Level H) for printed materials.
+
+## Next Steps
+
+1. Create your Shopify cart deep link with `?discount=` parameter
+2. Wrap it in a DeepLinkOS smart link with iOS/Android routing and fallbacks
+3. Generate a dynamic QR code from the smart link
+4. Add `?utm_source=print&utm_campaign=your-campaign` for attribution
+5. Deploy on packaging, in-store signage, or event materials
+
+Every QR scan will route customers directly into your native app checkout — no login friction, no lost Apple Pay sessions.
