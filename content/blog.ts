@@ -15,6 +15,7 @@ export type BlogPost = {
   searchTerms: string[];
   seoTitle: string;
   seoDescription: string;
+  image?: string | null;
 };
 
 export type PartnerCard = {
