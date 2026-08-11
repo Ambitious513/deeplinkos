@@ -1,4 +1,5 @@
 import { MDXRemote } from "next-mdx-remote/rsc";
+import remarkGfm from "remark-gfm";
 
 // Custom heading components that inject anchor IDs matching the ToC
 function slugify(text: string) {
@@ -75,20 +76,29 @@ const components = {
   ),
   // Code block
   pre: (props: React.HTMLAttributes<HTMLPreElement>) => (
-    <pre
+    <div
       style={{
-        background: "var(--surface-dark, #0f172a)",
-        color: "#e2e8f0",
-        borderRadius: 14,
-        padding: "1.25rem 1.5rem",
-        overflowX: "auto",
-        fontSize: "0.85rem",
-        lineHeight: 1.7,
         margin: "1.5rem 0",
-        border: "1px solid var(--border, #e5e7eb)",
+        borderRadius: 12,
+        overflow: "hidden",
+        border: "1px solid rgba(255,255,255,0.06)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
       }}
-      {...props}
-    />
+    >
+      <pre
+        style={{
+          background: "#1e2535",
+          color: "#cdd6f4",
+          padding: "1.25rem 1.5rem",
+          overflowX: "auto",
+          fontSize: "0.84rem",
+          lineHeight: 1.75,
+          margin: 0,
+          fontFamily: '"Fira Code", "Cascadia Code", Consolas, monospace',
+        }}
+        {...props}
+      />
+    </div>
   ),
   // Callout-style strong
   strong: (props: React.HTMLAttributes<HTMLElement>) => (
@@ -148,7 +158,15 @@ const components = {
 export function MdxContent({ source }: { source: string }) {
   return (
     <div className="blog-mdx-body">
-      <MDXRemote source={source} components={components} />
+      <MDXRemote
+        source={source}
+        components={components}
+        options={{
+          mdxOptions: {
+            remarkPlugins: [remarkGfm],
+          },
+        }}
+      />
     </div>
   );
 }
