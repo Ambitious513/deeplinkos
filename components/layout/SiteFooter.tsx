@@ -50,27 +50,30 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <nav aria-label="Product">
-          <h2 className="footer-heading">Product</h2>
-          <div className="footer-links">
-            {productLinks.map((link) => (
-              <Link key={link.href} href={link.href}>
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        </nav>
+        {/* Always side-by-side: Product + Company */}
+        <div className="footer-nav-row">
+          <nav aria-label="Product">
+            <h2 className="footer-heading">Product</h2>
+            <div className="footer-links">
+              {productLinks.map((link) => (
+                <Link key={link.href} href={link.href}>
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
 
-        <nav aria-label="Company">
-          <h2 className="footer-heading">Company</h2>
-          <div className="footer-links">
-            {companyLinks.map((link) => (
-              <Link key={link.href} href={link.href}>
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        </nav>
+          <nav aria-label="Company">
+            <h2 className="footer-heading">Company</h2>
+            <div className="footer-links">
+              {companyLinks.map((link) => (
+                <Link key={link.href} href={link.href}>
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
+        </div>
       </div>
 
       <div className="footer-bottom">

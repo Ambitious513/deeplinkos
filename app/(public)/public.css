@@ -1393,6 +1393,16 @@ html[data-theme="light"] .btn-secondary {
   gap: 28px;
   margin: 0 auto;
   padding: 36px 22px;
+  /* Brand column on top, then Product + Company side by side on ALL sizes */
+  grid-template-columns: 1fr;
+}
+
+/* Wrapper so Product + Company always sit in a row */
+.footer-nav-row {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  flex-wrap: wrap;
 }
 
 .footer-tagline {
@@ -1506,7 +1516,12 @@ html[data-theme="light"] .btn-secondary {
   }
 
   .footer-grid {
-    grid-template-columns: 1.6fr repeat(2, 1fr);
+    /* On desktop: brand col takes more space, nav cols share the rest */
+    grid-template-columns: 1.6fr 1fr;
+  }
+
+  .footer-nav-row {
+    gap: 56px;
   }
 
   .footer-bottom {
