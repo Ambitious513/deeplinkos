@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePublicAuth } from "@/components/auth/public-auth-shell";
 import type { DetectedPlatform, LinkGeneratorAdapter } from "@/lib/types";
 
@@ -27,10 +27,21 @@ export function HeroGeneratorPanel({ adapter }: HeroGeneratorPanelProps) {
   const [url, setUrl] = useState("");
   const [hasError, setHasError] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const DEMO_LINK = "https://deeplinkos.com/r/campaign-preview";
+
   const detected = useMemo(() => {
     if (!url.trim()) return null;
     return adapter?.detectPlatform?.(url) ?? fallbackDetector(url);
   }, [adapter, url]);
+
+  function handleCopy() {
+    navigator.clipboard.writeText(DEMO_LINK).catch(() => {});
+    setCopied(true);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopied(false), 1800);
+  }
 
   async function completeGeneration(destinationUrl: string) {
     if (adapter?.generate) {
@@ -120,11 +131,31 @@ export function HeroGeneratorPanel({ adapter }: HeroGeneratorPanelProps) {
 
       {success ? (
         <div className="hero-success">
-          <div className="success-icon">OK</div>
-          <strong>Your smart link preview is ready</strong>
-          <p>In production this state should be replaced by the existing LinkGenerator response.</p>
-          <div className="short-link-pill">deeplinkos.com/r/campaign-preview</div>
-          <button className="success-reset" type="button" onClick={() => setSuccess(false)}>
+          <div className="success-icon">✓</div>
+          <strong>Your smart link is ready</strong>
+          <p>Paste this link in your bio, campaign, or QR code. It routes each device to the right destination automatically.</p>
+          <div className="short-link-row">
+            <div className="short-link-pill">{DEMO_LINK}</div>
+            <button
+              className={`copy-btn${copied ? " copy-btn--copied" : ""}`}
+              type="button"
+              onClick={handleCopy}
+              aria-label={copied ? "Copied!" : "Copy link"}
+            >
+              {copied ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+              )}
+              <span>{copied ? "Copied!" : "Copy"}</span>
+            </button>
+          </div>
+          <button className="success-reset" type="button" onClick={() => { setSuccess(false); setCopied(false); }}>
             Create another
           </button>
         </div>

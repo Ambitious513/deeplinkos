@@ -9206,3 +9206,247 @@ html:not([data-theme="dark"]) .feature-card--hero {
 .feature-card--hero .feature-icon svg polygon {
   stroke: #fff;
 }
+
+/* ─── Phase 4: Standout Features ────────────────────────────────────────────── */
+
+/* Copy button — default state */
+.short-link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 8px 0 4px;
+}
+
+.short-link-pill {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-strong);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.1s;
+}
+
+.copy-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+/* Copied! state — green flash */
+.copy-btn--copied {
+  background: #10b981;
+  color: #fff;
+  border-color: #10b981;
+}
+
+.copy-btn--copied:hover {
+  background: #059669;
+  color: #fff;
+  border-color: #059669;
+  transform: none;
+}
+
+/* ✓ success icon update */
+.success-icon {
+  font-size: 1.8rem;
+  color: #10b981;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+/* ─── Routing Diagram ──────────────────────────────────────────────────────── */
+
+.routing-diagram {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0 24px;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 24px 56px;
+}
+
+@media (max-width: 640px) {
+  .routing-diagram {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 32px 16px 40px;
+  }
+}
+
+/* Source pill */
+.rd-source {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.rd-source--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.rd-source-label {
+  margin-bottom: 10px;
+  color: var(--text-soft);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rd-source-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 800;
+  font-family: monospace;
+}
+
+.rd-source-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Centre node */
+.rd-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: scale(0.75);
+  transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+}
+
+.rd-node--visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.rd-node-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-soft);
+  animation: pulse-ring 3s ease-in-out infinite;
+}
+
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.12); opacity: 0.2; }
+}
+
+.rd-node-core {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #f59e0b);
+  box-shadow: 0 6px 24px rgba(239,122,34,0.35);
+}
+
+.rd-node-label {
+  color: var(--text-soft);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Route cards */
+.rd-routes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rd-route {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.rd-route--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.rd-route-line {
+  width: 24px;
+  height: 2px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+.rd-route-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface-strong);
+  flex: 1;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.rd-route-card:hover {
+  border-color: var(--accent);
+  transform: translateX(3px);
+}
+
+.rd-route-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rd-route-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.rd-route-sub {
+  font-size: 0.7rem;
+  color: var(--text-soft);
+  line-height: 1.3;
+}
