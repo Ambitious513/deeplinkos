@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Android App Links Setup Guide: Eliminate the 'Open With' Dialog (2026)"
 description: "Step-by-step guide to setting up Android App Links with assetlinks.json so your app opens directly when someone taps a link, no app picker dialog, no frustrating detours."
 publishedAt: "2026-08-10"
@@ -46,6 +46,10 @@ Before jumping into the steps, here is the big picture. Android App Links requir
 3. **A handler in your app code** (Kotlin or Java) that decides what to do when a link arrives
 
 If any one of these three is missing or incorrect, App Links will not work. Let's build each one.
+
+> **Prefer to skip the setup?** If you are a creator, brand, or marketer who just wants links that open your app correctly, you don't need to touch any of this code. [DeepLinkOS](/) generates smart links that handle Android App Links, iOS Universal Links, store fallbacks, and click analytics automatically. You paste your URL and we handle the rest. [Try it free](/).
+
+> **Building the app yourself?** Keep reading. The rest of this guide covers the full manual setup.
 
 > **Also building for iPhone?** The iOS version of this setup is called Universal Links. The logic is almost identical, just with different files and settings. Check out the [iOS Universal Links guide](/blog/ios-universal-links-complete-guide) to set up both platforms at the same time.
 
