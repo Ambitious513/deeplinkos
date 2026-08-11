@@ -26,6 +26,7 @@ export type Feature = {
 export type Testimonial = {
   quote: string;
   author: string;
+  handle?: string;
   role: string;
 };
 
