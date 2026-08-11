@@ -8,6 +8,7 @@ import { cloudinaryUrl } from "@/lib/cloudinary";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 import { MdxContent } from "@/components/blog/MdxContent";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
+import { RelatedPosts } from "@/components/blog/RelatedPosts";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -146,6 +147,13 @@ export default async function BlogArticlePage({ params }: Props) {
             )}
           </div>
         </article>
+
+        {/* Related posts */}
+        <RelatedPosts
+          currentSlug={slug}
+          currentTags={mdx.tags}
+          currentCategory={mdx.category}
+        />
       </>
     );
   }

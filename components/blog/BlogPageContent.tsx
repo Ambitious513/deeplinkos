@@ -219,7 +219,13 @@ function BlogArticleCard({ post }: { post: BlogPost }) {
         <p itemProp="description">{post.excerpt}</p>
         <div className="blog-meta">
           <span>{post.author}</span>
-          <span>{post.readTime}</span>
+          <span className="blog-read-time">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v5l3 3" />
+            </svg>
+            {post.readTime}
+          </span>
           {isReal && <span className="blog-live-badge">Full article ↗</span>}
         </div>
         <span className="blog-read-cta">{isReal ? "Read article" : "Coming soon"}</span>
