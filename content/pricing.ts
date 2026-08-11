@@ -25,14 +25,14 @@ export type PricingPlan = {
 export const pricingPlans: PricingPlan[] = [
   {
     id: "creator_trial",
-    name: "Creator",
+    name: "Starter",
     price: "Free",
     suffix: "",
-    tagline: "No credit card needed — start routing in 60 seconds.",
+    tagline: "Always free. No credit card, no expiry.",
     cta: "Start free",
     href: "/signup",
     features: [
-      { label: "3 smart links (free trial)", highlighted: true },
+      { label: "3 smart links", highlighted: true },
       { label: "50,000 clicks / month" },
       { label: "1 custom domain" },
       { label: "Smart IAB routing (iOS & Android)" },

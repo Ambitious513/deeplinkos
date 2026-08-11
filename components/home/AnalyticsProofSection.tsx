@@ -23,10 +23,10 @@ const rows = [
   ["WhatsApp Support", "dlnk.os/r/wa-support", "2.8K", "WA", "green"],
 ];
 
-const avatarTone: Record<string, string> = {
-  "Social Sellers": "pink",
-  Creators: "blue",
-  "Marketing Teams": "green",
+const avatarColors: Record<string, string> = {
+  "Maya R.": "pink",
+  "Jordan K.": "blue",
+  "Priya M.": "green",
 };
 
 export function AnalyticsProofSection() {
@@ -95,14 +95,17 @@ export function AnalyticsProofSection() {
             <div className="testimonial-list">
               {testimonials.map((testimonial) => (
                 <article className="testimonial" key={testimonial.author}>
-                  <div className="stars">5.0</div>
+                  <div className="stars" aria-label="5 stars">★★★★★</div>
                   <p>"{testimonial.quote}"</p>
                   <div className="testimonial-author">
-                    <span className={`testimonial-avatar testimonial-avatar--${avatarTone[testimonial.author] ?? "blue"}`}>
-                      {testimonial.author.slice(0, 1)}
+                    <span className={`testimonial-avatar testimonial-avatar--${avatarColors[testimonial.author] ?? "blue"}`}>
+                      {testimonial.author.split(" ").map((w: string) => w[0]).join("")}
                     </span>
                     <div>
                       <strong>{testimonial.author}</strong>
+                      {testimonial.handle && (
+                        <span className="testimonial-handle">{testimonial.handle}</span>
+                      )}
                       <small>{testimonial.role}</small>
                     </div>
                   </div>

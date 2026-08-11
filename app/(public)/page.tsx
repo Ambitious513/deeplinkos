@@ -5,13 +5,11 @@ import { HomeHero } from "@/components/home/HomeHero";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { PlatformGrid } from "@/components/home/PlatformGrid";
 import { PricingPreviewSection } from "@/components/home/PricingPreviewSection";
-import { StatsBanner } from "@/components/home/StatsBanner";
 
 export default function HomePage() {
   return (
     <>
       <HomeHero />
-      <StatsBanner />
       <PlatformGrid />
       <HowItWorksSection />
       <FeatureGridSection />

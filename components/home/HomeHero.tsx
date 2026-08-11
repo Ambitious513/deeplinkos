@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { HeroGeneratorPanel } from "@/components/home/HeroGeneratorPanel";
+import { SocialProofStrip } from "@/components/home/SocialProofStrip";
 
 export function HomeHero() {
   return (
@@ -29,6 +30,7 @@ export function HomeHero() {
               or map on iOS, Android, and desktop in under 60 seconds.
             </p>
             <HeroGeneratorPanel />
+            <SocialProofStrip />
             <div className="stats-bar" aria-label="DeepLinkOS quick stats">
               <div className="stat-item">
                 <div className="stat-val">8+</div>
@@ -41,6 +43,10 @@ export function HomeHero() {
               <div className="stat-item">
                 <div className="stat-val">Free</div>
                 <div className="stat-lbl">Forever</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-val">0</div>
+                <div className="stat-lbl">SDK Needed</div>
               </div>
             </div>
           </div>

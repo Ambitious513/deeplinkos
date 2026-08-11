@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -92,11 +92,11 @@ export function SiteHeader({ onLogin, onSignup }: SiteHeaderProps) {
           )}
           {onSignup ? (
             <button className="btn btn-primary desktop-action" type="button" onClick={() => handleAuth("signup")}>
-              Get Started Free
+              Create Free Link
             </button>
           ) : (
             <Link className="btn btn-primary desktop-action" href="/signup">
-              Get Started Free
+              Create Free Link
             </Link>
           )}
           <button
@@ -129,11 +129,11 @@ export function SiteHeader({ onLogin, onSignup }: SiteHeaderProps) {
           )}
           {onSignup ? (
             <button className="btn btn-primary" type="button" onClick={() => handleAuth("signup")}>
-              Get Started Free
+              Create Free Link
             </button>
           ) : (
             <Link className="btn btn-primary" href="/signup" onClick={() => setMenuOpen(false)}>
-              Get Started Free
+              Create Free Link
             </Link>
           )}
         </nav>
@@ -168,3 +168,4 @@ function MenuIcon() {
     </svg>
   );
 }
+

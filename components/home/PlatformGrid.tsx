@@ -12,6 +12,11 @@ export function PlatformGrid() {
                 {platform.icon}
               </div>
               <div className="platform-card-name">{platform.name}</div>
+              {platform.scheme && (
+                <span className="platform-scheme" aria-hidden="true">
+                  {platform.scheme}
+                </span>
+              )}
             </article>
           ))}
         </div>
@@ -19,3 +24,4 @@ export function PlatformGrid() {
     </section>
   );
 }
+

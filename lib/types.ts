@@ -5,6 +5,7 @@ export type Platform = {
   name: string;
   color: string;
   icon: ReactNode;
+  scheme?: string;
 };
 
 export type Step = {
