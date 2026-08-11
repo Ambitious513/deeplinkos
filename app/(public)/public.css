@@ -2185,28 +2185,7 @@ html[data-theme="light"] .feature-card {
   grid-column: span 2;
 }
 
-.feature-card--hero {
-  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-  border-color: transparent;
-  box-shadow: 0 8px 32px rgba(37,99,235,0.28);
-}
 
-.feature-card--hero h3,
-.feature-card--hero p {
-  color: #fff;
-}
-
-.feature-card--hero .feature-icon {
-  background: rgba(255,255,255,0.2);
-  color: #fff;
-  width: 52px;
-  height: 52px;
-}
-
-.feature-card--hero .feature-tag {
-  background: rgba(255,255,255,0.2);
-  color: #fff;
-}
 
 .feature-icon {
   display: grid;
@@ -9085,20 +9064,6 @@ html[data-theme="light"] .faq-grid details {
   }
 }
 
-/* Hero feature card — make icon clearly visible on orange gradient */
-.feature-card--hero .feature-icon {
-  background: rgba(255, 255, 255, 0.22);
-  color: #fff;
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-}
-
-/* Force SVG strokes/fills inside hero card to white */
-.feature-card--hero .feature-icon svg {
-  stroke: #fff;
-  fill: none;
-}
 
 /* Newsletter button — brand blue, not orange */
 .newsletter-btn {
@@ -9176,36 +9141,6 @@ html[data-theme="light"] .faq-grid details {
   flex-shrink: 0;
 }
 
-/* ─── Fix: hero feature card gradient + icon visibility ─────────────────────── */
-/* html[data-theme=light] .feature-card has higher specificity - override it */
-html[data-theme="light"] .feature-card--hero,
-html:not([data-theme="dark"]) .feature-card--hero {
-  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-  box-shadow: 0 8px 32px rgba(37,99,235,0.28);
-}
-
-/* Icon container: solid white-frosted circle so the icon is always visible */
-.feature-card--hero .feature-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.25);
-  color: #fff;
-  margin-bottom: 16px;
-}
-
-/* Icon SVG strokes and fills explicitly white on the gradient bg */
-.feature-card--hero .feature-icon svg path,
-.feature-card--hero .feature-icon svg circle,
-.feature-card--hero .feature-icon svg rect,
-.feature-card--hero .feature-icon svg line,
-.feature-card--hero .feature-icon svg polyline,
-.feature-card--hero .feature-icon svg polygon {
-  stroke: #fff;
-}
 
 /* ─── Phase 4: Standout Features ────────────────────────────────────────────── */
 
@@ -9555,4 +9490,43 @@ html:not([data-theme="dark"]) .feature-card--hero {
 
 .related-post-meta svg {
   opacity: 0.6;
+}
+
+/* ─── Hero feature card — matches other cards, soft blue accent ──────────────── */
+.feature-card--hero {
+  background: rgba(255, 255, 255, 0.97);
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08);
+}
+
+html[data-theme="dark"] .feature-card--hero {
+  background: var(--card);
+  border-color: rgba(59, 130, 246, 0.35);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.08);
+}
+
+.feature-card--hero h3 {
+  color: var(--text);
+}
+
+.feature-card--hero p {
+  color: var(--text2);
+}
+
+.feature-card--hero .feature-icon {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+
+.feature-card--hero .feature-icon svg {
+  stroke: #2563eb;
+  fill: none;
+}
+
+.feature-card--hero .feature-tag {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
 }
