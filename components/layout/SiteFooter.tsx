@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { LogoMark } from "@/components/brand/logo-mark";
+import { NewsletterForm } from "@/components/layout/NewsletterForm";
 
 const productLinks = [
   { label: "Features", href: "/#features" },
   { label: "Pricing", href: "/pricing" },
   { label: "Blog", href: "/blog" },
+];
+
+const compareLinks = [
+  { label: "vs Firebase Dynamic Links", href: "/vs/firebase-dynamic-links" },
+  { label: "vs Linktree", href: "/vs/linktree" },
 ];
 
 const companyLinks = [
@@ -17,6 +23,16 @@ const companyLinks = [
 export function SiteFooter() {
   return (
     <footer className="site-footer">
+      {/* Newsletter row */}
+      <div className="footer-newsletter">
+        <div className="footer-newsletter-inner">
+          <p className="footer-newsletter-label">
+            Get weekly growth playbooks
+          </p>
+          <NewsletterForm />
+        </div>
+      </div>
+
       <div className="footer-grid">
         <div>
           <Link href="/" className="logo" aria-label="DeepLinkOS home">
@@ -50,12 +66,23 @@ export function SiteFooter() {
           </div>
         </div>
 
-        {/* Always side-by-side: Product + Company */}
+        {/* Always side-by-side: Product + Company + Compare */}
         <div className="footer-nav-row">
           <nav aria-label="Product">
             <h2 className="footer-heading">Product</h2>
             <div className="footer-links">
               {productLinks.map((link) => (
+                <Link key={link.href} href={link.href}>
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
+
+          <nav aria-label="Compare">
+            <h2 className="footer-heading">Compare</h2>
+            <div className="footer-links">
+              {compareLinks.map((link) => (
                 <Link key={link.href} href={link.href}>
                   {link.label}
                 </Link>

@@ -7,6 +7,7 @@ import { getMdxPostBySlug, getAllMdxPosts, extractHeadings } from "@/lib/blog-md
 import { cloudinaryUrl } from "@/lib/cloudinary";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 import { MdxContent } from "@/components/blog/MdxContent";
+import { ReadingProgress } from "@/components/blog/ReadingProgress";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -87,6 +88,7 @@ export default async function BlogArticlePage({ params }: Props) {
 
     return (
       <>
+        <ReadingProgress />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
 
         <article className="blog-article-mdx">
