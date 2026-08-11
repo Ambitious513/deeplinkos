@@ -202,21 +202,18 @@ export const testimonials: Testimonial[] = [
     quote:
       "I was sending everyone to a web page that opened inside Instagram's browser. Half the time they couldn't even check out. Switched to DeepLinkOS and my app opens directly now.",
     author: "Maya R.",
-    handle: "@mayasells",
     role: "Shopify seller, 28K Instagram followers",
   },
   {
     quote:
       "My TikTok bio used to link to a Linktree. Now it links to DeepLinkOS and the same URL opens my app on iOS, my store on desktop, and WhatsApp on Android. One link for everything.",
     author: "Jordan K.",
-    handle: "@jordancreates",
     role: "Content creator, TikTok & YouTube",
   },
   {
     quote:
       "We moved off Firebase Dynamic Links when it shut down and didn't want to pay for Branch. DeepLinkOS does everything we needed for our app campaigns without the enterprise pricing.",
     author: "Priya M.",
-    handle: "@priyagrowth",
     role: "Head of Growth, early-stage startup",
   },
 ];

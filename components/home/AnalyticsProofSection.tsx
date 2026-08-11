@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { testimonials } from "@/content/home";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
@@ -22,6 +23,12 @@ const rows = [
   ["Instagram Profile", "dlnk.os/r/ig-bio", "3.1K", "IG", "pink"],
   ["WhatsApp Support", "dlnk.os/r/wa-support", "2.8K", "WA", "green"],
 ];
+
+const avatarImages: Record<string, string> = {
+  "Maya R.": "https://res.cloudinary.com/bylks678/image/upload/w_80,h_80,c_fill,r_max/testimonials/maya.jpg",
+  "Jordan K.": "https://res.cloudinary.com/bylks678/image/upload/w_80,h_80,c_fill,r_max/testimonials/jordan.jpg",
+  "Priya M.": "https://res.cloudinary.com/bylks678/image/upload/w_80,h_80,c_fill,r_max/testimonials/priya.jpg",
+};
 
 const avatarColors: Record<string, string> = {
   "Maya R.": "pink",
@@ -98,14 +105,21 @@ export function AnalyticsProofSection() {
                   <div className="stars" aria-label="5 stars">★★★★★</div>
                   <p>"{testimonial.quote}"</p>
                   <div className="testimonial-author">
-                    <span className={`testimonial-avatar testimonial-avatar--${avatarColors[testimonial.author] ?? "blue"}`}>
-                      {testimonial.author.split(" ").map((w: string) => w[0]).join("")}
-                    </span>
+                    {avatarImages[testimonial.author] ? (
+                      <Image
+                        src={avatarImages[testimonial.author]}
+                        alt={testimonial.author}
+                        width={40}
+                        height={40}
+                        className="testimonial-avatar-img"
+                      />
+                    ) : (
+                      <span className={`testimonial-avatar testimonial-avatar--${avatarColors[testimonial.author] ?? "blue"}`}>
+                        {testimonial.author.split(" ").map((w: string) => w[0]).join("")}
+                      </span>
+                    )}
                     <div>
                       <strong>{testimonial.author}</strong>
-                      {testimonial.handle && (
-                        <span className="testimonial-handle">{testimonial.handle}</span>
-                      )}
                       <small>{testimonial.role}</small>
                     </div>
                   </div>

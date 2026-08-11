@@ -9066,3 +9066,112 @@ html[data-theme="light"] .faq-grid details {
   line-height: 1.7;
   margin-bottom: 24px;
 }
+
+/* ─── Adjustments: Social Proof Strip, Hero Icon, Newsletter, Footer ──────── */
+
+/* Social proof strip — centred under generator, hidden on narrow mobile */
+.social-proof-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 14px auto 4px;
+  width: fit-content;
+}
+
+@media (max-width: 479px) {
+  .social-proof-strip {
+    display: none;
+  }
+}
+
+/* Hero feature card — make icon clearly visible on orange gradient */
+.feature-card--hero .feature-icon {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+}
+
+/* Force SVG strokes/fills inside hero card to white */
+.feature-card--hero .feature-icon svg {
+  stroke: #fff;
+  fill: none;
+}
+
+/* Newsletter button — brand blue, not orange */
+.newsletter-btn {
+  background: #2563eb;
+  color: #fff;
+}
+
+.newsletter-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* Footer newsletter row — full-width centred strip */
+.footer-newsletter {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.footer-newsletter-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: var(--max, 1120px);
+  margin: 0 auto;
+  padding: 18px 24px;
+}
+
+@media (min-width: 640px) {
+  .footer-newsletter-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+}
+
+.footer-newsletter-label {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 800;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.newsletter-form {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  width: 100%;
+  max-width: 380px;
+}
+
+/* Footer grid — ensure brand col doesn't overflow */
+.footer-grid > div:first-child {
+  min-width: 0;
+}
+
+/* Footer nav row — wrap properly with gap */
+.footer-nav-row {
+  display: flex;
+  gap: 32px 48px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+/* Testimonial image avatar */
+.testimonial-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
