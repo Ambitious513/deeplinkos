@@ -9175,3 +9175,34 @@ html[data-theme="light"] .faq-grid details {
   border: 2px solid var(--border);
   flex-shrink: 0;
 }
+
+/* ─── Fix: hero feature card gradient + icon visibility ─────────────────────── */
+/* html[data-theme=light] .feature-card has higher specificity - override it */
+html[data-theme="light"] .feature-card--hero,
+html:not([data-theme="dark"]) .feature-card--hero {
+  background: linear-gradient(135deg, #ef7a22 0%, #f59e0b 100%);
+  box-shadow: 0 8px 32px rgba(239,122,34,0.28);
+}
+
+/* Icon container: solid white-frosted circle so the icon is always visible */
+.feature-card--hero .feature-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+/* Icon SVG strokes and fills explicitly white on the gradient bg */
+.feature-card--hero .feature-icon svg path,
+.feature-card--hero .feature-icon svg circle,
+.feature-card--hero .feature-icon svg rect,
+.feature-card--hero .feature-icon svg line,
+.feature-card--hero .feature-icon svg polyline,
+.feature-card--hero .feature-icon svg polygon {
+  stroke: #fff;
+}
