@@ -1,4 +1,4 @@
-/* Restored approved public site styles. */
+﻿/* Restored approved public site styles. */
 :root {
   /* Public site fonts ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â untouched */
   --font-sans: "Manrope", system-ui, sans-serif;
@@ -16,9 +16,9 @@
   --text-soft: #5d6472;
   --border: rgba(17, 19, 26, 0.12);
   --border-strong: rgba(17, 19, 26, 0.18);
-  --accent: #ef7a22;
-  --accent-strong: #d86410;
-  --accent-soft: rgba(239, 122, 34, 0.13);
+  --accent: #2563eb;
+  --accent-strong: #1d4ed8;
+  --accent-soft: rgba(37, 99, 235, 0.12);
   --green: #1d9a6c;
   --blue: #2c6bed;
   --red: #d34a4a;
@@ -39,9 +39,9 @@
   --text-soft: #a1a9b7;
   --border: rgba(255, 255, 255, 0.09);
   --border-strong: rgba(255, 255, 255, 0.14);
-  --accent: #ff8a2a;
-  --accent-strong: #f26d00;
-  --accent-soft: rgba(255, 138, 42, 0.14);
+  --accent: #3b82f6;
+  --accent-strong: #2563eb;
+  --accent-soft: rgba(59, 130, 246, 0.15);
   --green: #34d399;
   --blue: #6ea8ff;
   --red: #ff6b6b;
@@ -125,7 +125,7 @@ button {
 .btn-primary {
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   color: #fff;
-  box-shadow: 0 10px 24px rgba(239, 122, 34, 0.28);
+  box-shadow: 0 10px 24px rgba(37,99,235,0.28);
 }
 
 .btn-ghost {
@@ -2039,7 +2039,7 @@ html[data-theme="light"] .stat-item + .stat-item {
 .platform-card:hover {
   transform: translateY(-4px);
   border-color: var(--accent);
-  box-shadow: 0 12px 32px rgba(239,122,34,0.15);
+  box-shadow: 0 12px 32px rgba(37,99,235,0.28);
 }
 
 .platform-card-icon {
@@ -2186,9 +2186,9 @@ html[data-theme="light"] .feature-card {
 }
 
 .feature-card--hero {
-  background: linear-gradient(135deg, #ef7a22 0%, #f59e0b 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
   border-color: transparent;
-  box-shadow: 0 8px 32px rgba(239,122,34,0.28);
+  box-shadow: 0 8px 32px rgba(37,99,235,0.28);
 }
 
 .feature-card--hero h3,
@@ -7392,7 +7392,7 @@ html[data-theme="light"] .faq-grid details {
 }
 
 .badge--beta {
-  background: linear-gradient(135deg, rgba(239,122,34,0.18), rgba(44,107,237,0.18));
+  background: linear-gradient(135deg, rgba(37,99,235,0.28), rgba(44,107,237,0.18));
   color: var(--accent);
   border: 1px solid rgba(239, 122, 34, 0.25);
 }
@@ -7529,7 +7529,7 @@ html[data-theme="light"] .faq-grid details {
 .btn-table-action--primary:hover {
   background: var(--accent-soft);
   color: var(--accent);
-  border-color: rgba(239, 122, 34, 0.28);
+  border-color: rgba(37,99,235,0.28);
 }
 
 /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Create link modal ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
@@ -7918,8 +7918,8 @@ html[data-theme="light"] .faq-grid details {
 .billing-plan-card {
   border-radius: 22px;
   padding: 24px;
-  background: linear-gradient(135deg, rgba(239,122,34,0.08), rgba(44,107,237,0.05));
-  border: 1px solid rgba(239,122,34,0.22);
+  background: linear-gradient(135deg, rgba(37,99,235,0.28), rgba(44,107,237,0.05));
+  border: 1px solid rgba(37,99,235,0.28);
 }
 
 .usage-progress {
@@ -8607,7 +8607,7 @@ html[data-theme="light"] .faq-grid details {
 }
 
 .blog-mdx-body a {
-  color: var(--accent, #ef7a22);
+  color: var(--accent);
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -8711,8 +8711,8 @@ html[data-theme="light"] .faq-grid details {
   align-items: center;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(239,122,34,0.12);
-  color: var(--accent, #ef7a22);
+  background: rgba(37,99,235,0.28);
+  color: var(--accent);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -8818,7 +8818,7 @@ html[data-theme="light"] .faq-grid details {
 .footer-socials a:hover {
   background: var(--accent-soft);
   transform: scale(1.1) translateY(-1px);
-  box-shadow: 0 4px 12px rgba(239,122,34,0.18);
+  box-shadow: 0 4px 12px rgba(37,99,235,0.28);
   border-color: var(--accent);
   color: var(--accent);
 }
@@ -8943,7 +8943,7 @@ html[data-theme="light"] .faq-grid details {
   left: 0;
   height: 3px;
   z-index: 9999;
-  background: linear-gradient(90deg, var(--accent), #f59e0b);
+  background: linear-gradient(90deg, var(--accent), #3b82f6);
   transition: width 0.1s linear;
   pointer-events: none;
 }
@@ -9180,8 +9180,8 @@ html[data-theme="light"] .faq-grid details {
 /* html[data-theme=light] .feature-card has higher specificity - override it */
 html[data-theme="light"] .feature-card--hero,
 html:not([data-theme="dark"]) .feature-card--hero {
-  background: linear-gradient(135deg, #ef7a22 0%, #f59e0b 100%);
-  box-shadow: 0 8px 32px rgba(239,122,34,0.28);
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  box-shadow: 0 8px 32px rgba(37,99,235,0.28);
 }
 
 /* Icon container: solid white-frosted circle so the icon is always visible */
@@ -9372,8 +9372,8 @@ html:not([data-theme="dark"]) .feature-card--hero {
   height: 52px;
   place-items: center;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), #f59e0b);
-  box-shadow: 0 6px 24px rgba(239,122,34,0.35);
+  background: linear-gradient(135deg, var(--accent), #3b82f6);
+  box-shadow: 0 6px 24px rgba(37,99,235,0.28);
 }
 
 .rd-node-label {

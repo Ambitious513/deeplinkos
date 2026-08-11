@@ -5,7 +5,6 @@ import { HomeHero } from "@/components/home/HomeHero";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { PlatformGrid } from "@/components/home/PlatformGrid";
 import { PricingPreviewSection } from "@/components/home/PricingPreviewSection";
-import { RoutingDiagram } from "@/components/home/RoutingDiagram";
 
 export default function HomePage() {
   return (
@@ -13,7 +12,6 @@ export default function HomePage() {
       <HomeHero />
       <PlatformGrid />
       <HowItWorksSection />
-      <RoutingDiagram />
       <FeatureGridSection />
       <AnalyticsProofSection />
       <PricingPreviewSection />
